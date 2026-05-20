@@ -1,615 +1,146 @@
 /* ============================================================
-   Zillow BR — Estilos Globais
-   Paleta: fundo #F5F3EE | verde #2B5F3E | DM Sans + DM Serif Display
+   cards.js — Renderização dos cards de imóveis (página index)
+   Depende de: ui.js (formatarData, formatarEndereco)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap');
+/**
+ * Renderiza toda a grade de cards.
+ * Alterna entre o estado vazio e o grid, conforme a lista.
+ * @param {Array<Object>} imoveis
+ */
+function renderizarCards(imoveis) {
+  const grid          = document.getElementById('grid-imoveis');
+  const vazio         = document.getElementById('estado-vazio');
+  const semResultados = document.getElementById('estado-sem-resultados');
+  const contagem      = document.getElementById('contagem');
 
-/* ---- Variáveis de design ---- */
-:root {
-  --bg:            #F5F3EE;
-  --bg-card:       #FFFFFF;
-  --verde:         #2B5F3E;
-  --verde-claro:   #3D7A54;
-  --verde-hover:   #1E4A2F;
-  --verde-sutil:   #EBF2ED;
-  --texto:         #1A1A1A;
-  --texto-medio:   #4A4A4A;
-  --texto-fraco:   #8A8A8A;
-  --borda:         #E0DDD6;
-  --sombra:        0 2px 8px rgba(43,95,62,0.08);
-  --sombra-hover:  0 8px 28px rgba(43,95,62,0.18);
-  --radius:        12px;
-  --radius-sm:     8px;
-  --font-body:     'DM Sans', sans-serif;
-  --font-display:  'DM Serif Display', serif;
-  --trans:         0.2s ease;
-}
+  // Limpa o grid antes de re-renderizar
+  grid.innerHTML = '';
 
-/* ---- Reset base ---- */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html  { scroll-behavior: smooth; }
-body  {
-  font-family: var(--font-body);
-  background: var(--bg);
-  color: var(--texto);
-  line-height: 1.6;
-  min-height: 100vh;
-}
+  const totalGeral = typeof _todosImoveis !== 'undefined' ? _todosImoveis.length : null;
+  const hayImoveis  = totalGeral === null ? (imoveis?.length > 0) : (totalGeral > 0);
 
-/* ================================================================
-   HEADER
-   ================================================================ */
-.header {
-  background: var(--verde);
-  padding: 0 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.18);
-}
-.header-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  if (!hayImoveis) {
+    // Nenhum imóvel cadastrado → estado vazio principal
+    if (vazio)         vazio.style.display         = 'flex';
+    if (semResultados) semResultados.style.display  = 'none';
+    grid.style.display = 'none';
+    if (contagem) contagem.textContent = '0 imóveis';
+    return;
+  }
+
+  if (!imoveis || imoveis.length === 0) {
+    // Há imóveis mas filtro não encontrou nada
+    if (vazio)         vazio.style.display         = 'none';
+    if (semResultados) semResultados.style.display  = 'flex';
+    grid.style.display = 'none';
+    if (contagem) contagem.textContent = `${totalGeral} imóvel${totalGeral !== 1 ? 's' : ''}`;
+    return;
+  }
+
+  // Lista com resultados
+  if (vazio)         vazio.style.display         = 'none';
+  if (semResultados) semResultados.style.display  = 'none';
+  grid.style.display = 'grid';
+
+  if (contagem) {
+    contagem.textContent = `${totalGeral ?? imoveis.length} imóvel${(totalGeral ?? imoveis.length) !== 1 ? 's' : ''}`;
+  }
+
+  for (const imovel of imoveis) {
+    grid.appendChild(criarCard(imovel));
+  }
 }
 
-/* Logo */
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  color: white;
-}
-.logo-icone {
-  width: 34px;
-  height: 34px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-}
-.logo-nome {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  letter-spacing: -0.02em;
-}
-.logo-br {
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 600;
-  opacity: 0.6;
-  margin-left: 1px;
-  vertical-align: super;
+/**
+ * Cria o elemento DOM de um card individual.
+ * @param {Object} imovel
+ * @returns {HTMLElement}
+ */
+function criarCard(imovel) {
+  const loc    = imovel.localizacao  || {};
+  const cad    = imovel.cadastrante  || {};
+
+  const endereco   = formatarEndereco(loc);
+  const cidade     = [loc['Cidade'], loc['Estado']].filter(Boolean).join(', ');
+  const cep        = loc['CEP'] || '';
+  const qtdComodos = imovel.comodos ? imovel.comodos.length : 0;
+  const tipoCad    = cad['Tipo'] || 'Cadastrante';
+
+  const card = document.createElement('article');
+  card.className = 'card-imovel';
+  card.setAttribute('data-id', imovel.id);
+  card.setAttribute('role', 'button');
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('aria-label', `Ver ficha: ${endereco}`);
+
+  card.innerHTML = `
+    <!-- Área da foto (placeholder por enquanto) -->
+    <div class="card-foto">
+      <div class="card-foto-placeholder">
+        <!-- Ícone de casa SVG inline -->
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M8 50 L8 28 L32 10 L56 28 L56 50 Z"
+                stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" fill="none"/>
+          <rect x="22" y="36" width="20" height="14"
+                stroke="currentColor" stroke-width="2" fill="none"/>
+          <rect x="13" y="27" width="12" height="11"
+                stroke="currentColor" stroke-width="1.5" fill="none"/>
+          <rect x="39" y="27" width="12" height="11"
+                stroke="currentColor" stroke-width="1.5" fill="none"/>
+        </svg>
+        <span>Sem foto</span>
+      </div>
+      ${cep ? `<div class="card-badge">CEP ${cep}</div>` : ''}
+    </div>
+
+    <!-- Informações do imóvel -->
+    <div class="card-corpo">
+      <div class="card-endereco" title="${endereco}">${endereco || 'Endereço não informado'}</div>
+      <div class="card-cidade">${cidade || '—'}</div>
+
+      <div class="card-meta">
+        ${qtdComodos > 0
+          ? `<span class="meta-tag">🚪 ${qtdComodos} cômodo${qtdComodos !== 1 ? 's' : ''}</span>`
+          : ''}
+        <span class="meta-tag">${tipoCad}</span>
+      </div>
+
+      <div class="card-footer">
+        <span class="card-data">Importado ${formatarData(imovel.importadoEm)}</span>
+        <button class="btn-ver" data-id="${imovel.id}" onclick="navegarParaImovel(event)">
+          Ver ficha →
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Clique no card inteiro (exceto no botão, que tem seu próprio handler)
+  card.addEventListener('click', (e) => {
+    if (e.target.classList.contains('btn-ver')) return; // botão cuida de si
+    window.location.href = `imovel.html?id=${encodeURIComponent(imovel.id)}`;
+  });
+
+  // Acessibilidade: Enter/Space ativa o card
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      window.location.href = `imovel.html?id=${encodeURIComponent(imovel.id)}`;
+    }
+  });
+
+  return card;
 }
 
-/* Ações do header */
-.header-acoes { display: flex; align-items: center; gap: 10px; }
-
-/* ================================================================
-   BOTÕES
-   ================================================================ */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 18px;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  transition: var(--trans);
-  text-decoration: none;
-  white-space: nowrap;
-}
-.btn-primario  { background: white;                   color: var(--verde); }
-.btn-primario:hover  { background: var(--verde-sutil); }
-
-.btn-secundario { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.25); }
-.btn-secundario:hover { background: rgba(255,255,255,0.28); }
-
-.btn-verde   { background: var(--verde);    color: white; }
-.btn-verde:hover { background: var(--verde-hover); }
-
-.btn-outline { background: transparent; color: var(--verde); border: 1.5px solid var(--verde); }
-.btn-outline:hover { background: var(--verde-sutil); }
-
-.btn-fantasma { background: transparent; color: var(--texto-fraco); border: 1px solid var(--borda); }
-.btn-fantasma:hover { border-color: var(--texto-fraco); color: var(--texto); }
-
-/* ================================================================
-   HERO (index)
-   ================================================================ */
-.hero {
-  background: linear-gradient(140deg, var(--verde) 0%, var(--verde-claro) 100%);
-  padding: 60px 2rem;
-  text-align: center;
-  color: white;
-  position: relative;
-  overflow: hidden;
-}
-/* Textura sutil no fundo do hero */
-.hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M0 20 L20 0 L40 20 L20 40 Z' fill='none' stroke='white' stroke-width='0.5'/%3E%3C/g%3E%3C/svg%3E");
-}
-.hero-conteudo {
-  position: relative;
-  max-width: 620px;
-  margin: 0 auto;
-}
-.hero h1 {
-  font-family: var(--font-display);
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  line-height: 1.15;
-  margin-bottom: 14px;
-}
-.hero-subtitulo {
-  font-size: 1rem;
-  opacity: 0.85;
-  margin-bottom: 30px;
-  line-height: 1.5;
-}
-.hero-acoes { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-
-/* ================================================================
-   MAIN / LISTAGEM (index)
-   ================================================================ */
-.main {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 2rem;
-}
-.secao-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.secao-titulo {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  color: var(--texto);
-}
-.secao-contagem {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--texto-fraco);
-  background: var(--borda);
-  padding: 4px 12px;
-  border-radius: 20px;
-  letter-spacing: 0.04em;
-}
-
-/* ================================================================
-   CARDS
-   ================================================================ */
-#grid-imoveis {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
-}
-
-.card-imovel {
-  background: var(--bg-card);
-  border-radius: var(--radius);
-  border: 1px solid var(--borda);
-  overflow: hidden;
-  box-shadow: var(--sombra);
-  transition: box-shadow var(--trans), transform var(--trans);
-  animation: cardEntrar 0.35s ease both;
-}
-.card-imovel:hover {
-  box-shadow: var(--sombra-hover);
-  transform: translateY(-4px);
-}
-
-/* Delay escalonado para cada card */
-.card-imovel:nth-child(1) { animation-delay: 0ms; }
-.card-imovel:nth-child(2) { animation-delay: 50ms; }
-.card-imovel:nth-child(3) { animation-delay: 100ms; }
-.card-imovel:nth-child(4) { animation-delay: 150ms; }
-.card-imovel:nth-child(5) { animation-delay: 200ms; }
-.card-imovel:nth-child(6) { animation-delay: 250ms; }
-
-@keyframes cardEntrar {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Área da foto */
-.card-foto {
-  height: 186px;
-  background: var(--verde-sutil);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.card-foto-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  color: var(--verde);
-  opacity: 0.45;
-}
-.card-foto-placeholder svg { width: 52px; height: 52px; }
-.card-foto-placeholder span { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
-
-.card-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(43,95,62,0.88);
-  color: white;
-  font-size: 0.68rem;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 20px;
-  letter-spacing: 0.04em;
-  backdrop-filter: blur(4px);
-}
-
-/* Corpo do card */
-.card-corpo { padding: 16px 20px 20px; }
-
-.card-endereco {
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--texto);
-  margin-bottom: 3px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.card-cidade {
-  font-size: 0.82rem;
-  color: var(--texto-fraco);
-  margin-bottom: 12px;
-}
-
-.card-meta { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
-.meta-tag {
-  font-size: 0.72rem;
-  font-weight: 600;
-  background: var(--verde-sutil);
-  color: var(--verde);
-  padding: 3px 10px;
-  border-radius: 20px;
-  letter-spacing: 0.03em;
-}
-
-.card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-top: 1px solid var(--borda);
-  padding-top: 12px;
-}
-.card-data { font-size: 0.72rem; color: var(--texto-fraco); }
-
-.btn-ver {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--verde);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  font-family: var(--font-body);
-  transition: color var(--trans), letter-spacing var(--trans);
-}
-.btn-ver:hover { color: var(--verde-hover); letter-spacing: 0.03em; }
-
-/* ================================================================
-   ESTADO VAZIO
-   ================================================================ */
-#estado-vazio {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 20px;
-  text-align: center;
-  gap: 14px;
-}
-.vazio-icone {
-  width: 80px; height: 80px;
-  background: var(--verde-sutil);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  margin-bottom: 6px;
-}
-#estado-vazio h3 {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  color: var(--texto);
-}
-#estado-vazio p {
-  color: var(--texto-fraco);
-  font-size: 0.9rem;
-  max-width: 380px;
-  line-height: 1.6;
-}
-
-/* ================================================================
-   MODAL
-   ================================================================ */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  backdrop-filter: blur(4px);
-  z-index: 1000;
-  /* display:none aplicado inline no HTML como fallback sem CSS */
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.22s;
-  pointer-events: none;
-}
-.modal-overlay.ativo { opacity: 1; pointer-events: all; }
-
-.modal {
-  background: white;
-  border-radius: var(--radius);
-  padding: 32px;
-  max-width: 440px;
-  width: 90%;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.22);
-  transform: translateY(10px) scale(0.98);
-  transition: transform 0.22s;
-}
-.modal-overlay.ativo .modal { transform: translateY(0) scale(1); }
-
-.modal-titulo {
-  font-family: var(--font-display);
-  font-size: 1.35rem;
-  color: var(--texto);
-  margin-bottom: 10px;
-}
-.modal-texto {
-  color: var(--texto-medio);
-  font-size: 0.9rem;
-  line-height: 1.6;
-  margin-bottom: 24px;
-}
-.modal-acoes { display: flex; gap: 10px; justify-content: flex-end; }
-
-/* ================================================================
-   TOAST (notificações)
-   ================================================================ */
-.toast-container {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 2000;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  pointer-events: none;
-}
-.toast {
-  background: var(--texto);
-  color: white;
-  padding: 12px 18px;
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  font-weight: 500;
-  box-shadow: var(--sombra-hover);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  max-width: 320px;
-  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
-}
-.toast.sucesso { background: var(--verde); }
-.toast.erro    { background: #C0392B; }
-.toast.aviso   { background: #D4861A; }
-
-@keyframes toastIn {
-  from { opacity: 0; transform: translateX(24px) scale(0.95); }
-  to   { opacity: 1; transform: translateX(0) scale(1); }
-}
-@keyframes toastOut {
-  from { opacity: 1; transform: translateX(0); }
-  to   { opacity: 0; transform: translateX(24px); }
-}
-
-/* ================================================================
-   FICHA TÉCNICA (imovel.html)
-   ================================================================ */
-.pagina-imovel {
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 40px 2rem 80px;
-}
-
-/* Link de voltar */
-.ficha-voltar {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--verde);
-  text-decoration: none;
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin-bottom: 32px;
-  transition: gap var(--trans);
-}
-.ficha-voltar:hover { gap: 12px; }
-
-/* Cabeçalho da ficha */
-.ficha-cabecalho {
-  margin-bottom: 40px;
-  padding-bottom: 32px;
-  border-bottom: 2px solid var(--borda);
-}
-.ficha-titulo {
-  font-family: var(--font-display);
-  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
-  color: var(--texto);
-  line-height: 1.15;
-  margin-bottom: 6px;
-}
-.ficha-subtitulo {
-  font-size: 1.05rem;
-  color: var(--texto-medio);
-  margin-bottom: 3px;
-}
-.ficha-complemento { color: var(--texto-fraco); font-size: 0.9rem; }
-.ficha-importado {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.75rem;
-  color: var(--texto-fraco);
-  margin-top: 14px;
-  background: var(--borda);
-  padding: 4px 10px;
-  border-radius: 20px;
-}
-
-/* Seções da ficha */
-.ficha-secao { margin-bottom: 40px; }
-.ficha-secao-titulo {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  color: var(--verde);
-  margin-bottom: 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--borda);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Grid de atributos (chave/valor) */
-.ficha-grid-atributos {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 8px;
-}
-.atributo {
-  background: var(--bg-card);
-  border: 1px solid var(--borda);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-.atributo-chave {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--texto-fraco);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-}
-.atributo-valor {
-  font-size: 0.9rem;
-  color: var(--texto);
-  font-weight: 500;
-}
-
-/* Cômodos */
-.comodos-lista { display: flex; flex-direction: column; gap: 16px; }
-
-.comodo-card {
-  background: var(--bg-card);
-  border: 1px solid var(--borda);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--sombra);
-}
-.comodo-cabecalho {
-  background: var(--verde);
-  padding: 11px 20px;
-}
-.comodo-nome {
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  color: white;
-}
-.comodo-grupos { padding: 18px 20px; display: flex; flex-direction: column; gap: 18px; }
-
-.grupo-bloco { /* wrapper de cada grupo dentro do cômodo */ }
-.grupo-titulo {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--verde-claro);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 8px;
-}
-
-/* ================================================================
-   LOADING SPINNER
-   ================================================================ */
-.loading-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--texto-fraco);
-  font-size: 0.875rem;
-  padding: 40px;
-  justify-content: center;
-}
-.spinner {
-  width: 20px; height: 20px;
-  border: 2.5px solid var(--borda);
-  border-top-color: var(--verde);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Mensagem de erro na ficha */
-.ficha-erro {
-  text-align: center;
-  padding: 80px 20px;
-  color: var(--texto-fraco);
-}
-.ficha-erro h3 {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  color: var(--texto);
-  margin-bottom: 10px;
-}
-
-/* ================================================================
-   INPUT FILE oculto
-   ================================================================ */
-#input-excel { display: none; }
-
-/* ================================================================
-   RESPONSIVO
-   ================================================================ */
-@media (max-width: 640px) {
-  .hero  { padding: 40px 1rem; }
-  .main  { padding: 24px 1rem; }
-  #grid-imoveis { grid-template-columns: 1fr; }
-  .pagina-imovel { padding: 24px 1rem 60px; }
-  .modal-acoes { flex-direction: column-reverse; }
-  .modal-acoes .btn { width: 100%; justify-content: center; }
-  .ficha-grid-atributos { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-  .hero-acoes { flex-direction: column; align-items: center; }
+/**
+ * Handler do botão "Ver ficha →" dentro do card.
+ * Usa data-id para navegar sem depender de closure da função criarCard.
+ * @param {MouseEvent} evento
+ */
+function navegarParaImovel(evento) {
+  evento.stopPropagation(); // impede disparo duplo com o listener do card
+  const id = evento.currentTarget.getAttribute('data-id');
+  if (id) {
+    window.location.href = `imovel.html?id=${encodeURIComponent(id)}`;
+  }
 }
