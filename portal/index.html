@@ -6,54 +6,31 @@
   <title>Zillow BR — Portal Imobiliário</title>
   <meta name="description" content="Portal de fichas técnicas profissionais para imóveis brasileiros">
   <link rel="stylesheet" href="css/style.css">
-
-  <!--
-    SheetJS — biblioteca para leitura de arquivos .xlsx no navegador
-    Documentação: https://sheetjs.com
-    Licença: Apache 2.0
-  -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
   <!-- ============================================================
-       HEADER — Navegação principal
+       HEADER
        ============================================================ -->
   <header class="header">
     <div class="header-inner">
-      <!-- Logo -->
       <a href="index.html" class="logo" aria-label="Zillow BR — Página inicial">
         <div class="logo-icone" aria-hidden="true">🏡</div>
         <span class="logo-nome">Zillow<sup class="logo-br">BR</sup></span>
       </a>
-
-      <!-- Ação principal no header -->
       <div class="header-acoes">
-        <button
-          class="btn btn-secundario"
-          onclick="acionarImportacao()"
-          aria-label="Importar ficha técnica em Excel"
-        >
+        <button class="btn btn-secundario" onclick="acionarImportacao()" aria-label="Importar ficha técnica">
           ＋ Importar imóvel
         </button>
       </div>
     </div>
   </header>
 
-  <!--
-    Input file oculto — ativado programaticamente.
-    Aceita apenas .xlsx para garantir compatibilidade com a ficha técnica.
-  -->
-  <input
-    type="file"
-    id="input-excel"
-    accept=".xlsx,.xlsm"
-    aria-hidden="true"
-    onchange="processarArquivo(event)"
-  >
+  <input type="file" id="input-excel" accept=".xlsx,.xlsm" aria-hidden="true" onchange="processarArquivo(event)">
 
   <!-- ============================================================
-       HERO — Banner de boas-vindas com CTA de importação
+       HERO
        ============================================================ -->
   <section class="hero" aria-label="Boas-vindas">
     <div class="hero-conteudo">
@@ -71,59 +48,171 @@
   </section>
 
   <!-- ============================================================
-       LISTAGEM — Grid de imóveis cadastrados
+       MAIN — Filtros + Grid
        ============================================================ -->
   <main class="main" id="main-conteudo">
+
+    <!-- Cabeçalho da seção -->
     <div class="secao-header">
       <h2 class="secao-titulo">Imóveis cadastrados</h2>
       <span class="secao-contagem" id="contagem" aria-live="polite">0 imóveis</span>
     </div>
 
-    <!-- Estado vazio: exibido quando não há imóveis -->
+    <!-- ============================================================
+         BLOCO DE FILTROS
+         ============================================================ -->
+    <div class="filtros-wrap" id="filtros-wrap">
+
+      <!-- Linha principal: busca + botão filtros + ordenação -->
+      <div class="filtros-barra">
+
+        <!-- Campo de busca livre -->
+        <div class="busca-wrap">
+          <span class="busca-icone" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10.5 10.5 L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <input
+            type="text"
+            id="filtro-busca"
+            placeholder="Buscar por rua, cidade, CEP..."
+            autocomplete="off"
+            aria-label="Busca livre de imóveis"
+          >
+          <button
+            id="btn-limpar-busca"
+            class="busca-limpar"
+            style="display:none"
+            aria-label="Limpar busca"
+            title="Limpar"
+          >✕</button>
+        </div>
+
+        <!-- Botão de filtros avançados com badge contador -->
+        <button
+          id="btn-toggle-filtros"
+          class="btn btn-outline filtros-toggle"
+          aria-expanded="false"
+          aria-controls="painel-filtros"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M1 3h12M3 7h8M5 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Filtros
+          <span id="badge-filtros" class="filtros-badge" style="display:none">0</span>
+        </button>
+
+        <!-- Ordenação — sempre visível -->
+        <div class="ordenar-wrap">
+          <label for="filtro-ordenar" class="ordenar-label">Ordenar:</label>
+          <select id="filtro-ordenar" class="select-filtro" aria-label="Ordenar imóveis">
+            <option value="recente">Mais recente</option>
+            <option value="antigo">Mais antigo</option>
+            <option value="cidade-az">Cidade A → Z</option>
+            <option value="cidade-za">Cidade Z → A</option>
+          </select>
+        </div>
+
+      </div><!-- /filtros-barra -->
+
+      <!-- Painel avançado — colapsável -->
+      <div
+        id="painel-filtros"
+        class="painel-filtros"
+        role="region"
+        aria-label="Filtros avançados"
+      >
+        <div class="painel-filtros-inner">
+
+          <!-- Grade de filtros -->
+          <div class="filtros-grade">
+
+            <div class="filtro-grupo">
+              <label class="filtro-label" for="filtro-estado">Estado</label>
+              <select id="filtro-estado" class="select-filtro" aria-label="Filtrar por estado">
+                <option value="">Todos os estados</option>
+              </select>
+            </div>
+
+            <div class="filtro-grupo">
+              <label class="filtro-label" for="filtro-cidade">Cidade</label>
+              <select id="filtro-cidade" class="select-filtro" aria-label="Filtrar por cidade">
+                <option value="">Todas as cidades</option>
+              </select>
+            </div>
+
+            <div class="filtro-grupo">
+              <label class="filtro-label" for="filtro-comodos">Cômodos mínimos</label>
+              <select id="filtro-comodos" class="select-filtro" aria-label="Filtrar por número de cômodos">
+                <option value="0">Qualquer quantidade</option>
+                <option value="1">1 ou mais</option>
+                <option value="2">2 ou mais</option>
+                <option value="3">3 ou mais</option>
+                <option value="4">4 ou mais</option>
+                <option value="5">5 ou mais</option>
+                <option value="6">6 ou mais</option>
+              </select>
+            </div>
+
+            <div class="filtro-grupo">
+              <label class="filtro-label" for="filtro-cadastrante">Tipo de cadastrante</label>
+              <select id="filtro-cadastrante" class="select-filtro" aria-label="Filtrar por tipo de cadastrante">
+                <option value="">Todos</option>
+              </select>
+            </div>
+
+          </div><!-- /filtros-grade -->
+
+          <!-- Rodapé do painel: contagem + limpar -->
+          <div class="painel-rodape">
+            <span id="resultado-contagem" class="resultado-contagem" aria-live="polite"></span>
+            <button id="btn-limpar-filtros" class="btn btn-fantasma btn-sm">
+              Limpar filtros
+            </button>
+          </div>
+
+        </div>
+      </div><!-- /painel-filtros -->
+
+    </div><!-- /filtros-wrap -->
+
+    <!-- Estado vazio -->
     <div id="estado-vazio" role="region" aria-label="Nenhum imóvel cadastrado">
       <div class="vazio-icone" aria-hidden="true">🏠</div>
       <h3>Nenhum imóvel ainda</h3>
-      <p>
-        Importe um arquivo <strong>.xlsx</strong> gerado pela Ficha Técnica
-        para criar seu primeiro anúncio.
-      </p>
-      <button class="btn btn-verde" onclick="acionarImportacao()">
-        Importar primeiro imóvel
-      </button>
+      <p>Importe um arquivo <strong>.xlsx</strong> gerado pela Ficha Técnica para criar seu primeiro anúncio.</p>
+      <button class="btn btn-verde" onclick="acionarImportacao()">Importar primeiro imóvel</button>
     </div>
 
-    <!-- Grid de cards — preenchido dinamicamente por cards.js -->
-    <div
-      id="grid-imoveis"
-      style="display:none"
-      role="list"
-      aria-label="Lista de imóveis"
-    ></div>
+    <!-- Estado sem resultados (há imóveis mas o filtro não achou nada) -->
+    <div id="estado-sem-resultados" style="display:none" role="region" aria-label="Sem resultados">
+      <div class="vazio-icone" aria-hidden="true">🔍</div>
+      <h3>Nenhum imóvel encontrado</h3>
+      <p>Tente ajustar ou <button class="btn-link" onclick="limparTodosFiltros()">limpar os filtros</button>.</p>
+    </div>
+
+    <!-- Grid de cards -->
+    <div id="grid-imoveis" style="display:none" role="list" aria-label="Lista de imóveis"></div>
+
   </main>
 
   <!-- ============================================================
-       MODAL — Confirmação de imóvel duplicado
+       MODAL — Duplicata
        ============================================================ -->
-  <div
-    class="modal-overlay"
-    id="modal-duplicata"
-    style="display:none"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="modal-titulo"
-  >
+  <div class="modal-overlay" id="modal-duplicata" style="display:none"
+       role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
     <div class="modal">
       <h3 class="modal-titulo" id="modal-titulo">Imóvel já cadastrado</h3>
       <p class="modal-texto">
-        Já existe um imóvel cadastrado com o mesmo
-        <strong>CEP, número e complemento</strong>:
+        Já existe um imóvel com o mesmo <strong>CEP, número e complemento</strong>:
       </p>
-      <!-- Detalhe preenchido dinamicamente por ui.js -->
       <p class="modal-texto" style="margin-top:0;font-style:italic;color:var(--texto);">
         "<span id="modal-texto-detalhe"></span>"
       </p>
       <p class="modal-texto" style="margin-top:8px;">
-        Deseja <strong>atualizar</strong> os dados existentes ou <strong>cancelar</strong> a importação?
+        Deseja <strong>atualizar</strong> os dados existentes ou <strong>cancelar</strong>?
       </p>
       <div class="modal-acoes">
         <button class="btn btn-fantasma" id="btn-modal-cancelar">Cancelar</button>
@@ -132,76 +221,64 @@
     </div>
   </div>
 
-  <!-- ============================================================
-       TOASTS — Notificações temporárias
-       ============================================================ -->
+  <!-- TOASTS -->
   <div class="toast-container" id="toast-container" aria-live="assertive"></div>
 
   <!-- ============================================================
-       SCRIPTS — Ordem de carregamento importa:
-       storage → parser → ui → cards → lógica da página
+       SCRIPTS — ordem importa
        ============================================================ -->
   <script src="js/storage.js"></script>
   <script src="js/parser.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/cards.js"></script>
+  <script src="js/filtros.js"></script>
 
   <script>
     /* ============================================================
-       Lógica da página index — orquestração do fluxo de importação
+       Lógica da página index
        ============================================================ */
-
-    // Variável de escopo para guardar o imóvel parseado entre etapas do fluxo
     let _imovelPendente = null;
 
-    /* ---- Inicialização ---- */
     document.addEventListener('DOMContentLoaded', () => {
-      // Carrega e renderiza os imóveis salvos ao abrir a página
-      const imoveis = getImoveis();
-      renderizarCards(imoveis);
+      // Inicializa filtros com todos os imóveis — ele chama renderizarCards internamente
+      inicializarFiltros(getImoveis());
 
-      // Verifica se há toast pendente (ex: após exclusão na página do imóvel)
+      // Toast pendente de redirecionamento (ex: após exclusão)
       const pendente = sessionStorage.getItem('zillow_br_toast');
       if (pendente) {
         try {
           const { mensagem, tipo, icone } = JSON.parse(pendente);
           setTimeout(() => mostrarToast(mensagem, tipo, icone), 300);
-        } catch (e) { /* ignora erros de parse */ }
+        } catch (e) {}
         sessionStorage.removeItem('zillow_br_toast');
       }
     });
 
-    /* ---- Aciona o input[type=file] programaticamente ---- */
     function acionarImportacao() {
-      document.getElementById('input-excel').value = ''; // reseta para aceitar o mesmo arquivo
+      document.getElementById('input-excel').value = '';
       document.getElementById('input-excel').click();
     }
 
-    /* ---- Processa o arquivo selecionado ---- */
     async function processarArquivo(evento) {
       const arquivo = evento.target.files[0];
       if (!arquivo) return;
 
-      // Valida extensão antes de processar
-      if (!arquivo.name.toLowerCase().endsWith('.xlsx')) {
-        mostrarToast('Apenas arquivos .xlsx são aceitos.', 'erro', '❌');
+      const ext = arquivo.name.toLowerCase();
+      if (!ext.endsWith('.xlsx') && !ext.endsWith('.xlsm')) {
+        mostrarToast('Apenas arquivos .xlsx ou .xlsm são aceitos.', 'erro', '❌');
         return;
       }
 
-      // Feedback visual de loading
       mostrarToast('Lendo arquivo…', '', '⏳');
 
       try {
-        // Faz o parsing do Excel
         const imovel = await parsearExcel(arquivo);
 
-        // Valida se o ID foi gerado (significa que localizacao tem CEP/número)
         if (!imovel.id || imovel.id === '__') {
           mostrarToast('Arquivo inválido: CEP ou Número não encontrado.', 'erro', '❌');
           return;
         }
 
-        /* ---- Verifica duplicata ---- */
         const existente = checkDuplicata(
           imovel.localizacao['CEP']         || '',
           imovel.localizacao['Número']      || imovel.localizacao['Numero'] || '',
@@ -209,27 +286,22 @@
         );
 
         if (existente) {
-          // Guarda o imóvel novo enquanto aguarda resposta do modal
           _imovelPendente = imovel;
-          const enderecoExistente = formatarEndereco(existente.localizacao);
-          const confirmar = await abrirModalDuplicata(enderecoExistente);
-
+          const confirmar = await abrirModalDuplicata(formatarEndereco(existente.localizacao));
           if (!confirmar) {
             mostrarToast('Importação cancelada.', 'aviso', '⚠️');
             _imovelPendente = null;
             return;
           }
-
-          // Preserva a data original de importação
           imovel.importadoEm = existente.importadoEm;
         }
 
-        // Salva e atualiza a lista
         saveImovel(imovel);
-        renderizarCards(getImoveis());
 
-        const verbo = existente ? 'Dados atualizados' : 'Imóvel importado';
-        mostrarToast(`${verbo} com sucesso!`, 'sucesso', '✅');
+        // Atualiza filtros com a lista nova — ele re-renderiza os cards
+        atualizarCacheFiltros(getImoveis());
+
+        mostrarToast(`${existente ? 'Dados atualizados' : 'Imóvel importado'} com sucesso!`, 'sucesso', '✅');
         _imovelPendente = null;
 
       } catch (erro) {
