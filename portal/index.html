@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zillow BR — Portal Imobiliário</title>
+  <meta name="description" content="Portal de fichas técnicas profissionais para imóveis brasileiros">
+  <link rel="stylesheet" href="css/style.css">
+
+  <!--
+    SheetJS — biblioteca para leitura de arquivos .xlsx no navegador
+    Documentação: https://sheetjs.com
+    Licença: Apache 2.0
+  -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER — Navegação principal
+       ============================================================ -->
+  <header class="header">
+    <div class="header-inner">
+      <!-- Logo -->
+      <a href="index.html" class="logo" aria-label="Zillow BR — Página inicial">
+        <div class="logo-icone" aria-hidden="true">🏡</div>
+        <span class="logo-nome">Zillow<sup class="logo-br">BR</sup></span>
+      </a>
+
+      <!-- Ação principal no header -->
+      <div class="header-acoes">
+        <button
+          class="btn btn-secundario"
+          onclick="acionarImportacao()"
+          aria-label="Importar ficha técnica em Excel"
+        >
+          ＋ Importar imóvel
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!--
+    Input file oculto — ativado programaticamente.
+    Aceita apenas .xlsx para garantir compatibilidade com a ficha técnica.
+  -->
+  <input
+    type="file"
+    id="input-excel"
+    accept=".xlsx,.xlsm"
+    aria-hidden="true"
+    onchange="processarArquivo(event)"
+  >
+
+  <!-- ============================================================
+       HERO — Banner de boas-vindas com CTA de importação
+       ============================================================ -->
+  <section class="hero" aria-label="Boas-vindas">
+    <div class="hero-conteudo">
+      <h1>Fichas técnicas profissionais<br>para imóveis brasileiros</h1>
+      <p class="hero-subtitulo">
+        Importe o Excel gerado pela Ficha Técnica e gerencie<br>
+        seus anúncios com dados completos e estruturados.
+      </p>
+      <div class="hero-acoes">
+        <button class="btn btn-primario" onclick="acionarImportacao()">
+          📄 Importar Ficha Técnica (.xlsx)
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       LISTAGEM — Grid de imóveis cadastrados
+       ============================================================ -->
+  <main class="main" id="main-conteudo">
+    <div class="secao-header">
+      <h2 class="secao-titulo">Imóveis cadastrados</h2>
+      <span class="secao-contagem" id="contagem" aria-live="polite">0 imóveis</span>
+    </div>
+
+    <!-- Estado vazio: exibido quando não há imóveis -->
+    <div id="estado-vazio" role="region" aria-label="Nenhum imóvel cadastrado">
+      <div class="vazio-icone" aria-hidden="true">🏠</div>
+      <h3>Nenhum imóvel ainda</h3>
+      <p>
+        Importe um arquivo <strong>.xlsx</strong> gerado pela Ficha Técnica
+        para criar seu primeiro anúncio.
+      </p>
+      <button class="btn btn-verde" onclick="acionarImportacao()">
+        Importar primeiro imóvel
+      </button>
+    </div>
+
+    <!-- Grid de cards — preenchido dinamicamente por cards.js -->
+    <div
+      id="grid-imoveis"
+      style="display:none"
+      role="list"
+      aria-label="Lista de imóveis"
+    ></div>
+  </main>
+
+  <!-- ============================================================
+       MODAL — Confirmação de imóvel duplicado
+       ============================================================ -->
+  <div
+    class="modal-overlay"
+    id="modal-duplicata"
+    style="display:none"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-titulo"
+  >
+    <div class="modal">
+      <h3 class="modal-titulo" id="modal-titulo">Imóvel já cadastrado</h3>
+      <p class="modal-texto">
+        Já existe um imóvel cadastrado com o mesmo
+        <strong>CEP, número e complemento</strong>:
+      </p>
+      <!-- Detalhe preenchido dinamicamente por ui.js -->
+      <p class="modal-texto" style="margin-top:0;font-style:italic;color:var(--texto);">
+        "<span id="modal-texto-detalhe"></span>"
+      </p>
+      <p class="modal-texto" style="margin-top:8px;">
+        Deseja <strong>atualizar</strong> os dados existentes ou <strong>cancelar</strong> a importação?
+      </p>
+      <div class="modal-acoes">
+        <button class="btn btn-fantasma" id="btn-modal-cancelar">Cancelar</button>
+        <button class="btn btn-verde"    id="btn-modal-atualizar">Atualizar dados</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TOASTS — Notificações temporárias
+       ============================================================ -->
+  <div class="toast-container" id="toast-container" aria-live="assertive"></div>
+
+  <!-- ============================================================
+       SCRIPTS — Ordem de carregamento importa:
+       storage → parser → ui → cards → lógica da página
+       ============================================================ -->
+  <script src="js/storage.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/cards.js"></script>
+
+  <script>
+    /* ============================================================
+       Lógica da página index — orquestração do fluxo de importação
+       ============================================================ */
+
+    // Variável de escopo para guardar o imóvel parseado entre etapas do fluxo
+    let _imovelPendente = null;
+
+    /* ---- Inicialização ---- */
+    document.addEventListener('DOMContentLoaded', () => {
+      // Carrega e renderiza os imóveis salvos ao abrir a página
+      const imoveis = getImoveis();
+      renderizarCards(imoveis);
+
+      // Verifica se há toast pendente (ex: após exclusão na página do imóvel)
+      const pendente = sessionStorage.getItem('zillow_br_toast');
+      if (pendente) {
+        try {
+          const { mensagem, tipo, icone } = JSON.parse(pendente);
+          setTimeout(() => mostrarToast(mensagem, tipo, icone), 300);
+        } catch (e) { /* ignora erros de parse */ }
+        sessionStorage.removeItem('zillow_br_toast');
+      }
+    });
+
+    /* ---- Aciona o input[type=file] programaticamente ---- */
+    function acionarImportacao() {
+      document.getElementById('input-excel').value = ''; // reseta para aceitar o mesmo arquivo
+      document.getElementById('input-excel').click();
+    }
+
+    /* ---- Processa o arquivo selecionado ---- */
+    async function processarArquivo(evento) {
+      const arquivo = evento.target.files[0];
+      if (!arquivo) return;
+
+      // Valida extensão antes de processar
+      if (!arquivo.name.toLowerCase().endsWith('.xlsx')) {
+        mostrarToast('Apenas arquivos .xlsx são aceitos.', 'erro', '❌');
+        return;
+      }
+
+      // Feedback visual de loading
+      mostrarToast('Lendo arquivo…', '', '⏳');
+
+      try {
+        // Faz o parsing do Excel
+        const imovel = await parsearExcel(arquivo);
+
+        // Valida se o ID foi gerado (significa que localizacao tem CEP/número)
+        if (!imovel.id || imovel.id === '__') {
+          mostrarToast('Arquivo inválido: CEP ou Número não encontrado.', 'erro', '❌');
+          return;
+        }
+
+        /* ---- Verifica duplicata ---- */
+        const existente = checkDuplicata(
+          imovel.localizacao['CEP']         || '',
+          imovel.localizacao['Número']      || imovel.localizacao['Numero'] || '',
+          imovel.localizacao['Complemento'] || ''
+        );
+
+        if (existente) {
+          // Guarda o imóvel novo enquanto aguarda resposta do modal
+          _imovelPendente = imovel;
+          const enderecoExistente = formatarEndereco(existente.localizacao);
+          const confirmar = await abrirModalDuplicata(enderecoExistente);
+
+          if (!confirmar) {
+            mostrarToast('Importação cancelada.', 'aviso', '⚠️');
+            _imovelPendente = null;
+            return;
+          }
+
+          // Preserva a data original de importação
+          imovel.importadoEm = existente.importadoEm;
+        }
+
+        // Salva e atualiza a lista
+        saveImovel(imovel);
+        renderizarCards(getImoveis());
+
+        const verbo = existente ? 'Dados atualizados' : 'Imóvel importado';
+        mostrarToast(`${verbo} com sucesso!`, 'sucesso', '✅');
+        _imovelPendente = null;
+
+      } catch (erro) {
+        console.error('[index] Erro na importação:', erro);
+        mostrarToast(erro.message || 'Erro inesperado na importação.', 'erro', '❌');
+      }
+    }
+  </script>
+
+</body>
+</html>
