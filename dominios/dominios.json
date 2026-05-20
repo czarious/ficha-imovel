@@ -1,161 +1,83 @@
 {
-  "tipos_de_comodo": [
-    "Sala",
-    "Quarto 1",
-    "Quarto 2",
-    "Suíte 1",
-    "Suíte 2"
+  "_comentario": "Arquivo de domínios da Ficha Técnica de Imóvel. Edite aqui para adicionar opções nos dropdowns sem mexer no HTML.",
+
+  "paises": ["Brasil"],
+
+  "estados_brasil": [
+    "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA",
+    "MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN",
+    "RS","RO","RR","SC","SP","SE","TO"
   ],
+
+  "tipos_fixos": ["Sala"],
+
+  "cadastrante": {
+    "_comentario": "Campos do cadastrante — corretor, proprietário ou imobiliária",
+    "campos": [
+      {
+        "id": "tipo", "label": "Tipo de cadastrante", "grupo": "Identificação",
+        "tipo": "select",
+        "opcoes": ["Proprietário", "Corretor", "Imobiliária"]
+      },
+      { "id": "nome",     "label": "Nome completo", "grupo": "Identificação", "tipo": "text" },
+      { "id": "cpf",      "label": "CPF",           "grupo": "Identificação", "tipo": "text" },
+      { "id": "creci",    "label": "CRECI",          "grupo": "Identificação", "tipo": "text" },
+      { "id": "creci_j",  "label": "CRECI-J",        "grupo": "Identificação", "tipo": "text" },
+      { "id": "telefone", "label": "Telefone",        "grupo": "Identificação", "tipo": "text" },
+      { "id": "email",    "label": "E-mail",          "grupo": "Identificação", "tipo": "text" }
+    ]
+  },
 
   "atributos_comuns": [
     {
-      "id": "piso_material",
-      "label": "Piso — Material",
-      "tipo": "select",
-      "opcoes": [
-        "Porcelanato Polido",
-        "Porcelanato Fosco",
-        "Cerâmico",
-        "Vinílico",
-        "Madeira",
-        "Cimento Queimado",
-        "Outro",
-        "Sem informação"
-      ]
+      "_comentario": "Atributos que aparecem em todos os cômodos",
+      "id": "piso_material", "label": "Material", "grupo": "Piso", "tipo": "select",
+      "opcoes": ["Porcelanato Polido","Porcelanato Fosco","Cerâmico","Vinílico","Madeira","Cimento Queimado","Outro","Sem informação"]
     },
     {
-      "id": "parede_acabamento",
-      "label": "Parede — Acabamento",
-      "tipo": "select",
-      "opcoes": [
-        "Pintura Látex",
-        "Textura",
-        "Azulejo",
-        "Papel de Parede",
-        "Outro",
-        "Sem informação"
-      ]
+      "id": "parede_acabamento", "label": "Acabamento", "grupo": "Parede", "tipo": "select",
+      "opcoes": ["Pintura Látex","Textura","Azulejo","Papel de Parede","Outro","Sem informação"]
     },
     {
-      "id": "teto_acabamento",
-      "label": "Teto — Acabamento",
-      "tipo": "select",
-      "opcoes": [
-        "Gesso Rebaixado",
-        "Laje Aparente",
-        "PVC",
-        "Pintura Látex",
-        "Outro",
-        "Sem informação"
-      ]
+      "id": "teto_acabamento", "label": "Acabamento", "grupo": "Teto", "tipo": "select",
+      "opcoes": ["Gesso Rebaixado","Laje Aparente","PVC","Pintura Látex","Outro","Sem informação"]
     },
     {
-      "id": "tomadas",
-      "label": "Tomadas — Quantidade",
-      "tipo": "number"
+      "id": "tomadas", "label": "Quantidade", "grupo": "Elétrica", "tipo": "number"
     },
     {
-      "id": "ar_condicionado",
-      "label": "Ar condicionado",
-      "tipo": "select",
-      "opcoes": ["Sim", "Não", "Pré-instalação"]
+      "id": "ar_condicionado", "label": "Ar condicionado", "grupo": "Climatização", "tipo": "select",
+      "opcoes": ["Sim","Não","Pré-instalação"]
     }
   ],
 
   "atributos_especificos": {
+    "_comentario": "Atributos extras por tipo de cômodo. Adicione novos tipos aqui.",
     "Sala": [
-      {
-        "id": "sacada",
-        "label": "Sacada",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
-      },
-      {
-        "id": "lareira",
-        "label": "Lareira",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
-      }
+      { "id": "sacada",  "label": "Sacada",  "grupo": "Configuração", "tipo": "select", "opcoes": ["Sim","Não"] },
+      { "id": "lareira", "label": "Lareira", "grupo": "Configuração", "tipo": "select", "opcoes": ["Sim","Não"] }
     ],
-    "Quarto 1": [
+    "Quarto": [
+      { "id": "armario_embutido", "label": "Armário embutido", "grupo": "Configuração", "tipo": "select", "opcoes": ["Sim","Não"] },
+      { "id": "e_suite",          "label": "É suíte",          "grupo": "Configuração", "tipo": "select", "opcoes": ["Sim","Não"] }
+    ]
+  },
+
+  "atributos_banheiro_suite": {
+    "_comentario": "Aparece dentro do quarto quando 'É suíte = Sim'",
+    "campos": [
       {
-        "id": "armario_embutido",
-        "label": "Armário embutido",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
+        "id": "ban_piso", "label": "Material", "grupo": "Banheiro — Piso", "tipo": "select",
+        "opcoes": ["Porcelanato Polido","Porcelanato Fosco","Cerâmico","Outro","Sem informação"]
       },
       {
-        "id": "e_suite",
-        "label": "É suíte",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
-      }
-    ],
-    "Quarto 2": [
-      {
-        "id": "armario_embutido",
-        "label": "Armário embutido",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
+        "id": "ban_parede", "label": "Acabamento", "grupo": "Banheiro — Parede", "tipo": "select",
+        "opcoes": ["Azulejo","Porcelanato","Pintura Látex","Outro","Sem informação"]
       },
-      {
-        "id": "e_suite",
-        "label": "É suíte",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
-      }
-    ],
-    "Suíte 1": [
-      {
-        "id": "armario_embutido",
-        "label": "Armário embutido",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
-      },
-      {
-        "id": "box",
-        "label": "Box",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
-      },
-      {
-        "id": "banheira",
-        "label": "Banheira",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
-      },
-      {
-        "id": "gabinete",
-        "label": "Gabinete",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
-      }
-    ],
-    "Suíte 2": [
-      {
-        "id": "armario_embutido",
-        "label": "Armário embutido",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
-      },
-      {
-        "id": "box",
-        "label": "Box",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
-      },
-      {
-        "id": "banheira",
-        "label": "Banheira",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
-      },
-      {
-        "id": "gabinete",
-        "label": "Gabinete",
-        "tipo": "select",
-        "opcoes": ["Sim", "Não"]
-      }
+      { "id": "ban_box",      "label": "Box",      "grupo": "Banheiro — Equipamentos", "tipo": "select", "opcoes": ["Sim","Não"] },
+      { "id": "ban_banheira", "label": "Banheira", "grupo": "Banheiro — Equipamentos", "tipo": "select", "opcoes": ["Sim","Não"] },
+      { "id": "ban_gabinete", "label": "Gabinete", "grupo": "Banheiro — Equipamentos", "tipo": "select", "opcoes": ["Sim","Não"] },
+      { "id": "ban_tomadas",  "label": "Tomadas",  "grupo": "Banheiro — Elétrica",     "tipo": "number" }
     ]
   }
 }
