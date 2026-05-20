@@ -9,29 +9,44 @@
  * @param {Array<Object>} imoveis
  */
 function renderizarCards(imoveis) {
-  const grid   = document.getElementById('grid-imoveis');
-  const vazio  = document.getElementById('estado-vazio');
-  const contagem = document.getElementById('contagem');
+  const grid          = document.getElementById('grid-imoveis');
+  const vazio         = document.getElementById('estado-vazio');
+  const semResultados = document.getElementById('estado-sem-resultados');
+  const contagem      = document.getElementById('contagem');
 
   // Limpa o grid antes de re-renderizar
   grid.innerHTML = '';
 
-  if (!imoveis || imoveis.length === 0) {
-    vazio.style.display = 'flex';
-    grid.style.display  = 'none';
+  const totalGeral = typeof _todosImoveis !== 'undefined' ? _todosImoveis.length : null;
+  const hayImoveis  = totalGeral === null ? (imoveis?.length > 0) : (totalGeral > 0);
+
+  if (!hayImoveis) {
+    // Nenhum imóvel cadastrado → estado vazio principal
+    if (vazio)         vazio.style.display         = 'flex';
+    if (semResultados) semResultados.style.display  = 'none';
+    grid.style.display = 'none';
     if (contagem) contagem.textContent = '0 imóveis';
     return;
   }
 
-  vazio.style.display = 'none';
-  grid.style.display  = 'grid';
-
-  // Atualiza contador
-  if (contagem) {
-    contagem.textContent = `${imoveis.length} imóvel${imoveis.length !== 1 ? 's' : ''}`;
+  if (!imoveis || imoveis.length === 0) {
+    // Há imóveis mas filtro não encontrou nada
+    if (vazio)         vazio.style.display         = 'none';
+    if (semResultados) semResultados.style.display  = 'flex';
+    grid.style.display = 'none';
+    if (contagem) contagem.textContent = `${totalGeral} imóvel${totalGeral !== 1 ? 's' : ''}`;
+    return;
   }
 
-  // Cria e insere um card para cada imóvel
+  // Lista com resultados
+  if (vazio)         vazio.style.display         = 'none';
+  if (semResultados) semResultados.style.display  = 'none';
+  grid.style.display = 'grid';
+
+  if (contagem) {
+    contagem.textContent = `${totalGeral ?? imoveis.length} imóvel${(totalGeral ?? imoveis.length) !== 1 ? 's' : ''}`;
+  }
+
   for (const imovel of imoveis) {
     grid.appendChild(criarCard(imovel));
   }
