@@ -6,21 +6,25 @@
 <title>Ficha Técnica de Imóvel</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+  /* ─────────────────────────────────────────
+     VARIÁVEIS GLOBAIS DE TEMA
+     ───────────────────────────────────────── */
   :root {
-    --bg: #F5F3EE;
-    --surface: #FFFFFF;
-    --surface2: #F9F8F5;
-    --border: #E2DDD6;
-    --border-strong: #C8C0B4;
-    --text: #1A1714;
-    --text2: #6B6560;
-    --text3: #9C958E;
-    --accent: #2B5F3E;
+    --bg:           #F5F3EE;
+    --surface:      #FFFFFF;
+    --surface2:     #F9F8F5;
+    --border:       #E2DDD6;
+    --border-strong:#C8C0B4;
+    --text:         #1A1714;
+    --text2:        #6B6560;
+    --text3:        #9C958E;
+    --accent:       #2B5F3E;
     --accent-light: #EAF2ED;
-    --accent2: #8B4513;
-    --danger: #C0392B;
-    --radius: 10px;
-    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    --accent-border:#C3DBC9;
+    --danger:       #C0392B;
+    --danger-light: #FDF0EE;
+    --radius:       10px;
+    --shadow:       0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,25 +34,25 @@
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    padding: 0 0 80px 0;
+    padding-bottom: 100px;
   }
 
+  /* ─────────────────────────────────────────
+     CABEÇALHO
+     ───────────────────────────────────────── */
   header {
     background: var(--accent);
-    padding: 28px 40px;
+    padding: 24px 40px;
     display: flex;
     align-items: center;
     justify-content: space-between;
   }
-
   header h1 {
     font-family: 'DM Serif Display', serif;
     color: #fff;
     font-size: 22px;
     font-weight: 400;
-    letter-spacing: 0.02em;
   }
-
   header span {
     font-size: 12px;
     color: rgba(255,255,255,0.6);
@@ -56,342 +60,216 @@
     text-transform: uppercase;
   }
 
-  .container {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 40px 24px;
-  }
+  /* ─────────────────────────────────────────
+     CONTAINER
+     ───────────────────────────────────────── */
+  .container { max-width: 860px; margin: 0 auto; padding: 36px 24px; }
 
-  /* SELEÇÃO DE CÔMODOS */
-  .card {
+  /* ─────────────────────────────────────────
+     SEÇÕES
+     ───────────────────────────────────────── */
+  .secao {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     overflow: hidden;
   }
-
-  .card-header {
-    padding: 20px 24px;
+  .secao-header {
+    background: var(--surface2);
+    padding: 16px 24px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    user-select: none;
-    transition: background 0.15s;
+    gap: 12px;
   }
-
-  .card-header:hover { background: var(--surface2); }
-
-  .card-header-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .card-num {
-    width: 32px;
-    height: 32px;
+  .secao-icone {
+    width: 34px; height: 34px;
     background: var(--accent-light);
     color: var(--accent);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 500;
-    flex-shrink: 0;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
   }
+  .secao-titulo { font-family: 'DM Serif Display', serif; font-size: 17px; font-weight: 400; }
+  .secao-subtitulo { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .secao-body { padding: 24px; }
 
-  .card-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 17px;
-    font-weight: 400;
-    color: var(--text);
+  /* ─────────────────────────────────────────
+     CAMPOS
+     ───────────────────────────────────────── */
+  .campo { margin-bottom: 16px; }
+  .campo label {
+    display: block; font-size: 11px; font-weight: 500;
+    color: var(--text2); text-transform: uppercase;
+    letter-spacing: 0.07em; margin-bottom: 6px;
   }
-
-  .card-subtitle {
-    font-size: 12px;
-    color: var(--text3);
-    margin-top: 2px;
+  .campo input, .campo select {
+    width: 100%; padding: 10px 13px;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: var(--text); background: var(--surface);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    appearance: none; -webkit-appearance: none;
   }
-
-  .card-arrow {
-    font-size: 18px;
-    color: var(--text3);
-    transition: transform 0.25s;
+  .campo input:focus, .campo select:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(43,95,62,0.1);
   }
-
-  .card-arrow.open { transform: rotate(180deg); }
-
-  .card-body {
-    display: none;
-    padding: 24px;
-    animation: slideDown 0.2s ease;
+  .campo input[readonly] { background: var(--surface2); color: var(--text2); cursor: default; }
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: '▾'; position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%); color: var(--text3);
+    pointer-events: none; font-size: 12px;
   }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
 
-  .card-body.open { display: block; }
+  /* ─────────────────────────────────────────
+     ÁREA CALCULADA
+     ───────────────────────────────────────── */
+  .area-display {
+    background: var(--accent-light); border: 1px solid var(--accent-border);
+    border-radius: 8px; padding: 10px 13px; font-size: 15px;
+    color: var(--accent); font-weight: 500;
+    display: flex; align-items: center; gap: 5px; min-height: 41px;
+  }
+  .area-display small { font-size: 11px; font-weight: 400; color: #5A9470; }
 
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-8px); }
+  /* ─────────────────────────────────────────
+     APELIDO (referência interna)
+     ───────────────────────────────────────── */
+  .apelido-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .apelido-wrap input {
+    flex: 1; padding: 7px 11px;
+    border: 1px dashed var(--border-strong); border-radius: 7px;
+    font-size: 13px; font-style: italic; color: var(--text2);
+    background: var(--surface2); font-family: 'DM Sans', sans-serif;
+  }
+  .apelido-wrap input:focus { outline: none; border-color: var(--accent); border-style: solid; }
+  .apelido-label { font-size: 11px; color: var(--text3); white-space: nowrap; }
+
+  /* ─────────────────────────────────────────
+     CARTÕES DE CÔMODO
+     ───────────────────────────────────────── */
+  .comodo-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 14px;
+    overflow: hidden; transition: box-shadow 0.2s;
+  }
+  .comodo-card:hover { box-shadow: var(--shadow); }
+  .comodo-header {
+    padding: 14px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; user-select: none; transition: background 0.15s;
+  }
+  .comodo-header:hover { background: var(--surface2); }
+  .comodo-header-left { display: flex; align-items: center; gap: 12px; }
+  .comodo-num {
+    width: 30px; height: 30px; background: var(--accent-light);
+    color: var(--accent); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500; flex-shrink: 0;
+  }
+  .comodo-nome { font-family: 'DM Serif Display', serif; font-size: 16px; font-weight: 400; }
+  .comodo-progresso { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  .comodo-acoes { display: flex; align-items: center; gap: 10px; }
+  .badge-ok {
+    background: var(--accent-light); color: var(--accent);
+    font-size: 11px; font-weight: 500; padding: 3px 9px;
+    border-radius: 20px; border: 1px solid var(--accent-border);
+  }
+  .badge-suite {
+    background: #F0EAF8; color: #6B3FA0; font-size: 11px;
+    font-weight: 500; padding: 3px 9px; border-radius: 20px;
+    border: 1px solid #D4B8F0;
+  }
+  .btn-remover {
+    background: none; border: 1px solid var(--border);
+    border-radius: 6px; padding: 4px 10px; font-size: 12px;
+    color: var(--danger); cursor: pointer; transition: all 0.15s;
+  }
+  .btn-remover:hover { background: var(--danger-light); border-color: var(--danger); }
+  .comodo-arrow { font-size: 16px; color: var(--text3); transition: transform 0.25s; }
+  .comodo-arrow.aberto { transform: rotate(180deg); }
+  .comodo-body { display: none; padding: 20px; animation: fadeIn 0.2s ease; }
+  .comodo-body.aberto { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* SELEÇÃO INICIAL */
-  .selecao-comodos {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    padding: 28px;
-    margin-bottom: 28px;
+  /* ─────────────────────────────────────────
+     SUBGRUPO BANHEIRO (SUÍTE)
+     ───────────────────────────────────────── */
+  .banheiro-grupo {
+    margin-top: 20px; border: 1px solid #D4B8F0;
+    border-radius: 8px; overflow: hidden; display: none;
+  }
+  .banheiro-grupo.visivel { display: block; }
+  .banheiro-header {
+    background: #F7F0FD; padding: 10px 16px;
+    border-bottom: 1px solid #D4B8F0;
+    font-size: 12px; font-weight: 500; color: #6B3FA0;
+    text-transform: uppercase; letter-spacing: 0.07em;
+  }
+  .banheiro-body { padding: 16px; }
+
+  /* ─────────────────────────────────────────
+     DIVISOR DE GRUPO
+     ───────────────────────────────────────── */
+  .grupo-label {
+    font-size: 10px; font-weight: 500; color: var(--text3);
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin: 20px 0 12px; padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
   }
 
-  .selecao-comodos h2 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 19px;
-    font-weight: 400;
-    margin-bottom: 6px;
+  /* ─────────────────────────────────────────
+     BOTÕES
+     ───────────────────────────────────────── */
+  .btn-adicionar {
+    width: 100%; padding: 12px;
+    border: 2px dashed var(--border-strong); border-radius: var(--radius);
+    background: none; color: var(--accent);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s; margin-bottom: 8px;
   }
-
-  .selecao-comodos p {
-    font-size: 13px;
-    color: var(--text2);
-    margin-bottom: 20px;
-  }
-
-  .checkboxes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 10px;
-  }
-
-  .checkbox-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 14px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.15s;
-    font-size: 14px;
-  }
-
-  .checkbox-item:hover {
-    border-color: var(--accent);
-    background: var(--accent-light);
-  }
-
-  .checkbox-item input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--accent);
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-
-  .checkbox-item.checked {
-    border-color: var(--accent);
-    background: var(--accent-light);
-    color: var(--accent);
-    font-weight: 500;
-  }
-
-  /* FORMULÁRIO */
-  .campo-grupo {
-    margin-bottom: 18px;
-  }
-
-  .campo-grupo label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text2);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 7px;
-  }
-
-  .campo-grupo input,
-  .campo-grupo select {
-    width: 100%;
-    padding: 11px 14px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--text);
-    background: var(--surface);
-    transition: border-color 0.15s;
-    appearance: none;
-    -webkit-appearance: none;
-  }
-
-  .campo-grupo input:focus,
-  .campo-grupo select:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(43,95,62,0.08);
-  }
-
-  .select-wrapper {
-    position: relative;
-  }
-
-  .select-wrapper::after {
-    content: '▾';
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text3);
-    pointer-events: none;
-    font-size: 13px;
-  }
-
-  /* DIMENSÕES */
-  .dimensoes-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
-  }
-
-  .area-calc {
-    background: var(--accent-light);
-    border: 1px solid #C3DBC9;
-    border-radius: 8px;
-    padding: 11px 14px;
-    font-size: 14px;
-    color: var(--accent);
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .area-calc span { font-size: 12px; font-weight: 400; color: #5A9470; }
-
-  /* DIVISOR */
-  .divisor {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 20px 0;
-  }
-
-  .secao-label {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 14px;
-  }
-
-  .campos-2col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-
-  /* ESTADO VAZIO */
-  .empty-state {
-    text-align: center;
-    padding: 48px 24px;
-    color: var(--text3);
-  }
-
-  .empty-state .icon { font-size: 32px; margin-bottom: 12px; }
-  .empty-state p { font-size: 14px; line-height: 1.6; }
-
-  /* BOTÃO EXPORTAR */
+  .btn-adicionar:hover { border-color: var(--accent); background: var(--accent-light); }
   .btn-exportar {
-    position: fixed;
-    bottom: 28px;
-    right: 28px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 50px;
-    padding: 15px 28px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    box-shadow: 0 4px 20px rgba(43,95,62,0.35);
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    z-index: 100;
+    position: fixed; bottom: 28px; right: 28px;
+    background: var(--accent); color: #fff; border: none;
+    border-radius: 50px; padding: 15px 28px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    cursor: pointer; box-shadow: 0 4px 20px rgba(43,95,62,0.35);
+    transition: all 0.2s; z-index: 100;
   }
+  .btn-exportar:hover { background: #1e4a2e; transform: translateY(-2px); }
+  .btn-exportar:disabled { background: var(--border-strong); box-shadow: none; transform: none; cursor: not-allowed; }
 
-  .btn-exportar:hover {
-    background: #1e4a2e;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(43,95,62,0.45);
-  }
-
-  .btn-exportar:disabled {
-    background: var(--border-strong);
-    box-shadow: none;
-    transform: none;
-    cursor: not-allowed;
-  }
-
-  /* LOADING */
-  .loading {
-    text-align: center;
-    padding: 60px;
-    color: var(--text3);
-    font-size: 14px;
-  }
-
+  /* ─────────────────────────────────────────
+     LOADING / ERRO
+     ───────────────────────────────────────── */
+  .loading { text-align: center; padding: 60px; color: var(--text3); font-size: 14px; }
   .loading::after {
-    content: '';
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin-left: 10px;
-    vertical-align: middle;
+    content: ''; display: inline-block; width: 14px; height: 14px;
+    border: 2px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+    margin-left: 8px; vertical-align: middle;
   }
-
   @keyframes spin { to { transform: rotate(360deg); } }
-
   .erro-json {
-    background: #FDF0EE;
-    border: 1px solid #F0C8C0;
-    border-radius: var(--radius);
-    padding: 20px 24px;
-    color: var(--danger);
-    font-size: 14px;
-    line-height: 1.6;
-  }
-
-  /* BADGE PREENCHIDO */
-  .badge-ok {
-    background: var(--accent-light);
-    color: var(--accent);
-    font-size: 11px;
-    font-weight: 500;
-    padding: 3px 9px;
-    border-radius: 20px;
-    border: 1px solid #C3DBC9;
+    background: var(--danger-light); border: 1px solid #F0C8C0;
+    border-radius: var(--radius); padding: 20px 24px;
+    color: var(--danger); font-size: 14px; line-height: 1.7;
   }
 
   @media (max-width: 600px) {
-    header { padding: 20px; }
-    .container { padding: 24px 16px; }
-    .dimensoes-grid { grid-template-columns: 1fr 1fr; }
-    .dimensoes-grid .area-col { grid-column: 1 / -1; }
-    .campos-2col { grid-template-columns: 1fr; }
-    .checkboxes-grid { grid-template-columns: 1fr 1fr; }
+    header { padding: 18px; }
+    .container { padding: 20px 14px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -405,9 +283,7 @@
 </header>
 
 <div class="container">
-  <div id="app">
-    <div class="loading">Carregando domínios</div>
-  </div>
+  <div id="app"><div class="loading">Carregando domínios</div></div>
 </div>
 
 <button class="btn-exportar" id="btnExportar" disabled onclick="exportarExcel()">
@@ -416,316 +292,649 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
+/* ═══════════════════════════════════════════════════════
+   CONFIGURAÇÃO
+   URL do JSON de domínios no GitHub (fonte única de verdade)
+   ═══════════════════════════════════════════════════════ */
 const JSON_URL = 'https://raw.githubusercontent.com/czarious/ficha-imovel/main/dominios/dominios.json';
 
-let dominios = null;
-let dadosComodos = {};
+/* Estado global da ficha */
+let dom              = null;
+let dadosCadastrante = {};
+let dadosLocalizacao = {};
+let dadosSala        = {};
+let salaAtiva        = false;
+let quartos          = [];
+let contadorQuartos  = 0;
 
-// ── CARREGAR DOMÍNIOS ──────────────────────────────────────────
+
+/* ═══════════════════════════════════════════════════════
+   CARREGAMENTO DO JSON
+   Busca domínios no GitHub e inicia a renderização
+   ═══════════════════════════════════════════════════════ */
 async function carregarDominios() {
   try {
-    const r = await fetch(JSON_URL);
+    const r = await fetch(JSON_URL + '?v=' + Date.now());
     if (!r.ok) throw new Error('HTTP ' + r.status);
-    dominios = await r.json();
+    dom = await r.json();
     renderApp();
   } catch(e) {
     document.getElementById('app').innerHTML = `
       <div class="erro-json">
         <strong>Não foi possível carregar os domínios.</strong><br>
-        Verifique se o arquivo <code>dominios/dominios.json</code> foi enviado ao repositório GitHub.<br><br>
-        <small>Erro técnico: ${e.message}</small>
+        Verifique se <code>dominios/dominios.json</code> está no repositório.<br>
+        <small>Erro: ${e.message}</small>
       </div>`;
   }
 }
 
-// ── RENDER PRINCIPAL ──────────────────────────────────────────
+
+/* ═══════════════════════════════════════════════════════
+   RENDER PRINCIPAL
+   Monta as três seções da ficha
+   ═══════════════════════════════════════════════════════ */
 function renderApp() {
-  const app = document.getElementById('app');
-  app.innerHTML = `
-    <div class="selecao-comodos">
-      <h2>Selecione os cômodos do imóvel</h2>
-      <p>Marque os ambientes presentes. Um grupo de preenchimento será aberto para cada um.</p>
-      <div class="checkboxes-grid" id="checkboxesComodos"></div>
-    </div>
-    <div id="gruposComodos"></div>
-  `;
-  renderCheckboxes();
+  document.getElementById('app').innerHTML = `
+    <div id="sec-cadastrante"></div>
+    <div id="sec-localizacao"></div>
+    <div id="sec-comodos"></div>`;
+  renderCadastrante();
+  renderLocalizacao();
+  renderComodos();
 }
 
-// ── CHECKBOXES ────────────────────────────────────────────────
-function renderCheckboxes() {
-  const container = document.getElementById('checkboxesComodos');
-  container.innerHTML = '';
-  dominios.tipos_de_comodo.forEach(tipo => {
-    const checked = dadosComodos[tipo] !== undefined;
-    const div = document.createElement('label');
-    div.className = 'checkbox-item' + (checked ? ' checked' : '');
-    div.innerHTML = `
-      <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleComodo('${tipo}', this.checked)">
-      ${tipo}
-    `;
-    container.appendChild(div);
+
+/* ═══════════════════════════════════════════════════════
+   SEÇÃO CADASTRANTE
+   ═══════════════════════════════════════════════════════ */
+function renderCadastrante() {
+  let campos = '';
+  dom.cadastrante.campos.forEach(c => {
+    campos += campoDom(c, dadosCadastrante, 'cadastrante');
   });
+  document.getElementById('sec-cadastrante').innerHTML = `
+    <div class="secao">
+      <div class="secao-header">
+        <div class="secao-icone">👤</div>
+        <div>
+          <div class="secao-titulo">Cadastrante</div>
+          <div class="secao-subtitulo">Quem está registrando este imóvel</div>
+        </div>
+      </div>
+      <div class="secao-body"><div class="grid-2">${campos}</div></div>
+    </div>`;
 }
 
-// ── TOGGLE CÔMODO ─────────────────────────────────────────────
-function toggleComodo(tipo, ativo) {
-  if (ativo) {
-    if (!dadosComodos[tipo]) dadosComodos[tipo] = {};
-  } else {
-    delete dadosComodos[tipo];
-  }
-  renderCheckboxes();
-  renderGrupos();
-  atualizarBotao();
-}
 
-// ── RENDER GRUPOS ─────────────────────────────────────────────
-function renderGrupos() {
-  const container = document.getElementById('gruposComodos');
-  container.innerHTML = '';
+/* ═══════════════════════════════════════════════════════
+   SEÇÃO LOCALIZAÇÃO
+   CEP busca automática via ViaCEP — preenche rua, bairro, cidade, estado
+   ═══════════════════════════════════════════════════════ */
+function renderLocalizacao() {
+  const estados = dom.estados_brasil.map(e =>
+    `<option value="${e}" ${dadosLocalizacao.estado===e?'selected':''}>${e}</option>`
+  ).join('');
 
-  const selecionados = Object.keys(dadosComodos);
-
-  if (selecionados.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="icon">🏠</div>
-        <p>Nenhum cômodo selecionado ainda.<br>Marque os ambientes acima para começar o preenchimento.</p>
-      </div>`;
-    return;
-  }
-
-  selecionados.forEach((tipo, idx) => {
-    const dados = dadosComodos[tipo];
-    const preenchido = contarPreenchidos(tipo);
-    const total = contarTotal(tipo);
-
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.id = 'card-' + tipo.replace(/\s/g,'_');
-
-    const estaAberto = dados._aberto !== false;
-
-    card.innerHTML = `
-      <div class="card-header" onclick="toggleCard('${tipo}')">
-        <div class="card-header-left">
-          <div class="card-num">${idx + 1}</div>
-          <div>
-            <div class="card-title">${tipo}</div>
-            <div class="card-subtitle">${preenchido} de ${total} campos preenchidos</div>
+  document.getElementById('sec-localizacao').innerHTML = `
+    <div class="secao">
+      <div class="secao-header">
+        <div class="secao-icone">📍</div>
+        <div>
+          <div class="secao-titulo">Localização do Imóvel</div>
+          <div class="secao-subtitulo">Digite o CEP para preenchimento automático</div>
+        </div>
+      </div>
+      <div class="secao-body">
+        <div class="grid-2">
+          <div class="campo">
+            <label>País</label>
+            <div class="select-wrap">
+              <select onchange="salvarLoc('pais',this.value)">
+                <option value="Brasil" selected>Brasil</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+          </div>
+          <div class="campo">
+            <label>CEP</label>
+            <input type="text" id="campo-cep" maxlength="9" placeholder="00000-000"
+              value="${dadosLocalizacao.cep||''}"
+              oninput="mascaraCEP(this)"
+              onblur="buscarCEP(this.value)">
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px">
-          ${preenchido === total && total > 0 ? '<span class="badge-ok">✓ Completo</span>' : ''}
-          <span class="card-arrow ${estaAberto ? 'open' : ''}">▾</span>
+        <div class="grid-2">
+          <div class="campo">
+            <label>Rua / Logradouro</label>
+            <input type="text" id="campo-rua" readonly placeholder="Preenchido pelo CEP"
+              value="${dadosLocalizacao.rua||''}">
+          </div>
+          <div class="campo">
+            <label>Bairro</label>
+            <input type="text" id="campo-bairro" readonly placeholder="Preenchido pelo CEP"
+              value="${dadosLocalizacao.bairro||''}">
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="campo">
+            <label>Número</label>
+            <input type="text" placeholder="Ex: 123"
+              value="${dadosLocalizacao.numero||''}"
+              oninput="salvarLoc('numero',this.value); atualizarBotao()">
+          </div>
+          <div class="campo">
+            <label>Complemento</label>
+            <input type="text" placeholder="Apto, Bloco..."
+              value="${dadosLocalizacao.complemento||''}"
+              oninput="salvarLoc('complemento',this.value)">
+          </div>
+          <div class="campo">
+            <label>Estado</label>
+            <div class="select-wrap">
+              <select id="campo-estado" onchange="salvarLoc('estado',this.value)">
+                <option value="">— selecione —</option>${estados}
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="campo">
+            <label>Cidade</label>
+            <input type="text" id="campo-cidade" readonly placeholder="Preenchida pelo CEP"
+              value="${dadosLocalizacao.cidade||''}">
+          </div>
         </div>
       </div>
-      <div class="card-body ${estaAberto ? 'open' : ''}" id="body-${tipo.replace(/\s/g,'_')}">
-        ${renderFormComodo(tipo)}
+    </div>`;
+}
+
+/* Aplica máscara 00000-000 enquanto digita */
+function mascaraCEP(input) {
+  let v = input.value.replace(/\D/g,'').slice(0,8);
+  if (v.length > 5) v = v.slice(0,5) + '-' + v.slice(5);
+  input.value = v;
+}
+
+/* Consulta ViaCEP e preenche campos de endereço automaticamente */
+async function buscarCEP(cep) {
+  const limpo = cep.replace(/\D/g,'');
+  if (limpo.length !== 8) return;
+  try {
+    const r = await fetch(`https://viacep.com.br/ws/${limpo}/json/`);
+    const d = await r.json();
+    if (d.erro) { alert('CEP não encontrado.'); return; }
+    document.getElementById('campo-rua').value    = d.logradouro || '';
+    document.getElementById('campo-bairro').value = d.bairro     || '';
+    document.getElementById('campo-cidade').value = d.localidade || '';
+    document.getElementById('campo-estado').value = d.uf         || '';
+    salvarLoc('cep',    cep);
+    salvarLoc('rua',    d.logradouro || '');
+    salvarLoc('bairro', d.bairro     || '');
+    salvarLoc('cidade', d.localidade || '');
+    salvarLoc('estado', d.uf         || '');
+    atualizarBotao();
+  } catch(e) { console.warn('Erro CEP:', e.message); }
+}
+
+function salvarLoc(campo, valor) { dadosLocalizacao[campo] = valor; }
+
+
+/* ═══════════════════════════════════════════════════════
+   SEÇÃO CÔMODOS
+   Sala opcional + quartos em loop
+   ═══════════════════════════════════════════════════════ */
+function renderComodos() {
+  document.getElementById('sec-comodos').innerHTML = `
+    <div class="secao">
+      <div class="secao-header">
+        <div class="secao-icone">🏠</div>
+        <div>
+          <div class="secao-titulo">Cômodos</div>
+          <div class="secao-subtitulo">Adicione e detalhe cada ambiente</div>
+        </div>
       </div>
-    `;
-    container.appendChild(card);
-  });
-}
-
-// ── FORMULÁRIO DO CÔMODO ──────────────────────────────────────
-function renderFormComodo(tipo) {
-  let html = '';
-
-  // Dimensões
-  html += `<p class="secao-label">Dimensões</p>`;
-  html += `<div class="dimensoes-grid">`;
-  html += campoDimensao(tipo, 'largura', 'Largura (m)');
-  html += campoDimensao(tipo, 'comprimento', 'Comprimento (m)');
-  html += `<div class="area-col">
-    <div class="campo-grupo">
-      <label>Área calculada</label>
-      <div class="area-calc" id="area-${tipo.replace(/\s/g,'_')}">
-        ${calcularArea(tipo)} <span>m²</span>
-      </div>
-    </div>
-  </div>`;
-  html += `</div>`;
-
-  html += `<hr class="divisor">`;
-
-  // Atributos comuns
-  html += `<p class="secao-label">Atributos comuns</p>`;
-  html += `<div class="campos-2col">`;
-  dominios.atributos_comuns.forEach(attr => {
-    html += campoAtributo(tipo, attr);
-  });
-  html += `</div>`;
-
-  // Atributos específicos
-  const especificos = dominios.atributos_especificos[tipo];
-  if (especificos && especificos.length > 0) {
-    html += `<hr class="divisor">`;
-    html += `<p class="secao-label">Atributos específicos — ${tipo}</p>`;
-    html += `<div class="campos-2col">`;
-    especificos.forEach(attr => {
-      html += campoAtributo(tipo, attr);
-    });
-    html += `</div>`;
-  }
-
-  return html;
-}
-
-function campoDimensao(tipo, campo, label) {
-  const val = dadosComodos[tipo][campo] || '';
-  const id = tipo.replace(/\s/g,'_');
-  return `<div class="campo-grupo">
-    <label>${label}</label>
-    <input type="number" min="0" step="0.01" value="${val}" placeholder="0.00"
-      oninput="salvarDado('${tipo}','${campo}',this.value); atualizarArea('${id}','${tipo}')">
-  </div>`;
-}
-
-function campoAtributo(tipo, attr) {
-  const val = dadosComodos[tipo][attr.id] || '';
-  if (attr.tipo === 'select') {
-    let opts = `<option value="">— selecione —</option>`;
-    attr.opcoes.forEach(op => {
-      opts += `<option value="${op}" ${val === op ? 'selected' : ''}>${op}</option>`;
-    });
-    return `<div class="campo-grupo">
-      <label>${attr.label}</label>
-      <div class="select-wrapper">
-        <select onchange="salvarDado('${tipo}','${attr.id}',this.value); atualizarContador('${tipo}')">
-          ${opts}
-        </select>
+      <div class="secao-body">
+        <button class="btn-adicionar" onclick="toggleSala()" id="btn-sala">
+          ${salaAtiva ? '✕ Remover Sala' : '+ Adicionar Sala'}
+        </button>
+        <div id="bloco-sala"></div>
+        <div id="lista-quartos"></div>
+        <button class="btn-adicionar" onclick="adicionarQuarto()">+ Adicionar Quarto</button>
       </div>
     </div>`;
+  if (salaAtiva) renderBlocoSala();
+  quartos.forEach(q => renderBlocoQuarto(q.id));
+}
+
+function toggleSala() {
+  salaAtiva = !salaAtiva;
+  if (!salaAtiva) dadosSala = {};
+  document.getElementById('btn-sala').textContent = salaAtiva ? '✕ Remover Sala' : '+ Adicionar Sala';
+  if (salaAtiva) renderBlocoSala();
+  else document.getElementById('bloco-sala').innerHTML = '';
+  atualizarBotao();
+}
+
+function renderBlocoSala() {
+  document.getElementById('bloco-sala').innerHTML =
+    cartaoComodo('sala', 'Sala', 0, dadosSala, 'Sala', false);
+}
+
+function adicionarQuarto() {
+  contadorQuartos++;
+  const id = 'q' + contadorQuartos;
+  quartos.push({ id, dados: {} });
+  renderBlocoQuarto(id);
+  atualizarBotao();
+}
+
+function renderBlocoQuarto(id) {
+  const idx    = quartos.findIndex(q => q.id === id);
+  const q      = quartos[idx];
+  const num    = idx + 1;
+  const eSuite = q.dados.e_suite === 'Sim';
+  const nome   = eSuite ? `Suíte ${num}` : `Quarto ${num}`;
+  const antigo = document.getElementById('bloco-' + id);
+  if (antigo) antigo.remove();
+  const div = document.createElement('div');
+  div.id = 'bloco-' + id;
+  div.innerHTML = cartaoComodo(id, nome, num, q.dados, 'Quarto', true);
+  document.getElementById('lista-quartos').appendChild(div);
+  atualizarBanheiroSuite(id);
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   CARTÃO DE CÔMODO
+   Gera o HTML completo de um cômodo com todos os seus atributos
+   ═══════════════════════════════════════════════════════ */
+function cartaoComodo(id, nome, num, dados, tipo, removivel) {
+  const pre    = contarPreenchidos(tipo, dados);
+  const tot    = contarTotal(tipo);
+  const eSuite = dados.e_suite === 'Sim';
+
+  /* Atributos comuns agrupados por grupo */
+  const gruposC = {};
+  dom.atributos_comuns.forEach(a => {
+    if (!gruposC[a.grupo]) gruposC[a.grupo] = [];
+    gruposC[a.grupo].push(a);
+  });
+  let attrComuns = '';
+  Object.keys(gruposC).forEach(g => {
+    attrComuns += `<div class="grupo-label">${g}</div><div class="grid-2">`;
+    gruposC[g].forEach(a => { attrComuns += campoDom(a, dados, id); });
+    attrComuns += '</div>';
+  });
+
+  /* Atributos específicos do tipo de cômodo */
+  let attrEsp = '';
+  const esp = dom.atributos_especificos[tipo];
+  if (esp && esp.length > 0) {
+    const gruposE = {};
+    esp.forEach(a => {
+      if (!gruposE[a.grupo]) gruposE[a.grupo] = [];
+      gruposE[a.grupo].push(a);
+    });
+    Object.keys(gruposE).forEach(g => {
+      attrEsp += `<div class="grupo-label">${g}</div><div class="grid-2">`;
+      gruposE[g].forEach(a => { attrEsp += campoDom(a, dados, id); });
+      attrEsp += '</div>';
+    });
+  }
+
+  /* Subgrupo banheiro — visível apenas quando é suíte */
+  let banheiro = '';
+  if (tipo === 'Quarto') {
+    const gruposB = {};
+    dom.atributos_banheiro_suite.campos.forEach(a => {
+      if (!gruposB[a.grupo]) gruposB[a.grupo] = [];
+      gruposB[a.grupo].push(a);
+    });
+    let camposBan = '';
+    Object.keys(gruposB).forEach(g => {
+      camposBan += `<div class="grupo-label">${g}</div><div class="grid-2">`;
+      gruposB[g].forEach(a => { camposBan += campoDom(a, dados, id + '_ban'); });
+      camposBan += '</div>';
+    });
+    banheiro = `
+      <div class="banheiro-grupo ${eSuite?'visivel':''}" id="ban-${id}">
+        <div class="banheiro-header">🚿 Banheiro da suíte</div>
+        <div class="banheiro-body">${camposBan}</div>
+      </div>`;
+  }
+
+  return `
+    <div class="comodo-card" id="card-${id}">
+      <div class="comodo-header" onclick="toggleComodo('${id}')">
+        <div class="comodo-header-left">
+          ${num > 0 ? `<div class="comodo-num">${num}</div>` : ''}
+          <div>
+            <div class="comodo-nome" id="nome-${id}">${nome}</div>
+            <div class="comodo-progresso" id="prog-${id}">${pre} de ${tot} campos preenchidos</div>
+          </div>
+        </div>
+        <div class="comodo-acoes" id="acoes-${id}">
+          ${eSuite ? '<span class="badge-suite">Suíte</span>' : ''}
+          ${pre===tot && tot>0 ? '<span class="badge-ok">✓ Completo</span>' : ''}
+          ${removivel ? `<button class="btn-remover" onclick="removerQuarto('${id}',event)">✕</button>` : ''}
+          <span class="comodo-arrow aberto" id="arrow-${id}">▾</span>
+        </div>
+      </div>
+      <div class="comodo-body aberto" id="body-${id}">
+
+        <!-- Apelido: referência interna do cadastrante, não exportado -->
+        <div class="apelido-wrap">
+          <span class="apelido-label">Apelido (ref. interna):</span>
+          <input type="text" placeholder="Ex: Quarto do Miguel..."
+            value="${dados._apelido||''}"
+            oninput="salvarDado('${id}','_apelido',this.value)">
+        </div>
+
+        <!-- Formato e dimensões -->
+        <div class="grupo-label">Dimensões</div>
+        <div class="grid-3">
+          <div class="campo">
+            <label>Formato</label>
+            <div class="select-wrap">
+              <select id="formato-${id}"
+                onchange="salvarDado('${id}','formato',this.value); atualizarDimensoes('${id}')">
+                <option value="">— selecione —</option>
+                <option value="Retangular"       ${dados.formato==='Retangular'       ?'selected':''}>Retangular</option>
+                <option value="Planta irregular"  ${dados.formato==='Planta irregular' ?'selected':''}>Planta irregular</option>
+              </select>
+            </div>
+          </div>
+          <div id="dims-${id}" style="display:contents">${htmlDimensoes(id,dados)}</div>
+        </div>
+
+        ${attrComuns}
+        ${attrEsp}
+        ${banheiro}
+      </div>
+    </div>`;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   DIMENSÕES
+   Retangular mostra L x C e calcula área; irregular pede m² direto
+   ═══════════════════════════════════════════════════════ */
+function htmlDimensoes(id, dados) {
+  if (!dados.formato) return '<div></div><div></div>';
+  if (dados.formato === 'Retangular') {
+    return `
+      <div class="campo">
+        <label>Largura (m)</label>
+        <input type="number" min="0" step="0.01" placeholder="0.00"
+          value="${dados.largura||''}"
+          oninput="salvarDado('${id}','largura',this.value); calcularArea('${id}')">
+      </div>
+      <div class="campo">
+        <label>Comprimento (m)</label>
+        <input type="number" min="0" step="0.01" placeholder="0.00"
+          value="${dados.comprimento||''}"
+          oninput="salvarDado('${id}','comprimento',this.value); calcularArea('${id}')">
+      </div>`;
   } else {
-    return `<div class="campo-grupo">
-      <label>${attr.label}</label>
-      <input type="number" min="0" value="${val}" placeholder="0"
-        oninput="salvarDado('${tipo}','${attr.id}',this.value); atualizarContador('${tipo}')">
-    </div>`;
+    return `
+      <div class="campo">
+        <label>Área total (m²)</label>
+        <input type="number" min="0" step="0.01" placeholder="Ex: 18.50"
+          value="${dados.area_total||''}"
+          oninput="salvarDado('${id}','area_total',this.value); atualizarProgresso('${id}')">
+      </div>
+      <div></div>`;
   }
 }
 
-// ── HELPERS ───────────────────────────────────────────────────
-function salvarDado(tipo, campo, valor) {
-  if (!dadosComodos[tipo]) dadosComodos[tipo] = {};
-  dadosComodos[tipo][campo] = valor;
-  atualizarBotao();
+function atualizarDimensoes(id) {
+  const dados = getDados(id);
+  const el = document.getElementById('dims-' + id);
+  if (el) el.outerHTML = `<div id="dims-${id}" style="display:contents">${htmlDimensoes(id,dados)}</div>`;
+  atualizarProgresso(id);
 }
 
-function atualizarArea(id, tipo) {
-  const el = document.getElementById('area-' + id);
-  if (el) el.innerHTML = calcularArea(tipo) + ' <span>m²</span>';
+function calcularArea(id) {
+  const dados = getDados(id);
+  const l = parseFloat(dados.largura)     || 0;
+  const c = parseFloat(dados.comprimento) || 0;
+  if (l && c) salvarDado(id, 'area_total', (l*c).toFixed(2));
+  atualizarProgresso(id);
 }
 
-function calcularArea(tipo) {
-  const d = dadosComodos[tipo] || {};
-  const l = parseFloat(d.largura) || 0;
-  const c = parseFloat(d.comprimento) || 0;
-  return l && c ? (l * c).toFixed(2) : '—';
+
+/* ═══════════════════════════════════════════════════════
+   GERAÇÃO DE CAMPO HTML A PARTIR DO JSON
+   ═══════════════════════════════════════════════════════ */
+function campoDom(attr, dados, scopeId) {
+  const val = dados[attr.id] || '';
+  if (attr.tipo === 'select') {
+    const opts = `<option value="">— selecione —</option>` +
+      attr.opcoes.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('');
+    return `
+      <div class="campo">
+        <label>${attr.label}</label>
+        <div class="select-wrap">
+          <select onchange="salvarDado('${scopeId}','${attr.id}',this.value)">${opts}</select>
+        </div>
+      </div>`;
+  } else {
+    return `
+      <div class="campo">
+        <label>${attr.label}</label>
+        <input type="${attr.tipo==='number'?'number':'text'}" min="0"
+          placeholder="${attr.tipo==='number'?'0':''}"
+          value="${val}"
+          oninput="salvarDado('${scopeId}','${attr.id}',this.value)">
+      </div>`;
+  }
 }
 
-function atualizarContador(tipo) {
-  const id = tipo.replace(/\s/g,'_');
-  const card = document.getElementById('card-' + id);
-  if (!card) return;
-  const pre = contarPreenchidos(tipo);
-  const tot = contarTotal(tipo);
-  const sub = card.querySelector('.card-subtitle');
-  if (sub) sub.textContent = `${pre} de ${tot} campos preenchidos`;
-  const badge = card.querySelector('.badge-ok');
-  const headerRight = card.querySelector('.card-header > div:last-child');
-  if (pre === tot && tot > 0) {
-    if (!badge && headerRight) {
-      const b = document.createElement('span');
-      b.className = 'badge-ok';
-      b.textContent = '✓ Completo';
-      headerRight.insertBefore(b, headerRight.lastElementChild);
+
+/* ═══════════════════════════════════════════════════════
+   SALVAR DADOS
+   Redireciona para o objeto correto conforme o escopo
+   ═══════════════════════════════════════════════════════ */
+function salvarDado(scopeId, campo, valor) {
+  const id = scopeId.replace('_ban','');
+  if (id === 'cadastrante') {
+    dadosCadastrante[campo] = valor;
+  } else {
+    const dados = getDados(id);
+    dados[campo] = valor;
+    if (campo === 'e_suite') {
+      atualizarBanheiroSuite(id);
+      atualizarNomeQuarto(id);
     }
-  } else if (badge) badge.remove();
+  }
+  atualizarProgresso(id);
   atualizarBotao();
 }
 
+function getDados(id) {
+  if (id === 'sala') return dadosSala;
+  const q = quartos.find(q => q.id === id);
+  return q ? q.dados : {};
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   LÓGICA DE SUÍTE
+   Exibe banheiro e renomeia o cômodo quando "É suíte = Sim"
+   ═══════════════════════════════════════════════════════ */
+function atualizarBanheiroSuite(id) {
+  const dados  = getDados(id);
+  const eSuite = dados.e_suite === 'Sim';
+  const ban    = document.getElementById('ban-' + id);
+  if (ban) ban.classList.toggle('visivel', eSuite);
+}
+
+function atualizarNomeQuarto(id) {
+  const idx = quartos.findIndex(q => q.id === id);
+  if (idx < 0) return;
+  const num    = idx + 1;
+  const eSuite = quartos[idx].dados.e_suite === 'Sim';
+  const el     = document.getElementById('nome-' + id);
+  if (el) el.textContent = eSuite ? `Suíte ${num}` : `Quarto ${num}`;
+  const acoes = document.getElementById('acoes-' + id);
+  if (!acoes) return;
+  const badgeExist = acoes.querySelector('.badge-suite');
+  if (eSuite && !badgeExist) {
+    const b = document.createElement('span');
+    b.className = 'badge-suite'; b.textContent = 'Suíte';
+    acoes.insertBefore(b, acoes.firstChild);
+  } else if (!eSuite && badgeExist) { badgeExist.remove(); }
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   REMOVER QUARTO
+   ═══════════════════════════════════════════════════════ */
+function removerQuarto(id, e) {
+  e.stopPropagation();
+  quartos = quartos.filter(q => q.id !== id);
+  const bloco = document.getElementById('bloco-' + id);
+  if (bloco) bloco.remove();
+  /* Renumera os restantes */
+  quartos.forEach((q, idx) => {
+    const el = document.getElementById('nome-' + q.id);
+    if (el) el.textContent = q.dados.e_suite==='Sim' ? `Suíte ${idx+1}` : `Quarto ${idx+1}`;
+  });
+  atualizarBotao();
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   ABRIR / FECHAR CARTÃO
+   ═══════════════════════════════════════════════════════ */
+function toggleComodo(id) {
+  document.getElementById('body-'  + id)?.classList.toggle('aberto');
+  document.getElementById('arrow-' + id)?.classList.toggle('aberto');
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   PROGRESSO DO CÔMODO
+   ═══════════════════════════════════════════════════════ */
 function contarTotal(tipo) {
-  let n = 2; // largura + comprimento
-  n += dominios.atributos_comuns.length;
-  const esp = dominios.atributos_especificos[tipo];
+  let n = 1 + dom.atributos_comuns.length;
+  const esp = dom.atributos_especificos[tipo];
   if (esp) n += esp.length;
   return n;
 }
 
-function contarPreenchidos(tipo) {
-  const d = dadosComodos[tipo] || {};
+function contarPreenchidos(tipo, dados) {
   let n = 0;
-  if (d.largura) n++;
-  if (d.comprimento) n++;
-  dominios.atributos_comuns.forEach(a => { if (d[a.id]) n++; });
-  const esp = dominios.atributos_especificos[tipo];
-  if (esp) esp.forEach(a => { if (d[a.id]) n++; });
+  if (dados.formato) n++;
+  dom.atributos_comuns.forEach(a => { if (dados[a.id]) n++; });
+  const esp = dom.atributos_especificos[tipo];
+  if (esp) esp.forEach(a => { if (dados[a.id]) n++; });
   return n;
 }
 
-function toggleCard(tipo) {
-  const id = tipo.replace(/\s/g,'_');
-  const body = document.getElementById('body-' + id);
-  const card = document.getElementById('card-' + id);
-  const arrow = card.querySelector('.card-arrow');
-  const aberto = body.classList.toggle('open');
-  arrow.classList.toggle('open', aberto);
-  dadosComodos[tipo]._aberto = aberto;
+function atualizarProgresso(id) {
+  const tipo  = id === 'sala' ? 'Sala' : 'Quarto';
+  const dados = getDados(id);
+  const pre   = contarPreenchidos(tipo, dados);
+  const tot   = contarTotal(tipo);
+  const el    = document.getElementById('prog-' + id);
+  if (el) el.textContent = `${pre} de ${tot} campos preenchidos`;
+  const acoes = document.getElementById('acoes-' + id);
+  if (!acoes) return;
+  const badge = acoes.querySelector('.badge-ok');
+  if (pre===tot && tot>0 && !badge) {
+    const b = document.createElement('span');
+    b.className = 'badge-ok'; b.textContent = '✓ Completo';
+    const btnRem = acoes.querySelector('.btn-remover');
+    acoes.insertBefore(b, btnRem || acoes.lastChild);
+  } else if ((pre!==tot || tot===0) && badge) { badge.remove(); }
 }
 
+
+/* ═══════════════════════════════════════════════════════
+   HABILITAR BOTÃO DE EXPORTAÇÃO
+   Requer CEP + número preenchidos e ao menos um cômodo
+   ═══════════════════════════════════════════════════════ */
 function atualizarBotao() {
-  const btn = document.getElementById('btnExportar');
-  const temDados = Object.keys(dadosComodos).length > 0;
-  btn.disabled = !temDados;
+  const btn      = document.getElementById('btnExportar');
+  const temLoc   = dadosLocalizacao.cep && dadosLocalizacao.numero;
+  const temComodo = salaAtiva || quartos.length > 0;
+  btn.disabled   = !(temLoc && temComodo);
 }
 
-// ── EXPORTAR EXCEL ────────────────────────────────────────────
+
+/* ═══════════════════════════════════════════════════════
+   EXPORTAÇÃO PARA EXCEL
+   Estrutura: Cômodo | Grupo | Característica | Valor
+   Linhas em branco não são exportadas
+   Nome do arquivo: FT_BR_{CEP}_{Complemento}.xlsx
+   ═══════════════════════════════════════════════════════ */
 function exportarExcel() {
-  const linhas = [['Cômodo', 'Característica', 'Valor']];
+  const linhas = [['Cômodo', 'Grupo', 'Característica', 'Valor']];
 
-  Object.keys(dadosComodos).forEach(tipo => {
-    const d = dadosComodos[tipo];
-
-    // Dimensões
-    if (d.largura)      linhas.push([tipo, 'Largura (m)', d.largura]);
-    if (d.comprimento)  linhas.push([tipo, 'Comprimento (m)', d.comprimento]);
-    const area = calcularArea(tipo);
-    if (area !== '—')   linhas.push([tipo, 'Área calculada (m²)', area]);
-
-    // Atributos comuns
-    dominios.atributos_comuns.forEach(attr => {
-      if (d[attr.id]) linhas.push([tipo, attr.label, d[attr.id]]);
-    });
-
-    // Atributos específicos
-    const esp = dominios.atributos_especificos[tipo];
-    if (esp) esp.forEach(attr => {
-      if (d[attr.id]) linhas.push([tipo, attr.label, d[attr.id]]);
-    });
+  /* Cadastrante */
+  dom.cadastrante.campos.forEach(c => {
+    const v = dadosCadastrante[c.id];
+    if (v) linhas.push(['Cadastrante', c.grupo, c.label, v]);
   });
 
+  /* Localização */
+  [['pais','País'],['cep','CEP'],['rua','Rua'],['bairro','Bairro'],
+   ['numero','Número'],['complemento','Complemento'],
+   ['cidade','Cidade'],['estado','Estado']
+  ].forEach(([id, label]) => {
+    const v = dadosLocalizacao[id];
+    if (v) linhas.push(['Imóvel', 'Localização', label, v]);
+  });
+
+  /* Função auxiliar: exporta um cômodo linha a linha */
+  const exportarComodo = (nomeComodo, tipo, dados) => {
+    if (dados.formato) {
+      linhas.push([nomeComodo, 'Dimensões', 'Formato', dados.formato]);
+      if (dados.formato === 'Retangular') {
+        if (dados.largura)     linhas.push([nomeComodo, 'Dimensões', 'Largura (m)',     dados.largura]);
+        if (dados.comprimento) linhas.push([nomeComodo, 'Dimensões', 'Comprimento (m)', dados.comprimento]);
+      }
+      if (dados.area_total) linhas.push([nomeComodo, 'Dimensões', 'Área total (m²)', dados.area_total]);
+    }
+    dom.atributos_comuns.forEach(a => {
+      if (dados[a.id]) linhas.push([nomeComodo, a.grupo, a.label, dados[a.id]]);
+    });
+    const esp = dom.atributos_especificos[tipo];
+    if (esp) esp.forEach(a => {
+      if (dados[a.id]) linhas.push([nomeComodo, a.grupo, a.label, dados[a.id]]);
+    });
+    if (tipo === 'Quarto' && dados.e_suite === 'Sim') {
+      dom.atributos_banheiro_suite.campos.forEach(a => {
+        if (dados[a.id]) linhas.push([nomeComodo, a.grupo, a.label, dados[a.id]]);
+      });
+    }
+  };
+
+  if (salaAtiva) exportarComodo('Sala', 'Sala', dadosSala);
+
+  quartos.forEach((q, idx) => {
+    const num  = idx + 1;
+    const nome = q.dados.e_suite === 'Sim' ? `Suíte ${num}` : `Quarto ${num}`;
+    exportarComodo(nome, 'Quarto', q.dados);
+  });
+
+  /* Gera o arquivo */
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(linhas);
-
-  // Larguras das colunas
-  ws['!cols'] = [{ wch: 18 }, { wch: 28 }, { wch: 28 }];
-
-  // Estilo do cabeçalho
-  ['A1','B1','C1'].forEach(cell => {
-    if (ws[cell]) ws[cell].s = { font: { bold: true } };
-  });
-
+  ws['!cols'] = [{wch:18},{wch:28},{wch:28},{wch:30}];
+  ['A1','B1','C1','D1'].forEach(c => { if (ws[c]) ws[c].s = {font:{bold:true}}; });
   XLSX.utils.book_append_sheet(wb, ws, 'Ficha');
 
-  const data = new Date();
-  const nome = `ficha_imovel_${data.getFullYear()}${String(data.getMonth()+1).padStart(2,'0')}${String(data.getDate()).padStart(2,'0')}.xlsx`;
-  XLSX.writeFile(wb, nome);
+  /* Nome: FT_BR_{CEP}_{complemento ou numero} */
+  const cep  = (dadosLocalizacao.cep||'SEM_CEP').replace(/\D/g,'');
+  const comp = (dadosLocalizacao.complemento || dadosLocalizacao.numero || 'SN')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_');
+  XLSX.writeFile(wb, `FT_BR_${cep}_${comp}.xlsx`);
 }
 
-// ── INIT ──────────────────────────────────────────────────────
+/* Inicializa */
 carregarDominios();
 </script>
 </body>
