@@ -43,13 +43,18 @@ function atualizarCacheFiltros(imoveis) {
  * @param {Array<Object>} imoveis
  */
 function popularDropdowns(imoveis) {
-  const estados    = extrairUnicos(imoveis, i => i.localizacao?.['Estado']);
-  const cidades    = extrairUnicos(imoveis, i => i.localizacao?.['Cidade']);
+  const estados      = extrairUnicos(imoveis, i => i.localizacao?.['Estado']);
+  const cidades      = extrairUnicos(imoveis, i => i.localizacao?.['Cidade']);
   const cadastrantes = extrairUnicos(imoveis, i => i.cadastrante?.['Tipo']);
+  /* Tipo de imóvel — campo adicionado na ficha v0.3.0 */
+  const tiposImovel  = extrairUnicos(imoveis, i =>
+    i.localizacao?.['Tipo de Imóvel'] || i.localizacao?.['Tipo de Imovel']
+  );
 
-  preencherSelect('filtro-estado',      estados,      'Todos os estados');
-  preencherSelect('filtro-cidade',      cidades,      'Todas as cidades');
-  preencherSelect('filtro-cadastrante', cadastrantes, 'Todos');
+  preencherSelect('filtro-estado',       estados,      'Todos os estados');
+  preencherSelect('filtro-cidade',       cidades,      'Todas as cidades');
+  preencherSelect('filtro-cadastrante',  cadastrantes, 'Todos');
+  preencherSelect('filtro-tipo-imovel',  tiposImovel,  'Todos os tipos');
 }
 
 /**
@@ -151,7 +156,7 @@ function registrarEventos() {
   }
 
   // Demais selects do painel
-  ['filtro-cidade', 'filtro-comodos', 'filtro-cadastrante', 'filtro-ordenar'].forEach(id => {
+  ['filtro-cidade', 'filtro-comodos', 'filtro-cadastrante', 'filtro-tipo-imovel', 'filtro-ordenar'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('change', aplicarFiltros);
   });
@@ -177,8 +182,9 @@ function aplicarFiltros() {
   const estado      = document.getElementById('filtro-estado')?.value       || '';
   const cidade      = document.getElementById('filtro-cidade')?.value       || '';
   const comodos     = parseInt(document.getElementById('filtro-comodos')?.value  || '0');
-  const cadastrante = document.getElementById('filtro-cadastrante')?.value  || '';
-  const ordenar     = document.getElementById('filtro-ordenar')?.value      || 'recente';
+  const cadastrante = document.getElementById('filtro-cadastrante')?.value   || '';
+  const tipoImovel  = document.getElementById('filtro-tipo-imovel')?.value   || '';
+  const ordenar     = document.getElementById('filtro-ordenar')?.value       || 'recente';
 
   /* ---- Busca livre ---- */
   if (busca) {
@@ -198,6 +204,9 @@ function aplicarFiltros() {
   if (cidade)      resultado = resultado.filter(i => i.localizacao?.['Cidade'] === cidade);
   if (comodos > 0) resultado = resultado.filter(i => (i.comodos?.length || 0) >= comodos);
   if (cadastrante) resultado = resultado.filter(i => i.cadastrante?.['Tipo'] === cadastrante);
+  if (tipoImovel)  resultado = resultado.filter(i =>
+    (i.localizacao?.['Tipo de Imóvel'] || i.localizacao?.['Tipo de Imovel']) === tipoImovel
+  );
 
   /* ---- Ordenação ---- */
   resultado.sort((a, b) => {
@@ -252,7 +261,7 @@ function togglePainelFiltros() {
  * Reseta todos os controles de filtro para o estado inicial.
  */
 function limparTodosFiltros() {
-  const campos = ['filtro-busca', 'filtro-estado', 'filtro-cidade', 'filtro-cadastrante'];
+  const campos = ['filtro-busca', 'filtro-estado', 'filtro-cidade', 'filtro-cadastrante', 'filtro-tipo-imovel'];
   campos.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
@@ -296,6 +305,7 @@ function atualizarBadgeFiltros() {
   if (document.getElementById('filtro-cidade')?.value)             count++;
   if ((parseInt(document.getElementById('filtro-comodos')?.value) || 0) > 0) count++;
   if (document.getElementById('filtro-cadastrante')?.value)        count++;
+  if (document.getElementById('filtro-tipo-imovel')?.value)        count++;
 
   badge.textContent = count;
   badge.style.display = count > 0 ? 'inline-flex' : 'none';
