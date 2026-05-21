@@ -1,46 +1,38 @@
 /* ============================================================
    cards.js — Renderização dos cards de imóveis (página index)
    Depende de: ui.js (formatarData, formatarEndereco)
+   v0.3.0 — adicionado Tipo de Imóvel como meta-tag no card
    ============================================================ */
 
-/**
- * Renderiza toda a grade de cards.
- * Alterna entre o estado vazio e o grid, conforme a lista.
- * @param {Array<Object>} imoveis
- */
 function renderizarCards(imoveis) {
   const grid          = document.getElementById('grid-imoveis');
   const vazio         = document.getElementById('estado-vazio');
   const semResultados = document.getElementById('estado-sem-resultados');
   const contagem      = document.getElementById('contagem');
 
-  // Limpa o grid antes de re-renderizar
   grid.innerHTML = '';
 
   const totalGeral = typeof _todosImoveis !== 'undefined' ? _todosImoveis.length : null;
-  const hayImoveis  = totalGeral === null ? (imoveis?.length > 0) : (totalGeral > 0);
+  const hayImoveis = totalGeral === null ? (imoveis?.length > 0) : (totalGeral > 0);
 
   if (!hayImoveis) {
-    // Nenhum imóvel cadastrado → estado vazio principal
-    if (vazio)         vazio.style.display         = 'flex';
-    if (semResultados) semResultados.style.display  = 'none';
+    if (vazio)         vazio.style.display        = 'flex';
+    if (semResultados) semResultados.style.display = 'none';
     grid.style.display = 'none';
     if (contagem) contagem.textContent = '0 imóveis';
     return;
   }
 
   if (!imoveis || imoveis.length === 0) {
-    // Há imóveis mas filtro não encontrou nada
-    if (vazio)         vazio.style.display         = 'none';
-    if (semResultados) semResultados.style.display  = 'flex';
+    if (vazio)         vazio.style.display        = 'none';
+    if (semResultados) semResultados.style.display = 'flex';
     grid.style.display = 'none';
     if (contagem) contagem.textContent = `${totalGeral} imóvel${totalGeral !== 1 ? 's' : ''}`;
     return;
   }
 
-  // Lista com resultados
-  if (vazio)         vazio.style.display         = 'none';
-  if (semResultados) semResultados.style.display  = 'none';
+  if (vazio)         vazio.style.display        = 'none';
+  if (semResultados) semResultados.style.display = 'none';
   grid.style.display = 'grid';
 
   if (contagem) {
@@ -52,20 +44,17 @@ function renderizarCards(imoveis) {
   }
 }
 
-/**
- * Cria o elemento DOM de um card individual.
- * @param {Object} imovel
- * @returns {HTMLElement}
- */
 function criarCard(imovel) {
-  const loc    = imovel.localizacao  || {};
-  const cad    = imovel.cadastrante  || {};
+  const loc = imovel.localizacao || {};
+  const cad = imovel.cadastrante || {};
 
-  const endereco   = formatarEndereco(loc);
-  const cidade     = [loc['Cidade'], loc['Estado']].filter(Boolean).join(', ');
-  const cep        = loc['CEP'] || '';
-  const qtdComodos = imovel.comodos ? imovel.comodos.length : 0;
-  const tipoCad    = cad['Tipo'] || 'Cadastrante';
+  const endereco    = formatarEndereco(loc);
+  const cidade      = [loc['Cidade'], loc['Estado']].filter(Boolean).join(', ');
+  const cep         = loc['CEP'] || '';
+  const qtdComodos  = imovel.comodos ? imovel.comodos.length : 0;
+  const tipoCad     = cad['Tipo'] || 'Cadastrante';
+  /* Tipo de imóvel — novo campo v0.3.0 */
+  const tipoImovel  = loc['Tipo de Imóvel'] || loc['Tipo de Imovel'] || '';
 
   const card = document.createElement('article');
   card.className = 'card-imovel';
@@ -74,54 +63,46 @@ function criarCard(imovel) {
   card.setAttribute('tabindex', '0');
   card.setAttribute('aria-label', `Ver ficha: ${endereco}`);
 
+  /* Meta-tags: tipo de imóvel (se existir) + cômodos + tipo de cadastrante */
+  const metaTags = [
+    tipoImovel  ? `<span class="meta-tag meta-tag-tipo">${tipoImovel}</span>` : '',
+    qtdComodos > 0
+      ? `<span class="meta-tag">🚪 ${qtdComodos} cômodo${qtdComodos !== 1 ? 's' : ''}</span>`
+      : '',
+    `<span class="meta-tag">${tipoCad}</span>`
+  ].filter(Boolean).join('');
+
   card.innerHTML = `
-    <!-- Área da foto (placeholder por enquanto) -->
     <div class="card-foto">
       <div class="card-foto-placeholder">
-        <!-- Ícone de casa SVG inline -->
         <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M8 50 L8 28 L32 10 L56 28 L56 50 Z"
                 stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" fill="none"/>
-          <rect x="22" y="36" width="20" height="14"
-                stroke="currentColor" stroke-width="2" fill="none"/>
-          <rect x="13" y="27" width="12" height="11"
-                stroke="currentColor" stroke-width="1.5" fill="none"/>
-          <rect x="39" y="27" width="12" height="11"
-                stroke="currentColor" stroke-width="1.5" fill="none"/>
+          <rect x="22" y="36" width="20" height="14" stroke="currentColor" stroke-width="2" fill="none"/>
+          <rect x="13" y="27" width="12" height="11" stroke="currentColor" stroke-width="1.5" fill="none"/>
+          <rect x="39" y="27" width="12" height="11" stroke="currentColor" stroke-width="1.5" fill="none"/>
         </svg>
         <span>Sem foto</span>
       </div>
       ${cep ? `<div class="card-badge">CEP ${cep}</div>` : ''}
     </div>
-
-    <!-- Informações do imóvel -->
     <div class="card-corpo">
       <div class="card-endereco" title="${endereco}">${endereco || 'Endereço não informado'}</div>
       <div class="card-cidade">${cidade || '—'}</div>
-
-      <div class="card-meta">
-        ${qtdComodos > 0
-          ? `<span class="meta-tag">🚪 ${qtdComodos} cômodo${qtdComodos !== 1 ? 's' : ''}</span>`
-          : ''}
-        <span class="meta-tag">${tipoCad}</span>
-      </div>
-
+      <div class="card-meta">${metaTags}</div>
       <div class="card-footer">
         <span class="card-data">Importado ${formatarData(imovel.importadoEm)}</span>
         <button class="btn-ver" data-id="${imovel.id}" onclick="navegarParaImovel(event)">
           Ver ficha →
         </button>
       </div>
-    </div>
-  `;
+    </div>`;
 
-  // Clique no card inteiro (exceto no botão, que tem seu próprio handler)
   card.addEventListener('click', (e) => {
-    if (e.target.classList.contains('btn-ver')) return; // botão cuida de si
+    if (e.target.classList.contains('btn-ver')) return;
     window.location.href = `imovel.html?id=${encodeURIComponent(imovel.id)}`;
   });
 
-  // Acessibilidade: Enter/Space ativa o card
   card.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -132,15 +113,8 @@ function criarCard(imovel) {
   return card;
 }
 
-/**
- * Handler do botão "Ver ficha →" dentro do card.
- * Usa data-id para navegar sem depender de closure da função criarCard.
- * @param {MouseEvent} evento
- */
 function navegarParaImovel(evento) {
-  evento.stopPropagation(); // impede disparo duplo com o listener do card
+  evento.stopPropagation();
   const id = evento.currentTarget.getAttribute('data-id');
-  if (id) {
-    window.location.href = `imovel.html?id=${encodeURIComponent(id)}`;
-  }
+  if (id) window.location.href = `imovel.html?id=${encodeURIComponent(id)}`;
 }
