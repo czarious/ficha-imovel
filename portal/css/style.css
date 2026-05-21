@@ -867,3 +867,133 @@ body  {
 @media (max-width: 400px) {
   .filtros-grade    { grid-template-columns: 1fr; }
 }
+
+/* ================================================================
+   FICHA TÉCNICA v0.3.0 — accordion + tabela resumo
+   ================================================================ */
+
+/* ── Seção accordion (Localização / Cadastrante) ── */
+.ficha-secao-toggle {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: color var(--trans);
+}
+.ficha-secao-toggle:hover { color: var(--verde-hover); }
+
+.ficha-secao-arrow {
+  font-size: 14px;
+  color: var(--texto-fraco);
+  transition: transform 0.25s;
+  flex-shrink: 0;
+}
+.ficha-secao-arrow.aberto { transform: rotate(180deg); }
+
+.ficha-secao-corpo {
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Cômodo accordion na ficha do portal ── */
+.comodo-toggle {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.15s;
+}
+.comodo-toggle:hover { filter: brightness(1.08); }
+
+.comodo-cabecalho-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.comodo-area-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(255,255,255,0.2);
+  color: white;
+  padding: 2px 9px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.comodo-arrow-ficha {
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  transition: transform 0.25s;
+  flex-shrink: 0;
+}
+.comodo-arrow-ficha.aberto { transform: rotate(180deg); }
+
+/* ── Tabela resumo ── */
+.ficha-resumo-wrap {
+  margin-bottom: 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--borda);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--sombra);
+}
+
+.ficha-resumo-titulo {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--verde);
+  padding: 14px 20px 10px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.ficha-resumo-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.ficha-resumo-tabela thead th {
+  background: var(--bg);
+  padding: 9px 20px;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--texto-fraco);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border-bottom: 1px solid var(--borda);
+}
+
+.resumo-linha td {
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--borda);
+  color: var(--texto);
+}
+.resumo-linha:last-child td { border-bottom: none; }
+.resumo-linha:hover td { background: var(--bg); }
+
+.resumo-nome { font-weight: 500; }
+.resumo-area { color: var(--verde); font-weight: 600; text-align: right; }
+
+.ficha-resumo-tabela thead th:last-child { text-align: right; }
+
+.resumo-total td {
+  padding: 10px 20px;
+  background: var(--verde-sutil);
+  font-weight: 700;
+  color: var(--verde);
+  border-top: 2px solid var(--borda);
+}
+.resumo-total td:last-child { text-align: right; }
+
+/* ── Meta-tag especial para tipo de imóvel ── */
+.meta-tag-tipo {
+  background: #EAF0F8;
+  color: #2B4A7A;
+}
