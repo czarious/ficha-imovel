@@ -11,11 +11,11 @@
 
   "tipos_fixos": ["Sala"],
 
-  "cadastrante": {
-    "_comentario": "Campos do cadastrante — corretor, proprietário ou imobiliária",
+  "anunciante": {
+    "_comentario": "Campos do anunciante — corretor, proprietário ou imobiliária",
     "campos": [
       {
-        "id": "tipo", "label": "Tipo de cadastrante", "grupo": "Identificação",
+        "id": "tipo", "label": "Tipo de anunciante", "grupo": "Identificação",
         "tipo": "select",
         "opcoes": ["Proprietário", "Corretor", "Imobiliária"]
       },
