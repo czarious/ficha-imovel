@@ -25,7 +25,7 @@ function renderizarFicha(imovel) {
   }
 
   const loc = imovel.localizacao || {};
-  const cad = imovel.anunciante || {};
+  const cad = imovel.cadastrante || {};
   const endereco = formatarEndereco(loc);
 
   document.title = `${endereco} — Zillow BR`;
@@ -59,7 +59,7 @@ function renderizarFicha(imovel) {
     );
   }
 
-  /* ── Seção: Anunciante — fechada por padrão ── */
+  /* ── Seção: Cadastrante — fechada por padrão ── */
   if (Object.keys(cad).length > 0) {
     html += renderSecaoAccordion(
       'cadastrante',
