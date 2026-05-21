@@ -38,14 +38,14 @@ function atualizarCacheFiltros(imoveis) {
    ================================================================ */
 
 /**
- * Popula os selects de Estado, Cidade e Tipo de anunciante
+ * Popula os selects de Estado, Cidade e Tipo de cadastrante
  * com os valores únicos presentes nos imóveis cadastrados.
  * @param {Array<Object>} imoveis
  */
 function popularDropdowns(imoveis) {
   const estados      = extrairUnicos(imoveis, i => i.localizacao?.['Estado']);
   const cidades      = extrairUnicos(imoveis, i => i.localizacao?.['Cidade']);
-  const anunciantes = extrairUnicos(imoveis, i => i.anunciante?.['Tipo']);
+  const cadastrantes = extrairUnicos(imoveis, i => i.cadastrante?.['Tipo']);
   /* Tipo de imóvel — campo adicionado na ficha v0.3.0 */
   const tiposImovel  = extrairUnicos(imoveis, i =>
     i.localizacao?.['Tipo de Imóvel'] || i.localizacao?.['Tipo de Imovel']
@@ -53,7 +53,7 @@ function popularDropdowns(imoveis) {
 
   preencherSelect('filtro-estado',       estados,      'Todos os estados');
   preencherSelect('filtro-cidade',       cidades,      'Todas as cidades');
-  preencherSelect('filtro-anunciante',  anunciantes, 'Todos');
+  preencherSelect('filtro-cadastrante',  cadastrantes, 'Todos');
   preencherSelect('filtro-tipo-imovel',  tiposImovel,  'Todos os tipos');
 }
 
