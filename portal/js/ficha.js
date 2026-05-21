@@ -1,13 +1,10 @@
+/* versao: 0.3.0 */
 /* ============================================================
    ficha.js — Renderização da ficha técnica completa (imovel.html)
    Depende de: ui.js (formatarData, formatarEndereco)
-   v0.3.0 — accordion + tabela resumo + área total
+   v0.3.0 — accordion + tabela resumo + area total
    ============================================================ */
 
-/**
- * Renderiza a ficha técnica completa de um imóvel no container designado.
- * @param {Object|null} imovel
- */
 function renderizarFicha(imovel) {
   const container = document.getElementById('ficha-container');
   if (!container) return;
@@ -27,10 +24,8 @@ function renderizarFicha(imovel) {
   const loc = imovel.localizacao || {};
   const cad = imovel.cadastrante || {};
   const endereco = formatarEndereco(loc);
-
   document.title = `${endereco} — Zillow BR`;
 
-  /* ── Cabeçalho ── */
   let html = `
     <header class="ficha-cabecalho">
       <h1 class="ficha-titulo">${loc['Rua'] || 'Imóvel'}, ${loc['Número'] || loc['Numero'] || ''}</h1>
@@ -42,41 +37,30 @@ function renderizarFicha(imovel) {
       <span class="ficha-importado">📅 Importado em ${formatarData(imovel.importadoEm, 'longo')}</span>
     </header>`;
 
-  /* ── Tabela resumo de cômodos (estilo Zillow) ── */
+  /* Tabela resumo de cômodos */
   if (imovel.comodos && imovel.comodos.length > 0) {
     html += renderTabelaResumo(imovel.comodos);
   }
 
-  /* ── Seção: Localização — aberta por padrão ── */
+  /* Localização — aberta por padrão */
   if (Object.keys(loc).length > 0) {
-    html += renderSecaoAccordion(
-      'localizacao',
-      '📍 Localização',
+    html += renderSecaoAccordion('localizacao', '📍 Localização',
       `<div class="ficha-grid-atributos">
         ${Object.entries(loc).map(([k, v]) => renderAtributo(k, v)).join('')}
-      </div>`,
-      true  // aberta por padrão
-    );
+      </div>`, true);
   }
 
-  /* ── Seção: Cadastrante — fechada por padrão ── */
+  /* Anunciante — fechada por padrão */
   if (Object.keys(cad).length > 0) {
-    html += renderSecaoAccordion(
-      'cadastrante',
-      '👤 Cadastrante',
+    html += renderSecaoAccordion('cadastrante', '👤 Anunciante',
       `<div class="ficha-grid-atributos">
         ${Object.entries(cad).map(([k, v]) => renderAtributo(k, v)).join('')}
-      </div>`,
-      false  // fechada por padrão
-    );
+      </div>`, false);
   }
 
-  /* ── Seção: Cômodos — cada um colapsável ── */
+  /* Cômodos colapsáveis */
   if (imovel.comodos && imovel.comodos.length > 0) {
-    const comodosHTML = imovel.comodos.map((c, idx) =>
-      renderComodoAccordion(c, idx)
-    ).join('');
-
+    const comodosHTML = imovel.comodos.map((c, idx) => renderComodoAccordion(c, idx)).join('');
     html += `
       <section class="ficha-secao">
         <h2 class="ficha-secao-titulo">🏠 Detalhamento por cômodo</h2>
@@ -85,76 +69,42 @@ function renderizarFicha(imovel) {
   }
 
   container.innerHTML = html;
-
-  /* ── Inicializa accordions após injetar HTML ── */
-  inicializarAccordionsFicha();
 }
 
 /* ================================================================
-   TABELA RESUMO — estilo Zillow
+   TABELA RESUMO
    ================================================================ */
-
-/**
- * Monta a tabela resumo compacta no topo da ficha.
- * Exibe nome do cômodo, metragem e área total calculada.
- * @param {Array} comodos
- * @returns {string}
- */
 function renderTabelaResumo(comodos) {
-  /* Extrai metragem de cada cômodo */
-  const linhas = comodos.map(comodo => {
-    const area = extrairArea(comodo);
+  const linhas = comodos.map(c => {
+    const area = extrairArea(c);
     return `
       <tr class="resumo-linha">
-        <td class="resumo-nome">${escaparHTML(comodo.nome)}</td>
+        <td class="resumo-nome">${escaparHTML(c.nome)}</td>
         <td class="resumo-area">${area ? area + ' m²' : '—'}</td>
       </tr>`;
   }).join('');
 
-  /* Calcula área total dos cômodos com metragem informada */
-  const areaTotal = comodos.reduce((soma, c) => {
-    const a = parseFloat(extrairArea(c)) || 0;
-    return soma + a;
-  }, 0);
-
-  const totalHTML = areaTotal > 0
-    ? `<tr class="resumo-total">
-        <td>Área total dos cômodos</td>
-        <td>${areaTotal.toFixed(2)} m²</td>
-      </tr>`
-    : '';
+  const areaTotal = comodos.reduce((soma, c) => soma + (parseFloat(extrairArea(c)) || 0), 0);
+  const totalHTML = areaTotal > 0 ? `
+    <tr class="resumo-total">
+      <td>Área total dos cômodos</td>
+      <td>${areaTotal.toFixed(2)} m²</td>
+    </tr>` : '';
 
   return `
     <section class="ficha-resumo-wrap">
       <h2 class="ficha-resumo-titulo">Resumo</h2>
       <table class="ficha-resumo-tabela">
-        <thead>
-          <tr>
-            <th>Cômodo</th>
-            <th>Metragem</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${linhas}
-          ${totalHTML}
-        </tbody>
+        <thead><tr><th>Cômodo</th><th>Metragem</th></tr></thead>
+        <tbody>${linhas}${totalHTML}</tbody>
       </table>
     </section>`;
 }
 
-/**
- * Extrai o valor de área total de um cômodo a partir dos seus grupos.
- * Procura pelo item "Área total (m²)" no grupo "Dimensões".
- * @param {Object} comodo
- * @returns {string|null}
- */
 function extrairArea(comodo) {
   for (const grupo of (comodo.grupos || [])) {
     for (const item of (grupo.itens || [])) {
-      if (
-        item.caracteristica === 'Área total (m²)' ||
-        item.caracteristica === 'Area total (m2)'
-      ) {
+      if (item.caracteristica === 'Área total (m²)' || item.caracteristica === 'Area total (m2)') {
         return item.valor || null;
       }
     }
@@ -163,17 +113,8 @@ function extrairArea(comodo) {
 }
 
 /* ================================================================
-   ACCORDION DE SEÇÃO (Localização / Cadastrante)
+   ACCORDION DE SEÇÃO
    ================================================================ */
-
-/**
- * Gera uma seção com header clicável (accordion).
- * @param {string} id — identificador único da seção
- * @param {string} titulo — texto do header
- * @param {string} conteudoHTML — HTML interno da seção
- * @param {boolean} aberta — estado inicial
- * @returns {string}
- */
 function renderSecaoAccordion(id, titulo, conteudoHTML, aberta) {
   return `
     <section class="ficha-secao ficha-secao-accordion" id="sec-${id}">
@@ -187,10 +128,6 @@ function renderSecaoAccordion(id, titulo, conteudoHTML, aberta) {
     </section>`;
 }
 
-/**
- * Abre/fecha uma seção accordion da ficha.
- * @param {string} id
- */
 function toggleSecaoFicha(id) {
   const corpo = document.getElementById('corpo-sec-' + id);
   const arrow = document.getElementById('arrow-sec-' + id);
@@ -203,17 +140,9 @@ function toggleSecaoFicha(id) {
 /* ================================================================
    ACCORDION DE CÔMODO
    ================================================================ */
-
-/**
- * Gera o card de um cômodo com header colapsável.
- * Primeiro cômodo abre por padrão, demais fecham.
- * @param {Object} comodo
- * @param {number} idx — índice (0-based)
- * @returns {string}
- */
 function renderComodoAccordion(comodo, idx) {
-  const aberto = idx === 0; // primeiro cômodo abre, demais fecham
-  const area   = extrairArea(comodo);
+  const aberto   = idx === 0;
+  const area     = extrairArea(comodo);
   const idComodo = 'comodo-' + idx;
 
   const gruposHTML = comodo.grupos.map(grupo => `
@@ -239,10 +168,6 @@ function renderComodoAccordion(comodo, idx) {
     </div>`;
 }
 
-/**
- * Abre/fecha um cômodo accordion na ficha do portal.
- * @param {string} idComodo
- */
 function toggleComodoFicha(idComodo) {
   const corpo = document.getElementById(idComodo);
   const arrow = document.getElementById('arrow-' + idComodo);
@@ -252,25 +177,13 @@ function toggleComodoFicha(idComodo) {
   arrow?.classList.toggle('aberto', !aberto);
 }
 
-/**
- * Inicializa todos os accordions após renderizar a ficha.
- * Necessário porque o HTML é injetado via innerHTML.
- */
-function inicializarAccordionsFicha() {
-  // Nada adicional necessário — estado inicial definido inline no HTML gerado
-}
-
 /* ================================================================
-   HELPERS DE RENDERIZAÇÃO
+   HELPERS
    ================================================================ */
-
 function renderAtributo(chave, valor) {
   let valorFormatado = valor;
-  if (valor === 'Sim') {
-    valorFormatado = '<span style="color:var(--verde);font-weight:700;">✓ Sim</span>';
-  } else if (valor === 'Não' || valor === 'Nao') {
-    valorFormatado = '<span style="color:var(--texto-fraco);">✗ Não</span>';
-  }
+  if (valor === 'Sim') valorFormatado = '<span style="color:var(--verde);font-weight:700;">✓ Sim</span>';
+  else if (valor === 'Não' || valor === 'Nao') valorFormatado = '<span style="color:var(--texto-fraco);">✗ Não</span>';
   return `
     <div class="atributo">
       <span class="atributo-chave">${escaparHTML(chave)}</span>
@@ -281,9 +194,6 @@ function renderAtributo(chave, valor) {
 function escaparHTML(str) {
   if (!str) return '';
   return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
