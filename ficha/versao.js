@@ -22,7 +22,7 @@ const CHANGELOG = [
           'Salas agora são numeráveis: Sala 1, Sala 2... Quando há apenas uma, aparece somente "Sala".',
           'Ao remover um cômodo, os dados preenchidos são preservados em cache. Clicar em "+ Adicionar" restaura o cômodo com tudo que havia sido preenchido.',
           'Botão "↺ Limpar campos" dentro de cada cômodo para zerar os campos explicitamente quando necessário.',
-          'Seções Cadastrante e Localização agora são minimizáveis com accordion, igual aos cômodos.',
+          'Seções Anunciante e Localização agora são minimizáveis com accordion, igual aos cômodos.',
         ]
       },
       {
