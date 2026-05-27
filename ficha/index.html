@@ -186,7 +186,7 @@ const JSON_URL = 'https://raw.githubusercontent.com/czarious/ficha-imovel/main/d
 
 /* Estado global */
 let dom              = null;
-let dadosCadastrante = {};
+let dadosAnunciante = {};
 let dadosLocalizacao = {};
 
 /* Salas: array de { id, dados, removido } — igual aos quartos */
@@ -198,7 +198,7 @@ let quartos          = [];
 let contadorQuartos  = 0;
 
 /* Estado dos accordions das seções principais */
-let cadastranteAberto  = true;
+let anuncianteAberto  = true;
 let localizacaoAberta  = true;
 
 /* Tipos de imóvel predefinidos com grupos */
@@ -240,17 +240,17 @@ async function carregarDominios() {
    ════════════════════════════════════════════════════════ */
 function renderApp() {
   document.getElementById('app').innerHTML = `
-    <div id="sec-cadastrante"></div>
+    <div id="sec-anunciante"></div>
     <div id="sec-localizacao"></div>
     <div id="sec-comodos"></div>`;
-  renderCadastrante();
+  renderAnunciante();
   renderLocalizacao();
   renderComodos();
 }
 
 /* ════════════════════════════════════════════════════════
    ACCORDION DE SEÇÃO
-   Abre/fecha o corpo de uma seção principal (Cadastrante / Localização)
+   Abre/fecha o corpo de uma seção principal (Anunciante / Localização)
    ════════════════════════════════════════════════════════ */
 function toggleSecao(secaoId) {
   const wrap  = document.getElementById('wrap-' + secaoId);
@@ -262,12 +262,12 @@ function toggleSecao(secaoId) {
   if (aberto) {
     wrap.style.maxHeight = '0';
     if (arrow) arrow.classList.remove('aberto');
-    if (secaoId === 'cadastrante') cadastranteAberto = false;
+    if (secaoId === 'anunciante') anuncianteAberto = false;
     else localizacaoAberta = false;
   } else {
     wrap.style.maxHeight = wrap.scrollHeight + 'px';
     if (arrow) arrow.classList.add('aberto');
-    if (secaoId === 'cadastrante') cadastranteAberto = true;
+    if (secaoId === 'anunciante') anuncianteAberto = true;
     else localizacaoAberta = true;
   }
 }
@@ -287,32 +287,32 @@ function inicializarSecao(secaoId, aberto) {
 }
 
 /* ════════════════════════════════════════════════════════
-   SEÇÃO CADASTRANTE — minimizável
+   SEÇÃO ANUNCIANTE — minimizável
    ════════════════════════════════════════════════════════ */
-function renderCadastrante() {
+function renderAnunciante() {
   let campos = '';
-  dom.cadastrante.campos.forEach(c => { campos += campoDom(c, dadosCadastrante, 'cadastrante'); });
+  dom.anunciante.campos.forEach(c => { campos += campoDom(c, dadosAnunciante, 'anunciante'); });
 
-  document.getElementById('sec-cadastrante').innerHTML = `
+  document.getElementById('sec-anunciante').innerHTML = `
     <div class="secao">
-      <div class="secao-header minimizavel" onclick="toggleSecao('cadastrante')">
+      <div class="secao-header minimizavel" onclick="toggleSecao('anunciante')">
         <div class="secao-header-left">
           <div class="secao-icone">👤</div>
           <div>
-            <div class="secao-titulo">Cadastrante</div>
+            <div class="secao-titulo">Anunciante</div>
             <div class="secao-subtitulo">Quem está registrando este imóvel</div>
           </div>
         </div>
-        <span class="secao-arrow" id="arrow-secao-cadastrante">▾</span>
+        <span class="secao-arrow" id="arrow-secao-anunciante">▾</span>
       </div>
-      <div class="secao-body-wrap" id="wrap-cadastrante" style="max-height:0">
+      <div class="secao-body-wrap" id="wrap-anunciante" style="max-height:0">
         <div class="secao-body">
           <div class="grid-2">${campos}</div>
         </div>
       </div>
     </div>`;
 
-  setTimeout(() => inicializarSecao('cadastrante', cadastranteAberto), 10);
+  setTimeout(() => inicializarSecao('anunciante', anuncianteAberto), 10);
 }
 
 /* ════════════════════════════════════════════════════════
@@ -779,8 +779,8 @@ function campoDom(attr, dados, scopeId) {
    ════════════════════════════════════════════════════════ */
 function salvarDado(scopeId, campo, valor) {
   const id = scopeId.replace('_ban','');
-  if (id === 'cadastrante') {
-    dadosCadastrante[campo] = valor;
+  if (id === 'anunciante') {
+    dadosAnunciante[campo] = valor;
   } else {
     const dados = getDados(id);
     dados[campo] = valor;
@@ -908,10 +908,10 @@ function atualizarBotao() {
 function exportarExcel() {
   const linhas = [['Cômodo', 'Grupo', 'Característica', 'Valor']];
 
-  /* Cadastrante */
-  dom.cadastrante.campos.forEach(c => {
-    const v = dadosCadastrante[c.id];
-    if (v) linhas.push(['Cadastrante', c.grupo, c.label, v]);
+  /* Anunciante */
+  dom.anunciante.campos.forEach(c => {
+    const v = dadosAnunciante[c.id];
+    if (v) linhas.push(['Anunciante', c.grupo, c.label, v]);
   });
 
   /* Localização — inclui Tipo de Imóvel */
