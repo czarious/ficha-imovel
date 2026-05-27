@@ -52,7 +52,7 @@ const CHANGELOG = [
       {
         categoria: 'Portal — Filtros',
         itens: [
-          'Filtro completo adicionado na listagem: busca livre por rua, cidade, CEP; filtro por Estado encadeado com Cidade; cômodos mínimos; tipo de cadastrante; ordenação.',
+          'Filtro completo adicionado na listagem: busca livre por rua, cidade, CEP; filtro por Estado encadeado com Cidade; cômodos mínimos; tipo de anunciante; ordenação.',
           'Badge no botão Filtros indica quantos filtros estão ativos.',
           'Botão "Limpar filtros" reseta todos os controles de uma vez.',
           'Estado "sem resultados" diferenciado do estado "sem imóveis cadastrados".',
@@ -109,7 +109,7 @@ const CHANGELOG = [
         categoria: 'Arquitetura',
         itens: [
           'Atributos de cômodo carregados dinamicamente do dominios.json — novos campos sem tocar no HTML.',
-          'Estado global separado por escopo: dadosCadastrante, dadosLocalizacao, dadosSala, quartos[].',
+          'Estado global separado por escopo: dadosAnunciante, dadosLocalizacao, dadosSala, quartos[].',
           'SheetJS carregado via CDN para geração do Excel no navegador.',
         ]
       },
@@ -134,8 +134,8 @@ const CHANGELOG = [
       {
         categoria: 'Ficha Técnica',
         itens: [
-          'Estrutura inicial da ficha com seções Cadastrante, Localização e Cômodos.',
-          'Campos básicos de cadastrante: Tipo, Nome, CPF, CRECI, CRECI-J, Telefone, E-mail.',
+          'Estrutura inicial da ficha com seções Anunciante, Localização e Cômodos.',
+          'Campos básicos de anunciante: Tipo, Nome, CPF, CRECI, CRECI-J, Telefone, E-mail.',
           'Campos básicos de localização: País, CEP, Rua, Bairro, Número, Complemento, Cidade, Estado.',
           'Suporte a Sala única e múltiplos Quartos.',
           'Exportação básica para Excel.',
@@ -146,7 +146,7 @@ const CHANGELOG = [
         itens: [
           'Repositório criado: czarious/ficha-imovel.',
           'GitHub Pages habilitado para publicação estática.',
-          'Arquivo dominios.json criado com estados, campos do cadastrante, atributos comuns e específicos por cômodo.',
+          'Arquivo dominios.json criado com estados, campos do anunciante, atributos comuns e específicos por cômodo.',
           'Estrutura inicial: ficha/index.html + dominios/dominios.json.',
         ]
       }
