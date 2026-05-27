@@ -1,4 +1,5 @@
 {
+  "_arquivo": "f-dominios.json | versao: 0.4.0",
   "_comentario": "Arquivo de domínios da Ficha Técnica de Imóvel. Edite aqui para adicionar opções nos dropdowns sem mexer no HTML.",
 
   "paises": ["Brasil"],
