@@ -1,3 +1,4 @@
+<!-- versao: 0.3.0 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,6 +7,7 @@
   <title>Zillow BR — Portal Imobiliário</title>
   <meta name="description" content="Portal de fichas técnicas profissionais para imóveis brasileiros">
   <link rel="stylesheet" href="css/style.css">
+  <script src="p-versao.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
@@ -23,6 +25,14 @@
         <button class="btn btn-secundario" onclick="acionarImportacao()" aria-label="Importar ficha técnica">
           ＋ Importar imóvel
         </button>
+        <!-- Botão de versão -->
+        <button
+          onclick="window.location.href='p-changelog.html'"
+          title="Ver histórico de versões do portal"
+          style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.9);border-radius:20px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em;transition:background 0.15s;white-space:nowrap;"
+          onmouseover="this.style.background='rgba(255,255,255,0.22)'"
+          onmouseout="this.style.background='rgba(255,255,255,0.12)'"
+        >v<span id="label-versao-index">0.3.0</span></button>
       </div>
     </div>
   </header>
@@ -163,13 +173,6 @@
               </select>
             </div>
 
-            <div class="filtro-grupo">
-              <label class="filtro-label" for="filtro-tipo-imovel">Tipo de imóvel</label>
-              <select id="filtro-tipo-imovel" class="select-filtro" aria-label="Filtrar por tipo de imóvel">
-                <option value="">Todos os tipos</option>
-              </select>
-            </div>
-
           </div><!-- /filtros-grade -->
 
           <!-- Rodapé do painel: contagem + limpar -->
@@ -249,6 +252,12 @@
     document.addEventListener('DOMContentLoaded', () => {
       // Inicializa filtros com todos os imóveis — ele chama renderizarCards internamente
       inicializarFiltros(getImoveis());
+
+      // Versão no botão do header
+      const labelVersao = document.getElementById('label-versao-index');
+      if (labelVersao && typeof VERSAO_PORTAL !== 'undefined') {
+        labelVersao.textContent = VERSAO_PORTAL;
+      }
 
       // Toast pendente de redirecionamento (ex: após exclusão)
       const pendente = sessionStorage.getItem('zillow_br_toast');
