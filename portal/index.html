@@ -1,5 +1,5 @@
 <!-- arquivo: index.html | versao: 0.4.0 -->
-DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -7,7 +7,7 @@ DOCTYPE html>
   <title>Zillow BR — Portal Imobiliário</title>
   <meta name="description" content="Portal de fichas técnicas profissionais para imóveis brasileiros">
   <link rel="stylesheet" href="css/p-style.css">
-  <script src="p-versao.js"></script>
+  <script src="js/p-versao.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
@@ -170,6 +170,13 @@ DOCTYPE html>
               <label class="filtro-label" for="filtro-cadastrante">Tipo de cadastrante</label>
               <select id="filtro-cadastrante" class="select-filtro" aria-label="Filtrar por tipo de cadastrante">
                 <option value="">Todos</option>
+              </select>
+            </div>
+
+            <div class="filtro-grupo">
+              <label class="filtro-label" for="filtro-tipo-imovel">Tipo de imóvel</label>
+              <select id="filtro-tipo-imovel" class="select-filtro" aria-label="Filtrar por tipo de imóvel">
+                <option value="">Todos os tipos</option>
               </select>
             </div>
 
