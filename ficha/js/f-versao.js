@@ -1,13 +1,40 @@
-/* versao: 0.3.0 */
+/* arquivo: f-versao.js | versao: 0.4.0 */
 /* ============================================================
    f-versao.js — Controle de versão do Zillow BR · Ficha Técnica
    Fonte única de verdade para versão e changelog da ficha.
    Carregado em: ficha/index.html e ficha/f-changelog.html
    ============================================================ */
 
-const VERSAO_ATUAL = '0.3.0';
+const VERSAO_ATUAL = '0.4.0';
 
 const CHANGELOG = [
+  {
+    versao: '0.4.0',
+    data:   'Mai/2026',
+    titulo: 'Reorganização de estrutura e novidades no portal',
+    grupos: [
+      {
+        categoria: 'Estrutura do Repositório',
+        itens: [
+          'Todos os arquivos renomeados com prefixos f- (ficha) e p- (portal) para evitar ambiguidade.',
+          'Pasta js/ criada dentro de ficha/ para organizar os scripts.',
+          'f-versao.js movido para ficha/js/f-versao.js.',
+          'dominios.json renomeado para f-dominios.json.',
+          'Portal: todos os JS na pasta portal/js/ com prefixo p-.',
+          'Cabeçalho padronizado em todos os arquivos: arquivo: nome | versao: X.X.X.',
+        ]
+      },
+      {
+        categoria: 'Portal — Novidades',
+        itens: [
+          'Seção "Destaques" no topo da ficha do imóvel — badges automáticos de todos os atributos = Sim.',
+          'Botão WhatsApp na página do imóvel com mensagem pré-preenchida com o endereço.',
+          'Botão de versão no header do portal abrindo p-changelog.html.',
+          'p-versao.js criado como fonte única de verdade do portal.',
+        ]
+      }
+    ]
+  },
   {
     versao: '0.3.0',
     data:   'Mai/2026',
@@ -26,44 +53,22 @@ const CHANGELOG = [
         categoria: 'Ficha Técnica — Localização',
         itens: [
           'Campo "Tipo de Imóvel" adicionado com lista predefinida em três grupos: Residencial, Terreno / Rural e Comercial.',
-          'Tipos disponíveis: Apartamento, Casa, Sobrado, Casa em Condomínio, Cobertura, Flat / Apart-hotel, Kitnet / Quitinete, Loft, Studio, Casa Geminada, Edícula, Lote / Terreno, Chácara, Sítio, Fazenda, Sala Comercial, Loja, Galpão, Prédio Comercial.',
           'Tipo de Imóvel exportado no Excel dentro do grupo Localização.',
         ]
       },
       {
         categoria: 'Ficha Técnica — Exportação Excel',
         itens: [
-          'Nome do arquivo corrigido: FT_{CEP}_{Numero}_{Complemento}.xlsx — o Número agora aparece corretamente, sem prefixo BR_.',
-          'Quando não há complemento, o nome fica FT_{CEP}_{Numero}.xlsx.',
+          'Nome do arquivo corrigido: FT_{CEP}_{Numero}_{Complemento}.xlsx.',
           'Todas as salas visíveis são exportadas com numeração correta.',
-        ]
-      },
-      {
-        categoria: 'Estrutura do Repositório',
-        itens: [
-          'dominios.json movido para ficha/dominios/dominios.json.',
-          'Arquivos da ficha renomeados com prefixo f-: f-versao.js, f-changelog.html.',
-          'Arquivos do portal renomeados com prefixo p-: p-versao.js, p-changelog.html, p-render.js.',
         ]
       },
       {
         categoria: 'Portal — Filtros',
         itens: [
-          'Filtro completo adicionado na listagem: busca livre, Estado→Cidade encadeados, cômodos mínimos, tipo de anunciante, tipo de imóvel, ordenação.',
+          'Filtro completo: busca livre, Estado→Cidade encadeados, cômodos mínimos, tipo de anunciante, tipo de imóvel, ordenação.',
           'Badge no botão Filtros indica quantos filtros estão ativos.',
-          'Estado "sem resultados" diferenciado do estado "sem imóveis cadastrados".',
           'Suporte a .xlsm na importação além de .xlsx.',
-        ]
-      },
-      {
-        categoria: 'Portal — Ficha do Imóvel',
-        itens: [
-          'Seção "Destaques" no topo — badges automáticos de todos os atributos = Sim.',
-          'Tabela resumo com nome do cômodo e metragem.',
-          'Área total calculada automaticamente.',
-          'Localização abre por padrão, Anunciante fecha por padrão (accordion).',
-          'Cômodos colapsáveis — primeiro abre, demais fecham.',
-          'Botão WhatsApp para contato com o responsável.',
         ]
       },
       {
@@ -71,8 +76,6 @@ const CHANGELOG = [
         itens: [
           'Botão de versão no header da ficha e do portal.',
           'Páginas f-changelog.html e p-changelog.html com histórico completo.',
-          'f-versao.js e p-versao.js como fontes únicas de verdade.',
-          'Comentário /* versao: X.X.X */ no topo de cada arquivo JS.',
         ]
       }
     ]
@@ -131,7 +134,7 @@ const CHANGELOG = [
         itens: [
           'Repositório criado: czarious/ficha-imovel.',
           'GitHub Pages habilitado.',
-          'dominios.json criado com estados, campos do anunciante, atributos comuns e específicos.',
+          'f-dominios.json criado com estados, campos do anunciante, atributos comuns e específicos.',
         ]
       }
     ]
@@ -139,5 +142,6 @@ const CHANGELOG = [
 ];
 
 function abrirChangelog() {
-  window.location.href = 'f-changelog.html';
+  /* f-changelog.html está na raiz de ficha/, não em js/ */
+  window.location.href = '../f-changelog.html';
 }
