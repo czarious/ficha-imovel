@@ -1,13 +1,39 @@
-/* versao: 0.3.0 */
+/* arquivo: p-versao.js | versao: 0.4.0 */
 /* ============================================================
-   versao.js — Controle de versão do Zillow BR · Portal
+   p-versao.js — Controle de versão do Zillow BR · Portal
    Fonte única de verdade para versão e changelog do portal.
-   Carregado em: portal/index.html e portal/imovel.html
+   Carregado em: portal/index.html e portal/p-imovel.html
    ============================================================ */
 
-const VERSAO_PORTAL = '0.3.0';
+const VERSAO_PORTAL = '0.4.0';
 
 const CHANGELOG_PORTAL = [
+  {
+    versao: '0.4.0',
+    data:   'Mai/2026',
+    titulo: 'Reorganização de estrutura e novos recursos',
+    grupos: [
+      {
+        categoria: 'Estrutura do Repositório',
+        itens: [
+          'Todos os arquivos renomeados com prefixos f- (ficha) e p- (portal).',
+          'Todos os JS do portal movidos para portal/js/ com prefixo p-.',
+          'CSS renomeado para p-style.css.',
+          'Cabeçalho padronizado em todos os arquivos: arquivo: nome | versao: X.X.X.',
+          'p-versao.js movido para portal/js/p-versao.js.',
+          'p-imovel.html renomeado de imovel.html.',
+        ]
+      },
+      {
+        categoria: 'Página do Imóvel — Novidades',
+        itens: [
+          'Seção "Destaques" no topo — badges automáticos de todos os atributos = Sim.',
+          'Botão WhatsApp com mensagem pré-preenchida com o endereço do imóvel.',
+          'Botão de versão no header abrindo p-changelog.html.',
+        ]
+      }
+    ]
+  },
   {
     versao: '0.3.0',
     data:   'Mai/2026',
@@ -54,7 +80,7 @@ const CHANGELOG_PORTAL = [
         itens: [
           'Botão de versão no header do portal.',
           'Página changelog.html com histórico completo.',
-          'versao.js como fonte única de verdade para versão e changelog.',
+          'p-versao.js como fonte única de verdade para versão e changelog do portal.',
         ]
       }
     ]
@@ -62,5 +88,5 @@ const CHANGELOG_PORTAL = [
 ];
 
 function abrirChangelogPortal() {
-  window.location.href = 'changelog.html';
+  window.location.href = '../p-changelog.html';
 }
