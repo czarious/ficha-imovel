@@ -176,7 +176,7 @@
   ↓ Exportar Excel
 </button>
 
-<script src="versao.js"></script>
+<script src="f-versao.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 /* ════════════════════════════════════════════════════════
@@ -186,7 +186,7 @@ const JSON_URL = 'https://raw.githubusercontent.com/czarious/ficha-imovel/main/f
 
 /* Estado global */
 let dom              = null;
-let dadosAnunciante = {};
+let dadosCadastrante = {};
 let dadosLocalizacao = {};
 
 /* Salas: array de { id, dados, removido } — igual aos quartos */
@@ -198,7 +198,7 @@ let quartos          = [];
 let contadorQuartos  = 0;
 
 /* Estado dos accordions das seções principais */
-let anuncianteAberto  = true;
+let cadastranteAberto  = true;
 let localizacaoAberta  = true;
 
 /* Tipos de imóvel predefinidos com grupos */
@@ -240,17 +240,17 @@ async function carregarDominios() {
    ════════════════════════════════════════════════════════ */
 function renderApp() {
   document.getElementById('app').innerHTML = `
-    <div id="sec-anunciante"></div>
+    <div id="sec-cadastrante"></div>
     <div id="sec-localizacao"></div>
     <div id="sec-comodos"></div>`;
-  renderAnunciante();
+  renderCadastrante();
   renderLocalizacao();
   renderComodos();
 }
 
 /* ════════════════════════════════════════════════════════
    ACCORDION DE SEÇÃO
-   Abre/fecha o corpo de uma seção principal (Anunciante / Localização)
+   Abre/fecha o corpo de uma seção principal (Cadastrante / Localização)
    ════════════════════════════════════════════════════════ */
 function toggleSecao(secaoId) {
   const wrap  = document.getElementById('wrap-' + secaoId);
@@ -262,12 +262,12 @@ function toggleSecao(secaoId) {
   if (aberto) {
     wrap.style.maxHeight = '0';
     if (arrow) arrow.classList.remove('aberto');
-    if (secaoId === 'anunciante') anuncianteAberto = false;
+    if (secaoId === 'cadastrante') cadastranteAberto = false;
     else localizacaoAberta = false;
   } else {
     wrap.style.maxHeight = wrap.scrollHeight + 'px';
     if (arrow) arrow.classList.add('aberto');
-    if (secaoId === 'anunciante') anuncianteAberto = true;
+    if (secaoId === 'cadastrante') cadastranteAberto = true;
     else localizacaoAberta = true;
   }
 }
@@ -287,32 +287,32 @@ function inicializarSecao(secaoId, aberto) {
 }
 
 /* ════════════════════════════════════════════════════════
-   SEÇÃO ANUNCIANTE — minimizável
+   SEÇÃO CADASTRANTE — minimizável
    ════════════════════════════════════════════════════════ */
-function renderAnunciante() {
+function renderCadastrante() {
   let campos = '';
-  dom.anunciante.campos.forEach(c => { campos += campoDom(c, dadosAnunciante, 'anunciante'); });
+  dom.cadastrante.campos.forEach(c => { campos += campoDom(c, dadosCadastrante, 'cadastrante'); });
 
-  document.getElementById('sec-anunciante').innerHTML = `
+  document.getElementById('sec-cadastrante').innerHTML = `
     <div class="secao">
-      <div class="secao-header minimizavel" onclick="toggleSecao('anunciante')">
+      <div class="secao-header minimizavel" onclick="toggleSecao('cadastrante')">
         <div class="secao-header-left">
           <div class="secao-icone">👤</div>
           <div>
-            <div class="secao-titulo">Anunciante</div>
+            <div class="secao-titulo">Cadastrante</div>
             <div class="secao-subtitulo">Quem está registrando este imóvel</div>
           </div>
         </div>
-        <span class="secao-arrow" id="arrow-secao-anunciante">▾</span>
+        <span class="secao-arrow" id="arrow-secao-cadastrante">▾</span>
       </div>
-      <div class="secao-body-wrap" id="wrap-anunciante" style="max-height:0">
+      <div class="secao-body-wrap" id="wrap-cadastrante" style="max-height:0">
         <div class="secao-body">
           <div class="grid-2">${campos}</div>
         </div>
       </div>
     </div>`;
 
-  setTimeout(() => inicializarSecao('anunciante', anuncianteAberto), 10);
+  setTimeout(() => inicializarSecao('cadastrante', cadastranteAberto), 10);
 }
 
 /* ════════════════════════════════════════════════════════
@@ -779,8 +779,8 @@ function campoDom(attr, dados, scopeId) {
    ════════════════════════════════════════════════════════ */
 function salvarDado(scopeId, campo, valor) {
   const id = scopeId.replace('_ban','');
-  if (id === 'anunciante') {
-    dadosAnunciante[campo] = valor;
+  if (id === 'cadastrante') {
+    dadosCadastrante[campo] = valor;
   } else {
     const dados = getDados(id);
     dados[campo] = valor;
@@ -908,10 +908,10 @@ function atualizarBotao() {
 function exportarExcel() {
   const linhas = [['Cômodo', 'Grupo', 'Característica', 'Valor']];
 
-  /* Anunciante */
-  dom.anunciante.campos.forEach(c => {
-    const v = dadosAnunciante[c.id];
-    if (v) linhas.push(['Anunciante', c.grupo, c.label, v]);
+  /* Cadastrante */
+  dom.cadastrante.campos.forEach(c => {
+    const v = dadosCadastrante[c.id];
+    if (v) linhas.push(['Cadastrante', c.grupo, c.label, v]);
   });
 
   /* Localização — inclui Tipo de Imóvel */
