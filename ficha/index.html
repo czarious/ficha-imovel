@@ -1,3 +1,4 @@
+<!-- arquivo: index.html | versao: 0.4.0 -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -176,13 +177,13 @@
   ↓ Exportar Excel
 </button>
 
-<script src="f-versao.js"></script>
+<script src="js/f-versao.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 /* ════════════════════════════════════════════════════════
    CONFIGURAÇÃO
    ════════════════════════════════════════════════════════ */
-const JSON_URL = 'https://raw.githubusercontent.com/czarious/ficha-imovel/main/ficha/dominios/dominios.json';
+const JSON_URL = 'https://raw.githubusercontent.com/czarious/ficha-imovel/main/ficha/dominios/f-dominios.json';
 
 /* Estado global */
 let dom              = null;
@@ -291,7 +292,7 @@ function inicializarSecao(secaoId, aberto) {
    ════════════════════════════════════════════════════════ */
 function renderCadastrante() {
   let campos = '';
-  dom.cadastrante.campos.forEach(c => { campos += campoDom(c, dadosCadastrante, 'cadastrante'); });
+  dom.anunciante.campos.forEach(c => { campos += campoDom(c, dadosCadastrante, 'cadastrante'); });
 
   document.getElementById('sec-cadastrante').innerHTML = `
     <div class="secao">
@@ -299,8 +300,8 @@ function renderCadastrante() {
         <div class="secao-header-left">
           <div class="secao-icone">👤</div>
           <div>
-            <div class="secao-titulo">Cadastrante</div>
-            <div class="secao-subtitulo">Quem está registrando este imóvel</div>
+            <div class="secao-titulo">Anunciante</div>
+            <div class="secao-subtitulo">Quem está anunciando este imóvel</div>
           </div>
         </div>
         <span class="secao-arrow" id="arrow-secao-cadastrante">▾</span>
@@ -909,7 +910,7 @@ function exportarExcel() {
   const linhas = [['Cômodo', 'Grupo', 'Característica', 'Valor']];
 
   /* Cadastrante */
-  dom.cadastrante.campos.forEach(c => {
+  dom.anunciante.campos.forEach(c => {
     const v = dadosCadastrante[c.id];
     if (v) linhas.push(['Cadastrante', c.grupo, c.label, v]);
   });
