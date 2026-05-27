@@ -1,8 +1,7 @@
-/* versao: 0.3.0 */
+/* arquivo: p-filtros.js | versao: 0.4.0 */
 /* ============================================================
-   filtros.js — Filtragem, busca e ordenação de imóveis
-   Depende de: cards.js (renderizarCards), ui.js (formatarEndereco)
-   v0.3.0 — adicionado filtro por tipo de imóvel
+   p-filtros.js — Filtragem, busca e ordenação de imóveis
+   Depende de: p-cards.js (renderizarCards), p-ui.js (formatarEndereco)
    ============================================================ */
 
 let _todosImoveis = [];
