@@ -1,8 +1,7 @@
-/* versao: 0.3.0 */
+/* arquivo: p-cards.js | versao: 0.4.0 */
 /* ============================================================
-   cards.js — Renderização dos cards de imóveis (página index)
-   Depende de: ui.js (formatarData, formatarEndereco)
-   v0.3.0 — tipo de imóvel como meta-tag
+   p-cards.js — Renderização dos cards de imóveis (portal/index.html)
+   Depende de: p-ui.js (formatarData, formatarEndereco)
    ============================================================ */
 
 function renderizarCards(imoveis) {
