@@ -1,7 +1,8 @@
+/* arquivo: p-parser.js | versao: 0.4.0 */
 /* ============================================================
-   parser.js — Leitura do arquivo .xlsx gerado pela Ficha Técnica
+   p-parser.js — Leitura do arquivo .xlsx gerado pela Ficha Técnica
    Depende de: SheetJS (XLSX) carregado antes deste arquivo
-               storage.js (função normalizarId)
+               p-storage.js (função normalizarId)
    Estrutura esperada: Cômodo | Grupo | Característica | Valor
    ============================================================ */
 
