@@ -1,6 +1,8 @@
+/* arquivo: p-ui.js | versao: 0.4.0 */
 /* ============================================================
-   ui.js — Utilitários de interface
+   p-ui.js — Utilitários de interface
    Zillow BR Portal | Responsabilidade: modais, toasts, helpers
+   Sem dependências externas — usa apenas APIs nativas do browser
    ============================================================ */
 
 /* ----------------------------------------------------------------
