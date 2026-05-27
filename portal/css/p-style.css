@@ -997,3 +997,62 @@ body  {
   background: #EAF0F8;
   color: #2B4A7A;
 }
+
+/* ================================================================
+   DESTAQUES — badges automáticos dos atributos = Sim
+   ================================================================ */
+.ficha-destaques-wrap {
+  margin-bottom: 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  box-shadow: var(--sombra);
+}
+.ficha-destaques-titulo {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--verde);
+  margin-bottom: 12px;
+}
+.ficha-destaques-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.destaque-badge {
+  background: var(--verde-sutil);
+  color: var(--verde);
+  border: 1px solid var(--accent-border);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ================================================================
+   BOTÃO WHATSAPP
+   ================================================================ */
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #25D366;
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 11px 20px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--trans), transform var(--trans);
+  box-shadow: 0 2px 8px rgba(37,211,102,0.3);
+}
+.btn-whatsapp:hover {
+  background: #1ebe5d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(37,211,102,0.4);
+}
