@@ -1,6 +1,8 @@
+/* arquivo: p-storage.js | versao: 0.4.0 */
 /* ============================================================
-   storage.js — Gerenciamento de dados no localStorage
+   p-storage.js — Gerenciamento de dados no localStorage
    Zillow BR Portal | Responsabilidade: CRUD de imóveis
+   Sem dependências externas — usa apenas API nativa do browser
    ============================================================ */
 
 const CHAVE_STORAGE = 'zillow_br_imoveis';
