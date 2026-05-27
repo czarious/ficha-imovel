@@ -1,8 +1,7 @@
-/* versao: 0.3.0 */
+/* arquivo: p-render.js | versao: 0.4.0 */
 /* ============================================================
-   ficha.js — Renderização da ficha técnica completa (imovel.html)
-   Depende de: ui.js (formatarData, formatarEndereco)
-   v0.3.0 — accordion + tabela resumo + area total
+   p-render.js — Renderização da ficha técnica completa (portal/p-imovel.html)
+   Depende de: p-ui.js (formatarData, formatarEndereco)
    ============================================================ */
 
 function renderizarFicha(imovel) {
