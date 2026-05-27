@@ -142,6 +142,5 @@ const CHANGELOG = [
 ];
 
 function abrirChangelog() {
-  /* f-changelog.html está na raiz de ficha/, não em js/ */
-  window.location.href = '../f-changelog.html';
+  window.location.href = 'f-changelog.html';
 }
