@@ -1,16 +1,40 @@
-/* arquivo: p-versao.js | versao: 0.4.0 */
+/* arquivo: p-versao.js | versao: 0.5.0 */
 /* ============================================================
    p-versao.js — Controle de versão do Zillow BR · Portal
    Fonte única de verdade para versão e changelog do portal.
    Carregado em: portal/index.html e portal/p-imovel.html
    ============================================================ */
 
-const VERSAO_PORTAL = '0.4.0';
+const VERSAO_PORTAL = '0.5.0';
 
 const CHANGELOG_PORTAL = [
   {
+    versao: '0.5.0',
+    data:   '28/Mai/2026',
+    titulo: 'WhatsApp flutuante e padronização do portal',
+    grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          'Botão WhatsApp flutuante fixo no canto inferior direito da página do imóvel.',
+          'Número puxado automaticamente do campo Telefone do anunciante — sem configuração manual.',
+          'Mensagem pré-preenchida com o endereço do imóvel ao abrir o WhatsApp.',
+          'Botão só aparece quando o anunciante tem telefone cadastrado.',
+        ]
+      },
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'Renomeação global de cadastrante → anunciante em todos os arquivos do portal.',
+          'Categorias do changelog redefinidas: Interface & Funcionalidades e Sistema & Código.',
+          'Datas completas nas versões — formato DD/Mmm/AAAA aplicado retroativamente em todas as versões.',
+        ]
+      }
+    ]
+  },
+  {
     versao: '0.4.0',
-    data:   'Mai/2026',
+    data:   '27/Mai/2026',
     titulo: 'Reorganização de estrutura e novos recursos',
     grupos: [
       {
@@ -36,7 +60,7 @@ const CHANGELOG_PORTAL = [
   },
   {
     versao: '0.3.0',
-    data:   'Mai/2026',
+    data:   '26/Mai/2026',
     titulo: 'Portal publicado com filtros e ficha técnica',
     grupos: [
       {
