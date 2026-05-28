@@ -49,7 +49,7 @@ function parsearExcel(arquivo) {
 /**
  * Converte o array de linhas da planilha no objeto imóvel canônico.
  *
- * Linhas com célula A = "Cadastrante" → imovel.cadastrante
+ * Linhas com célula A = "Anunciante" → imovel.anunciante
  * Linhas com célula A = "Imóvel"      → imovel.localizacao
  * Demais linhas                       → imovel.comodos (agrupados por nome)
  *
@@ -59,7 +59,7 @@ function parsearExcel(arquivo) {
 function montarObjetoImovel(linhas) {
   const imovel = {
     id:           null,      // gerado ao final
-    cadastrante:  {},        // dados do cadastrante (flat)
+    anunciante:  {},        // dados do anunciante (flat)
     localizacao:  {},        // dados de localização (flat)
     comodos:      [],        // array de { nome, grupos: [{ nome, itens: [{caracteristica, valor}] }] }
     importadoEm:  new Date().toISOString()
@@ -85,9 +85,9 @@ function montarObjetoImovel(linhas) {
 
     const valor = colD; // pode ser string vazia; a ficha não exporta linhas vazias
 
-    /* ---- 1. Cadastrante ---- */
-    if (colA === 'Cadastrante') {
-      imovel.cadastrante[colC] = valor;
+    /* ---- 1. Anunciante ---- */
+    if (colA === 'Anunciante') {
+      imovel.anunciante[colC] = valor;
       continue;
     }
 
