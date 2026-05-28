@@ -96,13 +96,13 @@ function criarCard(imovel) {
 
   card.addEventListener('click', (e) => {
     if (e.target.classList.contains('btn-ver')) return;
-    window.location.href = `imovel.html?id=${encodeURIComponent(imovel.id)}`;
+    window.location.href = `p-imovel.html?id=${encodeURIComponent(imovel.id)}`;
   });
 
   card.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      window.location.href = `imovel.html?id=${encodeURIComponent(imovel.id)}`;
+      window.location.href = `p-imovel.html?id=${encodeURIComponent(imovel.id)}`;
     }
   });
 
@@ -112,5 +112,5 @@ function criarCard(imovel) {
 function navegarParaImovel(evento) {
   evento.stopPropagation();
   const id = evento.currentTarget.getAttribute('data-id');
-  if (id) window.location.href = `imovel.html?id=${encodeURIComponent(id)}`;
+  if (id) window.location.href = `p-imovel.html?id=${encodeURIComponent(id)}`;
 }
