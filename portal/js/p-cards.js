@@ -46,7 +46,7 @@ function renderizarCards(imoveis) {
 
 function criarCard(imovel) {
   const loc = imovel.localizacao || {};
-  const cad = imovel.cadastrante || {};
+  const cad = imovel.anunciante || {};
 
   const endereco   = formatarEndereco(loc);
   const cidade     = [loc['Cidade'], loc['Estado']].filter(Boolean).join(', ');
