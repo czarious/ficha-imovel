@@ -14,7 +14,7 @@ const CHANGELOG_PORTAL = [
     titulo: 'Reorganização de estrutura e novos recursos',
     grupos: [
       {
-        categoria: 'Estrutura do Repositório',
+        categoria: 'Sistema & Código',
         itens: [
           'Todos os arquivos renomeados com prefixos f- (ficha) e p- (portal).',
           'Todos os JS do portal movidos para portal/js/ com prefixo p-.',
@@ -25,10 +25,10 @@ const CHANGELOG_PORTAL = [
         ]
       },
       {
-        categoria: 'Página do Imóvel — Novidades',
+        categoria: 'Interface & Funcionalidades',
         itens: [
-          'Seção "Destaques" no topo — badges automáticos de todos os atributos = Sim.',
-          'Botão WhatsApp com mensagem pré-preenchida com o endereço do imóvel.',
+          'Seção "Destaques" no topo — badges automáticos de todos os atributos marcados como Sim.',
+          'Botão WhatsApp flutuante na página do imóvel — abre conversa com o anunciante com mensagem e endereço pré-preenchidos.',
           'Botão de versão no header abrindo p-changelog.html.',
         ]
       }
@@ -40,46 +40,34 @@ const CHANGELOG_PORTAL = [
     titulo: 'Portal publicado com filtros e ficha técnica',
     grupos: [
       {
-        categoria: 'Listagem de Imóveis',
+        categoria: 'Interface & Funcionalidades',
         itens: [
           'Grid de cards com foto placeholder, badge de CEP, meta-tags e botão "Ver ficha".',
           'Importação de arquivos .xlsx e .xlsm gerados pela Ficha Técnica.',
           'Deduplicação por CEP + Número + Complemento com modal de confirmação.',
           'Estado vazio com CTA de importação.',
           'Estado "sem resultados" diferenciado do estado "sem imóveis".',
-          'Tipo de imóvel exibido como meta-tag azul no card.',
-        ]
-      },
-      {
-        categoria: 'Filtros',
-        itens: [
+          'Tipo de imóvel exibido como meta-tag no card.',
           'Busca livre por rua, cidade, CEP e complemento em tempo real.',
-          'Filtro por Estado encadeado com Cidade — ao selecionar SP, só aparecem cidades de SP.',
+          'Filtro por Estado encadeado com Cidade.',
           'Filtro por cômodos mínimos (1 a 6+).',
-          'Filtro por tipo de anunciante.',
-          'Filtro por tipo de imóvel (Apartamento, Casa, etc.).',
+          'Filtro por tipo de anunciante e tipo de imóvel.',
           'Ordenação: mais recente, mais antigo, cidade A→Z, cidade Z→A.',
           'Badge no botão Filtros indica quantos filtros estão ativos.',
           'Botão "Limpar filtros" reseta todos os controles.',
-        ]
-      },
-      {
-        categoria: 'Página do Imóvel',
-        itens: [
           'Tabela resumo no topo com nome do cômodo e metragem.',
-          'Área total calculada automaticamente somando os m² de todos os cômodos.',
-          'Seção Localização abre por padrão (accordion).',
-          'Seção Anunciante fecha por padrão (accordion).',
-          'Cômodos colapsáveis — primeiro abre, demais fecham.',
+          'Área total calculada automaticamente.',
+          'Seção Localização abre por padrão, Anunciante fecha por padrão.',
+          'Cômodos colapsáveis na página do imóvel.',
           'Botão excluir imóvel com modal de confirmação.',
           'Botão imprimir ficha.',
         ]
       },
       {
-        categoria: 'Controle de Versão',
+        categoria: 'Sistema & Código',
         itens: [
           'Botão de versão no header do portal.',
-          'Página changelog.html com histórico completo.',
+          'Página p-changelog.html com histórico completo.',
           'p-versao.js como fonte única de verdade para versão e changelog do portal.',
         ]
       }
