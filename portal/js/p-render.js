@@ -21,7 +21,7 @@ function renderizarFicha(imovel) {
   }
 
   const loc = imovel.localizacao || {};
-  const cad = imovel.cadastrante || {};
+  const cad = imovel.anunciante || {};
   const endereco = formatarEndereco(loc);
   document.title = `${endereco} — Zillow BR`;
 
@@ -57,7 +57,7 @@ function renderizarFicha(imovel) {
 
   /* Anunciante — fechada por padrão */
   if (Object.keys(cad).length > 0) {
-    html += renderSecaoAccordion('cadastrante', '👤 Anunciante',
+    html += renderSecaoAccordion('anunciante', '👤 Anunciante',
       `<div class="ficha-grid-atributos">
         ${Object.entries(cad).map(([k, v]) => renderAtributo(k, v)).join('')}
       </div>`, false);
