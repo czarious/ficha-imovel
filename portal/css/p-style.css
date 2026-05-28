@@ -873,7 +873,7 @@ body  {
    FICHA TÉCNICA v0.3.0 — accordion + tabela resumo
    ================================================================ */
 
-/* ── Seção accordion (Localização / Cadastrante) ── */
+/* ── Seção accordion (Localização / Anunciante) ── */
 .ficha-secao-toggle {
   cursor: pointer;
   user-select: none;
