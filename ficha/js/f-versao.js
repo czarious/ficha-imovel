@@ -1,16 +1,40 @@
-/* arquivo: f-versao.js | versao: 0.4.0 */
+/* arquivo: f-versao.js | versao: 0.5.0 */
 /* ============================================================
    f-versao.js — Controle de versão do Zillow BR · Ficha Técnica
    Fonte única de verdade para versão e changelog da ficha.
    Carregado em: ficha/index.html e ficha/f-changelog.html
    ============================================================ */
 
-const VERSAO_ATUAL = '0.4.0';
+const VERSAO_ATUAL = '0.5.0';
 
 const CHANGELOG = [
   {
+    versao: '0.5.0',
+    data:   '28/Mai/2026',
+    titulo: 'WhatsApp flutuante e padronização do portal',
+    grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          'Botão WhatsApp flutuante fixo no canto inferior direito da página do imóvel.',
+          'Número puxado automaticamente do campo Telefone do anunciante — sem configuração manual.',
+          'Mensagem pré-preenchida com o endereço do imóvel ao abrir o WhatsApp.',
+          'Botão só aparece quando o anunciante tem telefone cadastrado.',
+        ]
+      },
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'Renomeação global de cadastrante → anunciante em todos os arquivos do portal.',
+          'Categorias do changelog redefinidas: Interface & Funcionalidades e Sistema & Código.',
+          'Datas completas nas versões — formato DD/Mmm/AAAA aplicado retroativamente em todas as versões.',
+        ]
+      }
+    ]
+  },
+  {
     versao: '0.4.0',
-    data:   'Mai/2026',
+    data:   '27/Mai/2026',
     titulo: 'Reorganização de estrutura e novidades no portal',
     grupos: [
       {
@@ -37,7 +61,7 @@ const CHANGELOG = [
   },
   {
     versao: '0.3.0',
-    data:   'Mai/2026',
+    data:   '26/Mai/2026',
     titulo: 'Melhorias de usabilidade e estrutura',
     grupos: [
       {
@@ -72,7 +96,7 @@ const CHANGELOG = [
   },
   {
     versao: '0.2.0',
-    data:   'Mai/2026',
+    data:   '21/Mai/2026',
     titulo: 'Ficha interativa por cômodo',
     grupos: [
       {
@@ -102,7 +126,7 @@ const CHANGELOG = [
   },
   {
     versao: '0.1.0',
-    data:   'Mai/2026',
+    data:   '20/Mai/2026',
     titulo: 'Versão inicial — estrutura base',
     grupos: [
       {
