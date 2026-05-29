@@ -1,10 +1,64 @@
-/* arquivo: p-parser.js | versao: 0.4.0 */
+/* arquivo: p-parser.js | versao: 0.6.0 */
 /* ============================================================
-   p-parser.js — Leitura do arquivo .xlsx gerado pela Ficha Técnica
+   p-parser.js — Leitura e validação do arquivo .xlsx gerado pela Ficha Técnica
    Depende de: SheetJS (XLSX) carregado antes deste arquivo
                p-storage.js (função normalizarId)
+               p-config.js (constantes do app)
    Estrutura esperada: Cômodo | Grupo | Característica | Valor
    ============================================================ */
+
+/**
+ * Valida se o arquivo é uma ficha legítima do Zillow BR.
+ * Qualquer falha lança erro com mensagem genérica — não entrega o roteiro.
+ * @param {File} arquivo
+ * @param {Array<Array<string>>} linhas — conteúdo já parseado pelo SheetJS
+ */
+function validarArquivo(arquivo, linhas) {
+  const erro = () => { throw new Error(APP_MENSAGEM_ERRO_IMPORT); };
+
+  /* ---- 1. Nome do arquivo ---- */
+  const nome = arquivo.name || '';
+  const nomeUpper = nome.toUpperCase();
+  const temPrefixo   = nomeUpper.startsWith(EXCEL_PREFIXO.toUpperCase());
+  const temExtensao  = EXCEL_EXTENSOES.some(e => nome.toLowerCase().endsWith(e));
+  const temSeparador = (nome.match(/_/g) || []).length >= 2;
+  if (!temPrefixo || !temExtensao || !temSeparador) erro();
+
+  /* ---- 2. Colunas obrigatórias — primeira linha não vazia ---- */
+  const cabecalho = linhas.find(l => l.some(c => String(c).trim() !== ''));
+  if (!cabecalho) erro();
+  const cols = cabecalho.map(c => String(c).trim().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
+  const colsEsperadas = ['comodo', 'grupo', 'caracteristica', 'valor'];
+  if (!colsEsperadas.every(c => cols.includes(c))) erro();
+
+  /* ---- 3. Linha Anunciante ---- */
+  const temAnunciante = linhas.some(l => String(l[0]).trim() === 'Anunciante');
+  if (!temAnunciante) erro();
+
+  /* ---- 4. Linha Imóvel ---- */
+  const temImovel = linhas.some(l =>
+    String(l[0]).trim() === 'Imóvel' || String(l[0]).trim() === 'Imovel'
+  );
+  if (!temImovel) erro();
+
+  /* ---- 5. CEP preenchido ---- */
+  const linhasCep = linhas.filter(l =>
+    (String(l[0]).trim() === 'Imóvel' || String(l[0]).trim() === 'Imovel') &&
+    String(l[2]).trim() === 'CEP'
+  );
+  const temCep = linhasCep.some(l => String(l[3]).trim() !== '');
+  if (!temCep) erro();
+
+  /* ---- 6. Ao menos um cômodo ---- */
+  const temComodo = linhas.some(l => {
+    const colA = String(l[0]).trim();
+    return colA !== '' && colA !== 'Anunciante' &&
+           colA !== 'Imóvel' && colA !== 'Imovel' &&
+           colA.toLowerCase() !== 'comodo' && colA.toLowerCase() !== 'cômodo';
+  });
+  if (!temComodo) erro();
+}
 
 /**
  * Lê um arquivo .xlsx e retorna um objeto imóvel estruturado.
@@ -33,11 +87,14 @@ function parsearExcel(arquivo) {
           raw: false // converte tudo para string
         });
 
+        // Valida antes de montar — rejeita se não for ficha legítima
+        validarArquivo(arquivo, linhas);
+
         const imovel = montarObjetoImovel(linhas);
         resolve(imovel);
 
       } catch (erro) {
-        reject(new Error('Erro ao processar o Excel: ' + erro.message));
+        reject(erro);
       }
     };
 
@@ -50,40 +107,35 @@ function parsearExcel(arquivo) {
  * Converte o array de linhas da planilha no objeto imóvel canônico.
  *
  * Linhas com célula A = "Anunciante" → imovel.anunciante
- * Linhas com célula A = "Imóvel"      → imovel.localizacao
- * Demais linhas                       → imovel.comodos (agrupados por nome)
+ * Linhas com célula A = "Imóvel"     → imovel.localizacao
+ * Demais linhas                      → imovel.comodos (agrupados por nome)
  *
  * @param {Array<Array<string>>} linhas
  * @returns {Object}
  */
 function montarObjetoImovel(linhas) {
   const imovel = {
-    id:           null,      // gerado ao final
-    anunciante:  {},        // dados do anunciante (flat)
-    localizacao:  {},        // dados de localização (flat)
-    comodos:      [],        // array de { nome, grupos: [{ nome, itens: [{caracteristica, valor}] }] }
-    importadoEm:  new Date().toISOString()
+    id:          null,
+    anunciante:  {},
+    localizacao: {},
+    comodos:     [],
+    importadoEm: new Date().toISOString()
   };
 
-  // Mapa temporário para agrupar cômodos preservando ordem de inserção
-  // Estrutura: { "Sala": { "Piso": { "Material": "Porcelanato" } } }
-  const mapaComodos   = {};
-  const ordemComodos  = []; // preserva ordem de aparição dos cômodos
-  const ordemGrupos   = {}; // preserva ordem de aparição dos grupos por cômodo
+  const mapaComodos  = {};
+  const ordemComodos = [];
+  const ordemGrupos  = {};
 
   for (const linha of linhas) {
-    // Extrai e limpa as 4 colunas esperadas
     const [colA, colB, colC, colD] = linha.map(c => String(c).trim());
 
-    // Ignora cabeçalho textual e linhas completamente vazias
     if (!colA) continue;
     const colALower = colA.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    if (colALower === 'comodo' || colALower === 'comodo') continue; // cabeçalho
+    if (colALower === 'comodo') continue; // cabeçalho
 
-    // Ignora linhas sem grupo ou característica definidos
     if (!colB || !colC) continue;
 
-    const valor = colD; // pode ser string vazia; a ficha não exporta linhas vazias
+    const valor = colD;
 
     /* ---- 1. Anunciante ---- */
     if (colA === 'Anunciante') {
@@ -101,20 +153,17 @@ function montarObjetoImovel(linhas) {
     const nomeComodo = colA;
     const nomeGrupo  = colB;
 
-    // Registra cômodo na ordem de aparição
     if (!mapaComodos[nomeComodo]) {
       mapaComodos[nomeComodo] = {};
       ordemComodos.push(nomeComodo);
       ordemGrupos[nomeComodo] = [];
     }
 
-    // Registra grupo na ordem de aparição dentro do cômodo
     if (!mapaComodos[nomeComodo][nomeGrupo]) {
       mapaComodos[nomeComodo][nomeGrupo] = {};
       ordemGrupos[nomeComodo].push(nomeGrupo);
     }
 
-    // Registra a característica (última escritura vence em duplicatas)
     mapaComodos[nomeComodo][nomeGrupo][colC] = valor;
   }
 
@@ -126,7 +175,7 @@ function montarObjetoImovel(linhas) {
       const atributos = mapaComodos[nomeComodo][nomeGrupo];
       const itens = Object.entries(atributos)
         .map(([caracteristica, valor]) => ({ caracteristica, valor }))
-        .filter(item => item.valor !== ''); // descarta campos em branco
+        .filter(item => item.valor !== '');
 
       if (itens.length > 0) {
         grupos.push({ nome: nomeGrupo, itens });
