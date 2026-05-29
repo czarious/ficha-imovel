@@ -1,4 +1,4 @@
-/* arquivo: p-filtros.js | versao: 0.4.0 */
+/* arquivo: p-filtros.js | versao: 0.6.0 */
 /* ============================================================
    p-filtros.js — Filtragem, busca e ordenação de imóveis
    Depende de: p-cards.js (renderizarCards), p-ui.js (formatarEndereco)
@@ -36,7 +36,7 @@ function popularDropdowns(imoveis) {
 
   preencherSelect('filtro-estado',      estados,      'Todos os estados');
   preencherSelect('filtro-cidade',      cidades,      'Todas as cidades');
-  preencherSelect('filtro-anunciante', anunciantes, 'Todos');
+  preencherSelect('filtro-anunciante',  anunciantes,  'Todos');
   preencherSelect('filtro-tipo-imovel', tiposImovel,  'Todos os tipos');
 }
 
@@ -118,7 +118,7 @@ function aplicarFiltros() {
   const estado     = document.getElementById('filtro-estado')?.value      || '';
   const cidade     = document.getElementById('filtro-cidade')?.value      || '';
   const comodos    = parseInt(document.getElementById('filtro-comodos')?.value || '0');
-  const anunciante = document.getElementById('filtro-anunciante')?.value || '';
+  const anunciante = document.getElementById('filtro-anunciante')?.value  || '';
   const tipoImovel = document.getElementById('filtro-tipo-imovel')?.value  || '';
   const ordenar    = document.getElementById('filtro-ordenar')?.value      || 'recente';
 
@@ -136,7 +136,7 @@ function aplicarFiltros() {
   if (estado)      resultado = resultado.filter(i => i.localizacao?.['Estado'] === estado);
   if (cidade)      resultado = resultado.filter(i => i.localizacao?.['Cidade'] === cidade);
   if (comodos > 0) resultado = resultado.filter(i => (i.comodos?.length || 0) >= comodos);
-  if (anunciante) resultado = resultado.filter(i => i.anunciante?.['Tipo'] === anunciante);
+  if (anunciante)  resultado = resultado.filter(i => i.anunciante?.['Tipo'] === anunciante);
   if (tipoImovel)  resultado = resultado.filter(i =>
     (i.localizacao?.['Tipo de Imóvel'] || i.localizacao?.['Tipo de Imovel']) === tipoImovel
   );
@@ -205,7 +205,7 @@ function atualizarBadgeFiltros() {
   if (document.getElementById('filtro-estado')?.value)             count++;
   if (document.getElementById('filtro-cidade')?.value)             count++;
   if ((parseInt(document.getElementById('filtro-comodos')?.value) || 0) > 0) count++;
-  if (document.getElementById('filtro-anunciante')?.value)        count++;
+  if (document.getElementById('filtro-anunciante')?.value)         count++;
   if (document.getElementById('filtro-tipo-imovel')?.value)        count++;
   badge.textContent = count;
   badge.style.display = count > 0 ? 'inline-flex' : 'none';
