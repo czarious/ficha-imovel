@@ -1,4 +1,4 @@
-<!-- arquivo: index.html | versao: 0.6.0 -->
+<!-- arquivo: index.html | versao: 0.6.1 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -10,7 +10,7 @@
   <!-- SheetJS — leitura de arquivos .xlsx/.xlsm -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <!-- Google Identity Services — OAuth 2.0 -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://accounts.google.com/gsi/client" onload="inicializarOAuth()" async defer></script>
 </head>
 <body>
 
@@ -24,8 +24,6 @@
         <span class="logo-nome">Zillow<sup class="logo-br">BR</sup></span>
       </a>
       <div class="header-acoes">
-        <!-- Botão login Google — visível apenas quando não autenticado -->
-        <div id="container-btn-login" style="display:none"></div>
         <button class="btn btn-secundario" onclick="acionarImportacao()" aria-label="Importar ficha técnica">
           ＋ Importar imóvel
         </button>
@@ -276,13 +274,6 @@
         labelVersao.textContent = VERSAO_PORTAL;
       }
 
-      /* Inicializa OAuth */
-      inicializarOAuth();
-
-      /* Botão de login no header */
-      renderizarBotaoLogin('container-btn-login');
-      atualizarEstadoLogin();
-
       /* Carrega imóveis do Drive */
       const estadoCarregando = document.getElementById('estado-carregando');
       if (estadoCarregando) estadoCarregando.style.display = 'flex';
@@ -360,7 +351,6 @@
           'sucesso', '✅'
         );
 
-        atualizarEstadoLogin();
 
       } catch (erro) {
         console.error('[index] Erro na importação:', erro);
