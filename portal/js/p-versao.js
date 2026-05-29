@@ -1,13 +1,39 @@
-/* arquivo: p-versao.js | versao: 0.5.0 */
+/* arquivo: p-versao.js | versao: 0.6.0 */
 /* ============================================================
    p-versao.js — Controle de versão do Zillow BR · Portal
    Fonte única de verdade para versão e changelog do portal.
    Carregado em: portal/index.html e portal/p-imovel.html
    ============================================================ */
 
-const VERSAO_PORTAL = '0.5.0';
+const VERSAO_PORTAL = '0.6.0';
 
 const CHANGELOG_PORTAL = [
+  {
+    versao: '0.6.0',
+    data:   '28/Mai/2026',
+    titulo: 'Google Drive como storage e validação de importação',
+    grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          'Botão "Entrar com Google" no header — aparece automaticamente quando necessário para importar ou excluir.',
+          'Estado de carregamento ao abrir o portal enquanto os imóveis são buscados no Drive.',
+          'Toast "Enviando para o Drive…" durante o upload, mantendo o usuário informado.',
+          'Mensagem de erro genérica para arquivos inválidos — não revela critérios de validação.',
+        ]
+      },
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'Google Drive substitui localStorage como banco de dados — imóveis acessíveis de qualquer dispositivo.',
+          'p-config.js criado como fonte única de verdade para constantes globais: nome do app, Client ID, API Key, ID da pasta Drive.',
+          'Validação de schema na importação — 6 verificações antes de aceitar o arquivo.',
+          'OAuth 2.0 implementado via Google Identity Services — login seguro sem expor credenciais.',
+          'API Key restrita ao domínio czarious.github.io e à Drive API.',
+        ]
+      }
+    ]
+  },
   {
     versao: '0.5.0',
     data:   '28/Mai/2026',
