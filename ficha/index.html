@@ -1,999 +1,363 @@
-<!-- arquivo: index.html | versao: 0.4.0 -->
+<!-- arquivo: index.html | versao: 0.6.1 -->
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ficha Técnica de Imóvel</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg:           #F5F3EE;
-    --surface:      #FFFFFF;
-    --surface2:     #F9F8F5;
-    --border:       #E2DDD6;
-    --border-strong:#C8C0B4;
-    --text:         #1A1714;
-    --text2:        #6B6560;
-    --text3:        #9C958E;
-    --accent:       #2B5F3E;
-    --accent-light: #EAF2ED;
-    --accent-border:#C3DBC9;
-    --danger:       #C0392B;
-    --danger-light: #FDF0EE;
-    --radius:       10px;
-    --shadow:       0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 100px; }
-
-  /* ── CABEÇALHO ── */
-  header { background: var(--accent); padding: 24px 40px; display: flex; align-items: center; justify-content: space-between; }
-  header h1 { font-family: 'DM Serif Display', serif; color: #fff; font-size: 22px; font-weight: 400; }
-  header span { font-size: 12px; color: rgba(255,255,255,0.6); letter-spacing: 0.08em; text-transform: uppercase; }
-
-  /* ── CONTAINER ── */
-  .container { max-width: 860px; margin: 0 auto; padding: 36px 24px; }
-
-  /* ── SEÇÕES ── */
-  .secao { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 24px; overflow: hidden; }
-  .secao-header {
-    background: var(--surface2); padding: 16px 24px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 12px;
-  }
-  /* Seção minimizável: header clicável */
-  .secao-header.minimizavel {
-    cursor: pointer; user-select: none;
-    transition: background 0.15s;
-    justify-content: space-between;
-  }
-  .secao-header.minimizavel:hover { background: #F0EDE8; }
-  .secao-header-left { display: flex; align-items: center; gap: 12px; }
-  .secao-arrow { font-size: 14px; color: var(--text3); transition: transform 0.25s; flex-shrink: 0; }
-  .secao-arrow.aberto { transform: rotate(180deg); }
-
-  /* Corpo colapsável das seções */
-  .secao-body-wrap { overflow: hidden; transition: max-height 0.3s ease; }
-  .secao-body { padding: 24px; }
-
-  .secao-icone { width: 34px; height: 34px; background: var(--accent-light); color: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-  .secao-titulo { font-family: 'DM Serif Display', serif; font-size: 17px; font-weight: 400; }
-  .secao-subtitulo { font-size: 12px; color: var(--text3); margin-top: 2px; }
-
-  /* ── CAMPOS ── */
-  .campo { margin-bottom: 16px; }
-  .campo label { display: block; font-size: 11px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
-  .campo input, .campo select { width: 100%; padding: 10px 13px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--surface); transition: border-color 0.15s, box-shadow 0.15s; appearance: none; -webkit-appearance: none; }
-  .campo input:focus, .campo select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(43,95,62,0.1); }
-  .campo input[readonly] { background: var(--surface2); color: var(--text2); cursor: default; }
-  .select-wrap { position: relative; }
-  .select-wrap::after { content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); pointer-events: none; font-size: 12px; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-
-  /* ── ÁREA CALCULADA ── */
-  .area-display { background: var(--accent-light); border: 1px solid var(--accent-border); border-radius: 8px; padding: 10px 13px; font-size: 15px; color: var(--accent); font-weight: 500; display: flex; align-items: center; gap: 5px; min-height: 41px; }
-  .area-display small { font-size: 11px; font-weight: 400; color: #5A9470; }
-
-  /* ── APELIDO ── */
-  .apelido-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-  .apelido-wrap input { flex: 1; padding: 7px 11px; border: 1px dashed var(--border-strong); border-radius: 7px; font-size: 13px; font-style: italic; color: var(--text2); background: var(--surface2); font-family: 'DM Sans', sans-serif; }
-  .apelido-wrap input:focus { outline: none; border-color: var(--accent); border-style: solid; }
-  .apelido-label { font-size: 11px; color: var(--text3); white-space: nowrap; }
-
-  /* ── CARTÕES DE CÔMODO ── */
-  .comodo-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 14px; overflow: hidden; transition: box-shadow 0.2s; }
-  .comodo-card:hover { box-shadow: var(--shadow); }
-  .comodo-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; transition: background 0.15s; }
-  .comodo-header:hover { background: var(--surface2); }
-  .comodo-header-left { display: flex; align-items: center; gap: 12px; }
-  .comodo-num { width: 30px; height: 30px; background: var(--accent-light); color: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
-  .comodo-nome { font-family: 'DM Serif Display', serif; font-size: 16px; font-weight: 400; }
-  .comodo-progresso { font-size: 11px; color: var(--text3); margin-top: 1px; }
-  .comodo-acoes { display: flex; align-items: center; gap: 10px; }
-  .badge-ok { background: var(--accent-light); color: var(--accent); font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; border: 1px solid var(--accent-border); }
-  .badge-suite { background: #F0EAF8; color: #6B3FA0; font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; border: 1px solid #D4B8F0; }
-  .btn-remover { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 12px; color: var(--danger); cursor: pointer; transition: all 0.15s; }
-  .btn-remover:hover { background: var(--danger-light); border-color: var(--danger); }
-  .comodo-arrow { font-size: 16px; color: var(--text3); transition: transform 0.25s; }
-  .comodo-arrow.aberto { transform: rotate(180deg); }
-  .comodo-body { display: none; padding: 20px; animation: fadeIn 0.2s ease; }
-  .comodo-body.aberto { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* Botão Limpar campos dentro do cômodo */
-  .comodo-footer { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
-  .btn-limpar-comodo { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--text2); cursor: pointer; transition: all 0.15s; }
-  .btn-limpar-comodo:hover { background: var(--danger-light); border-color: var(--danger); color: var(--danger); }
-
-  /* ── BANHEIRO SUÍTE ── */
-  .banheiro-grupo { margin-top: 20px; border: 1px solid #D4B8F0; border-radius: 8px; overflow: hidden; display: none; }
-  .banheiro-grupo.visivel { display: block; }
-  .banheiro-header { background: #F7F0FD; padding: 10px 16px; border-bottom: 1px solid #D4B8F0; font-size: 12px; font-weight: 500; color: #6B3FA0; text-transform: uppercase; letter-spacing: 0.07em; }
-  .banheiro-body { padding: 16px; }
-
-  /* ── DIVISOR DE GRUPO ── */
-  .grupo-label { font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin: 20px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
-
-  /* ── BOTÕES ── */
-  .btn-adicionar { width: 100%; padding: 12px; border: 2px dashed var(--border-strong); border-radius: var(--radius); background: none; color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; margin-bottom: 8px; }
-  .btn-adicionar:hover { border-color: var(--accent); background: var(--accent-light); }
-  .btn-exportar { position: fixed; bottom: 28px; right: 28px; background: var(--accent); color: #fff; border: none; border-radius: 50px; padding: 15px 28px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; box-shadow: 0 4px 20px rgba(43,95,62,0.35); transition: all 0.2s; z-index: 100; }
-  .btn-exportar:hover { background: #1e4a2e; transform: translateY(-2px); }
-  .btn-exportar:disabled { background: var(--border-strong); box-shadow: none; transform: none; cursor: not-allowed; }
-
-  /* ── LOADING / ERRO ── */
-  .loading { text-align: center; padding: 60px; color: var(--text3); font-size: 14px; }
-  .loading::after { content: ''; display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-left: 8px; vertical-align: middle; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .erro-json { background: var(--danger-light); border: 1px solid #F0C8C0; border-radius: var(--radius); padding: 20px 24px; color: var(--danger); font-size: 14px; line-height: 1.7; }
-
-  @media (max-width: 600px) {
-    header { padding: 18px; }
-    .container { padding: 20px 14px; }
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zillow BR — Portal Imobiliário</title>
+  <meta name="description" content="Portal de fichas técnicas profissionais para imóveis brasileiros">
+  <link rel="stylesheet" href="css/p-style.css">
+  <!-- SheetJS — leitura de arquivos .xlsx/.xlsm -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Google Identity Services — OAuth 2.0 -->
+  <script src="https://accounts.google.com/gsi/client" onload="inicializarOAuth()" async defer></script>
 </head>
 <body>
 
-<header>
-  <div>
-    <h1>Ficha Técnica de Imóvel</h1>
-    <span>Levantamento detalhado por cômodo</span>
-  </div>
-  <!-- Botão de versão — canto superior direito -->
-  <button
-    id="btn-versao"
-    onclick="abrirChangelog()"
-    title="Ver histórico de versões"
-    style="
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: rgba(255,255,255,0.9);
-      border-radius: 20px;
-      padding: 6px 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      letter-spacing: 0.05em;
-      transition: background 0.15s;
-      white-space: nowrap;
-    "
-    onmouseover="this.style.background='rgba(255,255,255,0.22)'"
-    onmouseout="this.style.background='rgba(255,255,255,0.12)'"
-  >
-    v<span id="label-versao">0.3.0</span>
-  </button>
-</header>
-
-<div class="container">
-  <div id="app"><div class="loading">Carregando domínios</div></div>
-</div>
-
-<button class="btn-exportar" id="btnExportar" disabled onclick="exportarExcel()">
-  ↓ Exportar Excel
-</button>
-
-<script src="js/f-versao.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script>
-/* ════════════════════════════════════════════════════════
-   CONFIGURAÇÃO
-   ════════════════════════════════════════════════════════ */
-const JSON_URL = 'https://raw.githubusercontent.com/czarious/ficha-imovel/main/ficha/dominios/f-dominios.json';
-
-/* Estado global */
-let dom              = null;
-let dadosAnunciante = {};
-let dadosLocalizacao = {};
-
-/* Salas: array de { id, dados, removido } — igual aos quartos */
-let salas         = [];
-let contadorSalas = 0;
-
-/* Quartos: array de { id, dados, removido } */
-let quartos          = [];
-let contadorQuartos  = 0;
-
-/* Estado dos accordions das seções principais */
-let anuncianteAberto  = true;
-let localizacaoAberta  = true;
-
-/* Tipos de imóvel predefinidos com grupos */
-const TIPOS_IMOVEL = {
-  'Residencial': [
-    'Apartamento','Casa','Sobrado','Casa em Condomínio',
-    'Cobertura','Flat / Apart-hotel','Kitnet / Quitinete',
-    'Loft','Studio','Casa Geminada','Edícula'
-  ],
-  'Terreno / Rural': [
-    'Lote / Terreno','Chácara','Sítio','Fazenda'
-  ],
-  'Comercial': [
-    'Sala Comercial','Loja','Galpão','Prédio Comercial'
-  ]
-};
-
-/* ════════════════════════════════════════════════════════
-   CARREGAMENTO DO JSON
-   ════════════════════════════════════════════════════════ */
-async function carregarDominios() {
-  try {
-    const r = await fetch(JSON_URL + '?v=' + Date.now());
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    dom = await r.json();
-    renderApp();
-  } catch(e) {
-    document.getElementById('app').innerHTML = `
-      <div class="erro-json">
-        <strong>Não foi possível carregar os domínios.</strong><br>
-        Verifique se <code>ficha/dominios/dominios.json</code> está no repositório.<br>
-        <small>Erro: ${e.message}</small>
-      </div>`;
-  }
-}
-
-/* ════════════════════════════════════════════════════════
-   RENDER PRINCIPAL
-   ════════════════════════════════════════════════════════ */
-function renderApp() {
-  document.getElementById('app').innerHTML = `
-    <div id="sec-anunciante"></div>
-    <div id="sec-localizacao"></div>
-    <div id="sec-comodos"></div>`;
-  renderAnunciante();
-  renderLocalizacao();
-  renderComodos();
-}
-
-/* ════════════════════════════════════════════════════════
-   ACCORDION DE SEÇÃO
-   Abre/fecha o corpo de uma seção principal (Anunciante / Localização)
-   ════════════════════════════════════════════════════════ */
-function toggleSecao(secaoId) {
-  const wrap  = document.getElementById('wrap-' + secaoId);
-  const arrow = document.getElementById('arrow-secao-' + secaoId);
-  if (!wrap) return;
-
-  const aberto = wrap.style.maxHeight && wrap.style.maxHeight !== '0px';
-
-  if (aberto) {
-    wrap.style.maxHeight = '0';
-    if (arrow) arrow.classList.remove('aberto');
-    if (secaoId === 'anunciante') anuncianteAberto = false;
-    else localizacaoAberta = false;
-  } else {
-    wrap.style.maxHeight = wrap.scrollHeight + 'px';
-    if (arrow) arrow.classList.add('aberto');
-    if (secaoId === 'anunciante') anuncianteAberto = true;
-    else localizacaoAberta = true;
-  }
-}
-
-/* Inicializa a altura de uma seção colapsável após renderizar */
-function inicializarSecao(secaoId, aberto) {
-  const wrap = document.getElementById('wrap-' + secaoId);
-  const arrow = document.getElementById('arrow-secao-' + secaoId);
-  if (!wrap) return;
-  if (aberto) {
-    wrap.style.maxHeight = wrap.scrollHeight + 'px';
-    if (arrow) arrow.classList.add('aberto');
-  } else {
-    wrap.style.maxHeight = '0';
-    if (arrow) arrow.classList.remove('aberto');
-  }
-}
-
-/* ════════════════════════════════════════════════════════
-   SEÇÃO CADASTRANTE — minimizável
-   ════════════════════════════════════════════════════════ */
-function renderAnunciante() {
-  let campos = '';
-  dom.anunciante.campos.forEach(c => { campos += campoDom(c, dadosAnunciante, 'anunciante'); });
-
-  document.getElementById('sec-anunciante').innerHTML = `
-    <div class="secao">
-      <div class="secao-header minimizavel" onclick="toggleSecao('anunciante')">
-        <div class="secao-header-left">
-          <div class="secao-icone">👤</div>
-          <div>
-            <div class="secao-titulo">Anunciante</div>
-            <div class="secao-subtitulo">Quem está anunciando este imóvel</div>
-          </div>
-        </div>
-        <span class="secao-arrow" id="arrow-secao-anunciante">▾</span>
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo" aria-label="Zillow BR — Página inicial">
+        <div class="logo-icone" aria-hidden="true">🏡</div>
+        <span class="logo-nome">Zillow<sup class="logo-br">BR</sup></span>
+      </a>
+      <div class="header-acoes">
+        <button class="btn btn-secundario" onclick="acionarImportacao()" aria-label="Importar ficha técnica">
+          ＋ Importar imóvel
+        </button>
+        <!-- Botão de versão -->
+        <button
+          onclick="window.location.href='p-changelog.html'"
+          title="Ver histórico de versões do portal"
+          style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.9);border-radius:20px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em;transition:background 0.15s;white-space:nowrap;"
+          onmouseover="this.style.background='rgba(255,255,255,0.22)'"
+          onmouseout="this.style.background='rgba(255,255,255,0.12)'"
+        >v<span id="label-versao-portal">0.6.0</span></button>
       </div>
-      <div class="secao-body-wrap" id="wrap-anunciante" style="max-height:0">
-        <div class="secao-body">
-          <div class="grid-2">${campos}</div>
-        </div>
+    </div>
+  </header>
+
+  <input type="file" id="input-excel" accept=".xlsx,.xlsm" aria-hidden="true" onchange="processarArquivo(event)">
+
+  <!-- ============================================================
+       HERO
+       ============================================================ -->
+  <section class="hero" aria-label="Boas-vindas">
+    <div class="hero-conteudo">
+      <h1>Fichas técnicas profissionais<br>para imóveis brasileiros</h1>
+      <p class="hero-subtitulo">
+        Importe o Excel gerado pela Ficha Técnica e gerencie<br>
+        seus anúncios com dados completos e estruturados.
+      </p>
+      <div class="hero-acoes">
+        <button class="btn btn-primario" onclick="acionarImportacao()">
+          📄 Importar Ficha Técnica (.xlsx)
+        </button>
       </div>
-    </div>`;
+    </div>
+  </section>
 
-  setTimeout(() => inicializarSecao('anunciante', anuncianteAberto), 10);
-}
+  <!-- ============================================================
+       MAIN — Filtros + Grid
+       ============================================================ -->
+  <main class="main" id="main-conteudo">
 
-/* ════════════════════════════════════════════════════════
-   SEÇÃO LOCALIZAÇÃO — com Tipo de Imóvel e minimizável
-   ════════════════════════════════════════════════════════ */
-function renderLocalizacao() {
-  const estados = dom.estados_brasil.map(e =>
-    `<option value="${e}" ${dadosLocalizacao.estado===e?'selected':''}>${e}</option>`
-  ).join('');
+    <!-- Cabeçalho da seção -->
+    <div class="secao-header">
+      <h2 class="secao-titulo">Imóveis cadastrados</h2>
+      <span class="secao-contagem" id="contagem" aria-live="polite">0 imóveis</span>
+    </div>
 
-  /* Select de Tipo de Imóvel com optgroups */
-  const tipoAtual = dadosLocalizacao.tipo_imovel || '';
-  let opcosTipo = `<option value="">— selecione —</option>`;
-  Object.entries(TIPOS_IMOVEL).forEach(([grupo, tipos]) => {
-    opcosTipo += `<optgroup label="${grupo}">`;
-    tipos.forEach(t => {
-      opcosTipo += `<option value="${t}" ${tipoAtual===t?'selected':''}>${t}</option>`;
-    });
-    opcosTipo += `</optgroup>`;
-  });
+    <!-- ============================================================
+         BLOCO DE FILTROS
+         ============================================================ -->
+    <div class="filtros-wrap" id="filtros-wrap">
 
-  document.getElementById('sec-localizacao').innerHTML = `
-    <div class="secao">
-      <div class="secao-header minimizavel" onclick="toggleSecao('localizacao')">
-        <div class="secao-header-left">
-          <div class="secao-icone">📍</div>
-          <div>
-            <div class="secao-titulo">Localização do Imóvel</div>
-            <div class="secao-subtitulo">Digite o CEP para preenchimento automático</div>
-          </div>
-        </div>
-        <span class="secao-arrow" id="arrow-secao-localizacao">▾</span>
-      </div>
-      <div class="secao-body-wrap" id="wrap-localizacao" style="max-height:0">
-        <div class="secao-body">
+      <!-- Linha principal: busca + botão filtros + ordenação -->
+      <div class="filtros-barra">
 
-          <!-- Tipo de Imóvel — destaque no topo -->
-          <div class="grid-2" style="margin-bottom:6px">
-            <div class="campo">
-              <label>Tipo de Imóvel</label>
-              <div class="select-wrap">
-                <select onchange="salvarLoc('tipo_imovel',this.value)">${opcosTipo}</select>
-              </div>
-            </div>
-            <div></div>
-          </div>
-
-          <div class="grupo-label" style="margin-top:8px">Endereço</div>
-
-          <div class="grid-2">
-            <div class="campo">
-              <label>País</label>
-              <div class="select-wrap">
-                <select onchange="salvarLoc('pais',this.value)">
-                  <option value="Brasil" ${(dadosLocalizacao.pais||'Brasil')==='Brasil'?'selected':''}>Brasil</option>
-                  <option value="Outro"  ${dadosLocalizacao.pais==='Outro'?'selected':''}>Outro</option>
-                </select>
-              </div>
-            </div>
-            <div class="campo">
-              <label>CEP</label>
-              <input type="text" id="campo-cep" maxlength="9" placeholder="00000-000"
-                value="${dadosLocalizacao.cep||''}"
-                oninput="mascaraCEP(this)" onblur="buscarCEP(this.value)">
-            </div>
-          </div>
-          <div class="grid-2">
-            <div class="campo">
-              <label>Rua / Logradouro</label>
-              <input type="text" id="campo-rua" readonly placeholder="Preenchido pelo CEP"
-                value="${dadosLocalizacao.rua||''}">
-            </div>
-            <div class="campo">
-              <label>Bairro</label>
-              <input type="text" id="campo-bairro" readonly placeholder="Preenchido pelo CEP"
-                value="${dadosLocalizacao.bairro||''}">
-            </div>
-          </div>
-          <div class="grid-3">
-            <div class="campo">
-              <label>Número</label>
-              <input type="text" placeholder="Ex: 123"
-                value="${dadosLocalizacao.numero||''}"
-                oninput="salvarLoc('numero',this.value); atualizarBotao()">
-            </div>
-            <div class="campo">
-              <label>Complemento</label>
-              <input type="text" placeholder="Apto, Bloco..."
-                value="${dadosLocalizacao.complemento||''}"
-                oninput="salvarLoc('complemento',this.value)">
-            </div>
-            <div class="campo">
-              <label>Estado</label>
-              <div class="select-wrap">
-                <select id="campo-estado" onchange="salvarLoc('estado',this.value)">
-                  <option value="">— selecione —</option>${estados}
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="grid-2">
-            <div class="campo">
-              <label>Cidade</label>
-              <input type="text" id="campo-cidade" readonly placeholder="Preenchida pelo CEP"
-                value="${dadosLocalizacao.cidade||''}">
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>`;
-
-  setTimeout(() => inicializarSecao('localizacao', localizacaoAberta), 10);
-}
-
-function mascaraCEP(input) {
-  let v = input.value.replace(/\D/g,'').slice(0,8);
-  if (v.length > 5) v = v.slice(0,5) + '-' + v.slice(5);
-  input.value = v;
-}
-
-async function buscarCEP(cep) {
-  const limpo = cep.replace(/\D/g,'');
-  if (limpo.length !== 8) return;
-  try {
-    const r = await fetch(`https://viacep.com.br/ws/${limpo}/json/`);
-    const d = await r.json();
-    if (d.erro) { alert('CEP não encontrado.'); return; }
-    document.getElementById('campo-rua').value    = d.logradouro || '';
-    document.getElementById('campo-bairro').value = d.bairro     || '';
-    document.getElementById('campo-cidade').value = d.localidade || '';
-    document.getElementById('campo-estado').value = d.uf         || '';
-    salvarLoc('cep',    cep);
-    salvarLoc('rua',    d.logradouro || '');
-    salvarLoc('bairro', d.bairro     || '');
-    salvarLoc('cidade', d.localidade || '');
-    salvarLoc('estado', d.uf         || '');
-    atualizarBotao();
-  } catch(e) { console.warn('Erro CEP:', e.message); }
-}
-
-function salvarLoc(campo, valor) { dadosLocalizacao[campo] = valor; }
-
-/* ════════════════════════════════════════════════════════
-   SEÇÃO CÔMODOS
-   Salas numeráveis + Quartos
-   ════════════════════════════════════════════════════════ */
-function renderComodos() {
-  document.getElementById('sec-comodos').innerHTML = `
-    <div class="secao">
-      <div class="secao-header">
-        <div class="secao-icone">🏠</div>
-        <div>
-          <div class="secao-titulo">Cômodos</div>
-          <div class="secao-subtitulo">Adicione e detalhe cada ambiente</div>
-        </div>
-      </div>
-      <div class="secao-body">
-        <!-- Salas -->
-        <div id="lista-salas"></div>
-        <button class="btn-adicionar" onclick="adicionarSala()">+ Adicionar Sala</button>
-        <!-- Quartos -->
-        <div id="lista-quartos"></div>
-        <button class="btn-adicionar" onclick="adicionarQuarto()">+ Adicionar Quarto</button>
-      </div>
-    </div>`;
-
-  salas.filter(s => !s.removido).forEach(s => renderBlocoSala(s.id));
-  quartos.filter(q => !q.removido).forEach(q => renderBlocoQuarto(q.id));
-}
-
-/* ── SALAS ── */
-function adicionarSala() {
-  /* Restaura primeira sala removida, se houver */
-  const removida = salas.find(s => s.removido);
-  if (removida) {
-    removida.removido = false;
-    renderBlocoSala(removida.id);
-  } else {
-    contadorSalas++;
-    const id = 's' + contadorSalas;
-    salas.push({ id, dados: {}, removido: false });
-    renderBlocoSala(id);
-  }
-  atualizarBotao();
-}
-
-function removerSala(id, e) {
-  e.stopPropagation();
-  const s = salas.find(s => s.id === id);
-  if (s) s.removido = true;
-  document.getElementById('bloco-' + id)?.remove();
-  renumerarSalas();
-  atualizarBotao();
-}
-
-function renderBlocoSala(id) {
-  const visiveis = salas.filter(s => !s.removido);
-  const idx = visiveis.findIndex(s => s.id === id);
-  const s   = salas.find(s => s.id === id);
-  if (!s) return;
-  const num  = idx + 1;
-  const nome = visiveis.length > 1 ? `Sala ${num}` : 'Sala';
-
-  const antigo = document.getElementById('bloco-' + id);
-  if (antigo) antigo.remove();
-
-  const div = document.createElement('div');
-  div.id = 'bloco-' + id;
-  div.innerHTML = cartaoComodo(id, nome, num, s.dados, 'Sala', true);
-  document.getElementById('lista-salas').appendChild(div);
-}
-
-function renumerarSalas() {
-  const visiveis = salas.filter(s => !s.removido);
-  visiveis.forEach((s, idx) => {
-    const el = document.getElementById('nome-' + s.id);
-    if (el) el.textContent = visiveis.length > 1 ? `Sala ${idx+1}` : 'Sala';
-  });
-}
-
-/* ── QUARTOS ── */
-function adicionarQuarto() {
-  /* Restaura primeiro quarto removido, se houver */
-  const removido = quartos.find(q => q.removido);
-  if (removido) {
-    removido.removido = false;
-    renderBlocoQuarto(removido.id);
-  } else {
-    contadorQuartos++;
-    const id = 'q' + contadorQuartos;
-    quartos.push({ id, dados: {}, removido: false });
-    renderBlocoQuarto(id);
-  }
-  atualizarBotao();
-}
-
-function removerQuarto(id, e) {
-  e.stopPropagation();
-  const q = quartos.find(q => q.id === id);
-  if (q) q.removido = true;
-  document.getElementById('bloco-' + id)?.remove();
-  renumerarQuartos();
-  atualizarBotao();
-}
-
-function renderBlocoQuarto(id) {
-  const visiveis = quartos.filter(q => !q.removido);
-  const idx  = visiveis.findIndex(q => q.id === id);
-  const q    = quartos.find(q => q.id === id);
-  if (!q) return;
-  const num    = idx + 1;
-  const eSuite = q.dados.e_suite === 'Sim';
-  const nome   = eSuite ? `Suíte ${num}` : `Quarto ${num}`;
-
-  const antigo = document.getElementById('bloco-' + id);
-  if (antigo) antigo.remove();
-
-  const div = document.createElement('div');
-  div.id = 'bloco-' + id;
-  div.innerHTML = cartaoComodo(id, nome, num, q.dados, 'Quarto', true);
-  document.getElementById('lista-quartos').appendChild(div);
-  atualizarBanheiroSuite(id);
-}
-
-function renumerarQuartos() {
-  const visiveis = quartos.filter(q => !q.removido);
-  visiveis.forEach((q, idx) => {
-    const el = document.getElementById('nome-' + q.id);
-    if (el) el.textContent = q.dados.e_suite === 'Sim' ? `Suíte ${idx+1}` : `Quarto ${idx+1}`;
-  });
-}
-
-/* ════════════════════════════════════════════════════════
-   CARTÃO DE CÔMODO
-   ════════════════════════════════════════════════════════ */
-function cartaoComodo(id, nome, num, dados, tipo, removivel) {
-  const pre    = contarPreenchidos(tipo, dados);
-  const tot    = contarTotal(tipo);
-  const eSuite = dados.e_suite === 'Sim';
-
-  /* Atributos comuns agrupados */
-  const gruposC = {};
-  dom.atributos_comuns.forEach(a => {
-    if (!gruposC[a.grupo]) gruposC[a.grupo] = [];
-    gruposC[a.grupo].push(a);
-  });
-  let attrComuns = '';
-  Object.keys(gruposC).forEach(g => {
-    attrComuns += `<div class="grupo-label">${g}</div><div class="grid-2">`;
-    gruposC[g].forEach(a => { attrComuns += campoDom(a, dados, id); });
-    attrComuns += '</div>';
-  });
-
-  /* Atributos específicos do tipo */
-  let attrEsp = '';
-  const esp = dom.atributos_especificos[tipo];
-  if (esp && esp.length > 0) {
-    const gruposE = {};
-    esp.forEach(a => {
-      if (!gruposE[a.grupo]) gruposE[a.grupo] = [];
-      gruposE[a.grupo].push(a);
-    });
-    Object.keys(gruposE).forEach(g => {
-      attrEsp += `<div class="grupo-label">${g}</div><div class="grid-2">`;
-      gruposE[g].forEach(a => { attrEsp += campoDom(a, dados, id); });
-      attrEsp += '</div>';
-    });
-  }
-
-  /* Subgrupo banheiro da suíte */
-  let banheiro = '';
-  if (tipo === 'Quarto') {
-    const gruposB = {};
-    dom.atributos_banheiro_suite.campos.forEach(a => {
-      if (!gruposB[a.grupo]) gruposB[a.grupo] = [];
-      gruposB[a.grupo].push(a);
-    });
-    let camposBan = '';
-    Object.keys(gruposB).forEach(g => {
-      camposBan += `<div class="grupo-label">${g}</div><div class="grid-2">`;
-      gruposB[g].forEach(a => { camposBan += campoDom(a, dados, id + '_ban'); });
-      camposBan += '</div>';
-    });
-    banheiro = `
-      <div class="banheiro-grupo ${eSuite?'visivel':''}" id="ban-${id}">
-        <div class="banheiro-header">🚿 Banheiro da suíte</div>
-        <div class="banheiro-body">${camposBan}</div>
-      </div>`;
-  }
-
-  return `
-    <div class="comodo-card" id="card-${id}">
-      <div class="comodo-header" onclick="toggleComodo('${id}')">
-        <div class="comodo-header-left">
-          ${num > 0 ? `<div class="comodo-num">${num}</div>` : ''}
-          <div>
-            <div class="comodo-nome" id="nome-${id}">${nome}</div>
-            <div class="comodo-progresso" id="prog-${id}">${pre} de ${tot} campos preenchidos</div>
-          </div>
-        </div>
-        <div class="comodo-acoes" id="acoes-${id}">
-          ${eSuite ? '<span class="badge-suite">Suíte</span>' : ''}
-          ${pre===tot && tot>0 ? '<span class="badge-ok">✓ Completo</span>' : ''}
-          ${removivel ? `<button class="btn-remover" onclick="${tipo==='Sala'?'removerSala':'removerQuarto'}('${id}',event)">✕</button>` : ''}
-          <span class="comodo-arrow aberto" id="arrow-${id}">▾</span>
-        </div>
-      </div>
-      <div class="comodo-body aberto" id="body-${id}">
-
-        <div class="apelido-wrap">
-          <span class="apelido-label">Apelido (ref. interna):</span>
-          <input type="text" placeholder="Ex: Quarto do Miguel..."
-            value="${dados._apelido||''}"
-            oninput="salvarDado('${id}','_apelido',this.value)">
+        <!-- Campo de busca livre -->
+        <div class="busca-wrap">
+          <span class="busca-icone" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10.5 10.5 L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <input
+            type="text"
+            id="filtro-busca"
+            placeholder="Buscar por rua, cidade, CEP..."
+            autocomplete="off"
+            aria-label="Busca livre de imóveis"
+          >
+          <button
+            id="btn-limpar-busca"
+            class="busca-limpar"
+            style="display:none"
+            aria-label="Limpar busca"
+            title="Limpar"
+          >✕</button>
         </div>
 
-        <div class="grupo-label">Dimensões</div>
-        <div class="grid-3">
-          <div class="campo">
-            <label>Formato</label>
-            <div class="select-wrap">
-              <select id="formato-${id}"
-                onchange="salvarDado('${id}','formato',this.value); atualizarDimensoes('${id}')">
-                <option value="">— selecione —</option>
-                <option value="Retangular"      ${dados.formato==='Retangular'      ?'selected':''}>Retangular</option>
-                <option value="Planta irregular" ${dados.formato==='Planta irregular'?'selected':''}>Planta irregular</option>
+        <!-- Botão de filtros avançados com badge contador -->
+        <button
+          id="btn-toggle-filtros"
+          class="btn btn-outline filtros-toggle"
+          aria-expanded="false"
+          aria-controls="painel-filtros"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M1 3h12M3 7h8M5 11h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          Filtros
+          <span id="badge-filtros" class="filtros-badge" style="display:none">0</span>
+        </button>
+
+        <!-- Ordenação — sempre visível -->
+        <div class="ordenar-wrap">
+          <label for="filtro-ordenar" class="ordenar-label">Ordenar:</label>
+          <select id="filtro-ordenar" class="select-filtro" aria-label="Ordenar imóveis">
+            <option value="recente">Mais recente</option>
+            <option value="antigo">Mais antigo</option>
+            <option value="cidade-az">Cidade A → Z</option>
+            <option value="cidade-za">Cidade Z → A</option>
+          </select>
+        </div>
+
+      </div><!-- /filtros-barra -->
+
+      <!-- Painel avançado — colapsável -->
+      <div
+        id="painel-filtros"
+        class="painel-filtros"
+        role="region"
+        aria-label="Filtros avançados"
+      >
+        <div class="painel-filtros-inner">
+
+          <!-- Grade de filtros -->
+          <div class="filtros-grade">
+
+            <div class="filtro-grupo">
+              <label class="filtro-label" for="filtro-estado">Estado</label>
+              <select id="filtro-estado" class="select-filtro" aria-label="Filtrar por estado">
+                <option value="">Todos os estados</option>
               </select>
             </div>
+
+            <div class="filtro-grupo">
+              <label class="filtro-label" for="filtro-cidade">Cidade</label>
+              <select id="filtro-cidade" class="select-filtro" aria-label="Filtrar por cidade">
+                <option value="">Todas as cidades</option>
+              </select>
+            </div>
+
+            <div class="filtro-grupo">
+              <label class="filtro-label" for="filtro-comodos">Cômodos mínimos</label>
+              <select id="filtro-comodos" class="select-filtro" aria-label="Filtrar por número de cômodos">
+                <option value="0">Qualquer quantidade</option>
+                <option value="1">1 ou mais</option>
+                <option value="2">2 ou mais</option>
+                <option value="3">3 ou mais</option>
+                <option value="4">4 ou mais</option>
+                <option value="5">5 ou mais</option>
+                <option value="6">6 ou mais</option>
+              </select>
+            </div>
+
+            <div class="filtro-grupo">
+              <label class="filtro-label" for="filtro-anunciante">Tipo de anunciante</label>
+              <select id="filtro-anunciante" class="select-filtro" aria-label="Filtrar por tipo de anunciante">
+                <option value="">Todos</option>
+              </select>
+            </div>
+
+            <div class="filtro-grupo">
+              <label class="filtro-label" for="filtro-tipo-imovel">Tipo de imóvel</label>
+              <select id="filtro-tipo-imovel" class="select-filtro" aria-label="Filtrar por tipo de imóvel">
+                <option value="">Todos os tipos</option>
+              </select>
+            </div>
+
+          </div><!-- /filtros-grade -->
+
+          <!-- Rodapé do painel: contagem + limpar -->
+          <div class="painel-rodape">
+            <span id="resultado-contagem" class="resultado-contagem" aria-live="polite"></span>
+            <button id="btn-limpar-filtros" class="btn btn-fantasma btn-sm">
+              Limpar filtros
+            </button>
           </div>
-          <div id="dims-${id}" style="display:contents">${htmlDimensoes(id,dados)}</div>
+
         </div>
+      </div><!-- /painel-filtros -->
 
-        ${attrComuns}
-        ${attrEsp}
-        ${banheiro}
+    </div><!-- /filtros-wrap -->
 
-        <!-- Rodapé do cômodo: botão para limpar campos preenchidos -->
-        <div class="comodo-footer">
-          <button class="btn-limpar-comodo" onclick="limparComodo('${id}','${tipo}',event)">
-            ↺ Limpar campos
-          </button>
-        </div>
-
+    <!-- Estado de carregamento -->
+    <div id="estado-carregando" style="display:none" role="region" aria-label="Carregando imóveis">
+      <div class="loading-wrap">
+        <div class="spinner" aria-hidden="true"></div>
+        <span>Carregando imóveis…</span>
       </div>
-    </div>`;
-}
+    </div>
 
-/* ════════════════════════════════════════════════════════
-   DIMENSÕES
-   ════════════════════════════════════════════════════════ */
-function htmlDimensoes(id, dados) {
-  if (!dados.formato) return '<div></div><div></div>';
-  if (dados.formato === 'Retangular') {
-    return `
-      <div class="campo">
-        <label>Largura (m)</label>
-        <input type="number" min="0" step="0.01" placeholder="0.00"
-          value="${dados.largura||''}"
-          oninput="salvarDado('${id}','largura',this.value); calcularArea('${id}')">
+    <!-- Estado vazio -->
+    <div id="estado-vazio" style="display:none" role="region" aria-label="Nenhum imóvel cadastrado">
+      <div class="vazio-icone" aria-hidden="true">🏠</div>
+      <h3>Nenhum imóvel ainda</h3>
+      <p>Importe um arquivo <strong>.xlsx</strong> gerado pela Ficha Técnica para criar seu primeiro anúncio.</p>
+      <button class="btn btn-verde" onclick="acionarImportacao()">Importar primeiro imóvel</button>
+    </div>
+
+    <!-- Estado sem resultados -->
+    <div id="estado-sem-resultados" style="display:none" role="region" aria-label="Sem resultados">
+      <div class="vazio-icone" aria-hidden="true">🔍</div>
+      <h3>Nenhum imóvel encontrado</h3>
+      <p>Tente ajustar ou <button class="btn-link" onclick="limparTodosFiltros()">limpar os filtros</button>.</p>
+    </div>
+
+    <!-- Grid de cards -->
+    <div id="grid-imoveis" style="display:none" role="list" aria-label="Lista de imóveis"></div>
+
+  </main>
+
+  <!-- ============================================================
+       MODAL — Duplicata
+       ============================================================ -->
+  <div class="modal-overlay" id="modal-duplicata" style="display:none"
+       role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <div class="modal">
+      <h3 class="modal-titulo" id="modal-titulo">Imóvel já cadastrado</h3>
+      <p class="modal-texto">
+        Já existe um imóvel com o mesmo <strong>CEP, número e complemento</strong>:
+      </p>
+      <p class="modal-texto" style="margin-top:0;font-style:italic;color:var(--texto);">
+        "<span id="modal-texto-detalhe"></span>"
+      </p>
+      <p class="modal-texto" style="margin-top:8px;">
+        Deseja <strong>atualizar</strong> os dados existentes ou <strong>cancelar</strong>?
+      </p>
+      <div class="modal-acoes">
+        <button class="btn btn-fantasma" id="btn-modal-cancelar">Cancelar</button>
+        <button class="btn btn-verde"    id="btn-modal-atualizar">Atualizar dados</button>
       </div>
-      <div class="campo">
-        <label>Comprimento (m)</label>
-        <input type="number" min="0" step="0.01" placeholder="0.00"
-          value="${dados.comprimento||''}"
-          oninput="salvarDado('${id}','comprimento',this.value); calcularArea('${id}')">
-      </div>`;
-  } else {
-    return `
-      <div class="campo">
-        <label>Área total (m²)</label>
-        <input type="number" min="0" step="0.01" placeholder="Ex: 18.50"
-          value="${dados.area_total||''}"
-          oninput="salvarDado('${id}','area_total',this.value); atualizarProgresso('${id}')">
-      </div>
-      <div></div>`;
-  }
-}
+    </div>
+  </div>
 
-function atualizarDimensoes(id) {
-  const dados = getDados(id);
-  const el = document.getElementById('dims-' + id);
-  if (el) el.outerHTML = `<div id="dims-${id}" style="display:contents">${htmlDimensoes(id,dados)}</div>`;
-  atualizarProgresso(id);
-}
+  <!-- TOASTS -->
+  <div class="toast-container" id="toast-container" aria-live="assertive"></div>
 
-function calcularArea(id) {
-  const dados = getDados(id);
-  const l = parseFloat(dados.largura)     || 0;
-  const c = parseFloat(dados.comprimento) || 0;
-  if (l && c) salvarDado(id, 'area_total', (l*c).toFixed(2));
-  atualizarProgresso(id);
-}
+  <!-- ============================================================
+       SCRIPTS — ordem importa
+       p-config.js deve ser o primeiro
+       ============================================================ -->
+  <script src="js/p-config.js"></script>
+  <script src="js/p-storage.js"></script>
+  <script src="js/p-parser.js"></script>
+  <script src="js/p-ui.js"></script>
+  <script src="js/p-cards.js"></script>
+  <script src="js/p-filtros.js"></script>
+  <script src="js/p-versao.js"></script>
 
-/* ════════════════════════════════════════════════════════
-   CAMPO HTML A PARTIR DO JSON
-   ════════════════════════════════════════════════════════ */
-function campoDom(attr, dados, scopeId) {
-  const val = dados[attr.id] || '';
-  if (attr.tipo === 'select') {
-    const opts = `<option value="">— selecione —</option>` +
-      attr.opcoes.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('');
-    return `
-      <div class="campo">
-        <label>${attr.label}</label>
-        <div class="select-wrap">
-          <select onchange="salvarDado('${scopeId}','${attr.id}',this.value)">${opts}</select>
-        </div>
-      </div>`;
-  } else {
-    return `
-      <div class="campo">
-        <label>${attr.label}</label>
-        <input type="${attr.tipo==='number'?'number':'text'}" min="0"
-          placeholder="${attr.tipo==='number'?'0':''}"
-          value="${val}"
-          oninput="salvarDado('${scopeId}','${attr.id}',this.value)">
-      </div>`;
-  }
-}
-
-/* ════════════════════════════════════════════════════════
-   SALVAR DADOS
-   ════════════════════════════════════════════════════════ */
-function salvarDado(scopeId, campo, valor) {
-  const id = scopeId.replace('_ban','');
-  if (id === 'anunciante') {
-    dadosAnunciante[campo] = valor;
-  } else {
-    const dados = getDados(id);
-    dados[campo] = valor;
-    if (campo === 'e_suite') {
-      atualizarBanheiroSuite(id);
-      atualizarNomeQuarto(id);
-    }
-  }
-  atualizarProgresso(id);
-  atualizarBotao();
-}
-
-function getDados(id) {
-  const sala = salas.find(s => s.id === id);
-  if (sala) return sala.dados;
-  const quarto = quartos.find(q => q.id === id);
-  return quarto ? quarto.dados : {};
-}
-
-/* ════════════════════════════════════════════════════════
-   LIMPAR CÔMODO — apaga todos os campos exceto apelido
-   ════════════════════════════════════════════════════════ */
-function limparComodo(id, tipo, e) {
-  e.stopPropagation();
-  const dados = getDados(id);
-  const apelido = dados._apelido; // preserva só o apelido
-  Object.keys(dados).forEach(k => delete dados[k]);
-  if (apelido) dados._apelido = apelido;
-
-  /* Re-renderiza o cartão com os campos zerados */
-  if (tipo === 'Sala') renderBlocoSala(id);
-  else renderBlocoQuarto(id);
-  atualizarBotao();
-}
-
-/* ════════════════════════════════════════════════════════
-   SUÍTE
-   ════════════════════════════════════════════════════════ */
-function atualizarBanheiroSuite(id) {
-  const dados  = getDados(id);
-  const eSuite = dados.e_suite === 'Sim';
-  const ban    = document.getElementById('ban-' + id);
-  if (ban) ban.classList.toggle('visivel', eSuite);
-}
-
-function atualizarNomeQuarto(id) {
-  const visiveis = quartos.filter(q => !q.removido);
-  const idx = visiveis.findIndex(q => q.id === id);
-  if (idx < 0) return;
-  const num    = idx + 1;
-  const eSuite = quartos.find(q => q.id === id)?.dados.e_suite === 'Sim';
-  const el     = document.getElementById('nome-' + id);
-  if (el) el.textContent = eSuite ? `Suíte ${num}` : `Quarto ${num}`;
-  const acoes = document.getElementById('acoes-' + id);
-  if (!acoes) return;
-  const badgeExist = acoes.querySelector('.badge-suite');
-  if (eSuite && !badgeExist) {
-    const b = document.createElement('span');
-    b.className = 'badge-suite'; b.textContent = 'Suíte';
-    acoes.insertBefore(b, acoes.firstChild);
-  } else if (!eSuite && badgeExist) { badgeExist.remove(); }
-}
-
-/* ════════════════════════════════════════════════════════
-   TOGGLE CÔMODO
-   ════════════════════════════════════════════════════════ */
-function toggleComodo(id) {
-  document.getElementById('body-'  + id)?.classList.toggle('aberto');
-  document.getElementById('arrow-' + id)?.classList.toggle('aberto');
-}
-
-/* ════════════════════════════════════════════════════════
-   PROGRESSO
-   ════════════════════════════════════════════════════════ */
-function contarTotal(tipo) {
-  let n = 1 + dom.atributos_comuns.length;
-  const esp = dom.atributos_especificos[tipo];
-  if (esp) n += esp.length;
-  return n;
-}
-
-function contarPreenchidos(tipo, dados) {
-  let n = 0;
-  if (dados.formato) n++;
-  dom.atributos_comuns.forEach(a => { if (dados[a.id]) n++; });
-  const esp = dom.atributos_especificos[tipo];
-  if (esp) esp.forEach(a => { if (dados[a.id]) n++; });
-  return n;
-}
-
-function atualizarProgresso(id) {
-  /* Determina o tipo do cômodo */
-  const tipo = salas.find(s => s.id === id) ? 'Sala' : 'Quarto';
-  const dados = getDados(id);
-  const pre   = contarPreenchidos(tipo, dados);
-  const tot   = contarTotal(tipo);
-  const el    = document.getElementById('prog-' + id);
-  if (el) el.textContent = `${pre} de ${tot} campos preenchidos`;
-  const acoes = document.getElementById('acoes-' + id);
-  if (!acoes) return;
-  const badge = acoes.querySelector('.badge-ok');
-  if (pre===tot && tot>0 && !badge) {
-    const b = document.createElement('span');
-    b.className = 'badge-ok'; b.textContent = '✓ Completo';
-    const btnRem = acoes.querySelector('.btn-remover');
-    acoes.insertBefore(b, btnRem || acoes.lastChild);
-  } else if ((pre!==tot || tot===0) && badge) { badge.remove(); }
-}
-
-/* ════════════════════════════════════════════════════════
-   BOTÃO EXPORTAR
-   ════════════════════════════════════════════════════════ */
-function atualizarBotao() {
-  const btn      = document.getElementById('btnExportar');
-  const temLoc   = dadosLocalizacao.cep && dadosLocalizacao.numero;
-  const saisVisiveis    = salas.filter(s => !s.removido).length;
-  const quartosVisiveis = quartos.filter(q => !q.removido).length;
-  btn.disabled = !(temLoc && (saisVisiveis + quartosVisiveis > 0));
-}
-
-/* ════════════════════════════════════════════════════════
-   EXPORTAÇÃO PARA EXCEL
-   Nome: FT_{CEP}_{Numero}_{Complemento}.xlsx
-   ════════════════════════════════════════════════════════ */
-function exportarExcel() {
-  const linhas = [['Cômodo', 'Grupo', 'Característica', 'Valor']];
-
-  /* Anunciante */
-  dom.anunciante.campos.forEach(c => {
-    const v = dadosAnunciante[c.id];
-    if (v) linhas.push(['Anunciante', c.grupo, c.label, v]);
-  });
-
-  /* Localização — inclui Tipo de Imóvel */
-  const camposLoc = [
-    ['tipo_imovel','Tipo de Imóvel'],
-    ['pais','País'],['cep','CEP'],['rua','Rua'],['bairro','Bairro'],
-    ['numero','Número'],['complemento','Complemento'],
-    ['cidade','Cidade'],['estado','Estado']
-  ];
-  camposLoc.forEach(([id, label]) => {
-    const v = dadosLocalizacao[id];
-    if (v) linhas.push(['Imóvel', 'Localização', label, v]);
-  });
-
-  /* Auxiliar: exporta um cômodo */
-  const exportarComodo = (nomeComodo, tipo, dados) => {
-    if (dados.formato) {
-      linhas.push([nomeComodo, 'Dimensões', 'Formato', dados.formato]);
-      if (dados.formato === 'Retangular') {
-        if (dados.largura)     linhas.push([nomeComodo, 'Dimensões', 'Largura (m)',     dados.largura]);
-        if (dados.comprimento) linhas.push([nomeComodo, 'Dimensões', 'Comprimento (m)', dados.comprimento]);
+  <script>
+    /* ============================================================
+       Inicialização da página
+       ============================================================ */
+    document.addEventListener('DOMContentLoaded', async () => {
+      /* Versão no botão do header */
+      const labelVersao = document.getElementById('label-versao-portal');
+      if (labelVersao && typeof VERSAO_PORTAL !== 'undefined') {
+        labelVersao.textContent = VERSAO_PORTAL;
       }
-      if (dados.area_total) linhas.push([nomeComodo, 'Dimensões', 'Área total (m²)', dados.area_total]);
-    }
-    dom.atributos_comuns.forEach(a => {
-      if (dados[a.id]) linhas.push([nomeComodo, a.grupo, a.label, dados[a.id]]);
+
+      /* Carrega imóveis do Drive */
+      const estadoCarregando = document.getElementById('estado-carregando');
+      if (estadoCarregando) estadoCarregando.style.display = 'flex';
+
+      try {
+        const imoveis = await getImoveis();
+        inicializarFiltros(imoveis);
+      } catch (e) {
+        mostrarToast('Erro ao carregar imóveis. Verifique sua conexão.', 'erro', '❌');
+        inicializarFiltros([]);
+      } finally {
+        if (estadoCarregando) estadoCarregando.style.display = 'none';
+      }
+
+      /* Toast pendente de redirecionamento */
+      const pendente = sessionStorage.getItem('zillow_br_toast');
+      if (pendente) {
+        try {
+          const { mensagem, tipo, icone } = JSON.parse(pendente);
+          setTimeout(() => mostrarToast(mensagem, tipo, icone), 300);
+        } catch (e) {}
+        sessionStorage.removeItem('zillow_br_toast');
+      }
     });
-    const esp = dom.atributos_especificos[tipo];
-    if (esp) esp.forEach(a => {
-      if (dados[a.id]) linhas.push([nomeComodo, a.grupo, a.label, dados[a.id]]);
-    });
-    if (tipo === 'Quarto' && dados.e_suite === 'Sim') {
-      dom.atributos_banheiro_suite.campos.forEach(a => {
-        if (dados[a.id]) linhas.push([nomeComodo, a.grupo, a.label, dados[a.id]]);
-      });
+
+    /* ============================================================
+       Importação de arquivo
+       ============================================================ */
+    function acionarImportacao() {
+      document.getElementById('input-excel').value = '';
+      document.getElementById('input-excel').click();
     }
-  };
 
-  /* Salas visíveis */
-  const saisVisiveis = salas.filter(s => !s.removido);
-  saisVisiveis.forEach((s, idx) => {
-    const nome = saisVisiveis.length > 1 ? `Sala ${idx+1}` : 'Sala';
-    exportarComodo(nome, 'Sala', s.dados);
-  });
+    async function processarArquivo(evento) {
+      const arquivo = evento.target.files[0];
+      if (!arquivo) return;
 
-  /* Quartos visíveis */
-  quartos.filter(q => !q.removido).forEach((q, idx) => {
-    const nome = q.dados.e_suite === 'Sim' ? `Suíte ${idx+1}` : `Quarto ${idx+1}`;
-    exportarComodo(nome, 'Quarto', q.dados);
-  });
+      mostrarToast('Validando arquivo…', '', '⏳');
 
-  /* Gera workbook */
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(linhas);
-  ws['!cols'] = [{wch:18},{wch:28},{wch:28},{wch:30}];
-  ['A1','B1','C1','D1'].forEach(c => { if (ws[c]) ws[c].s = {font:{bold:true}}; });
-  XLSX.utils.book_append_sheet(wb, ws, 'Ficha');
+      try {
+        /* Parseia e valida — lança erro se não for ficha legítima */
+        const imovel = await parsearExcel(arquivo);
 
-  /* Nome: FT_{CEP}_{Numero}_{Complemento}.xlsx */
-  const limpar = str => (str||'')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-zA-Z0-9]/g,'').toUpperCase();
+        if (!imovel.id || imovel.id === '__') {
+          mostrarToast('Arquivo inválido: CEP ou Número não encontrado.', 'erro', '❌');
+          return;
+        }
 
-  const cep   = (dadosLocalizacao.cep||'').replace(/\D/g,'') || 'SEMCEP';
-  const num   = limpar(dadosLocalizacao.numero)      || 'SN';
-  const comp  = limpar(dadosLocalizacao.complemento) || '';
-  const nome  = comp ? `FT_${cep}_${num}_${comp}.xlsx` : `FT_${cep}_${num}.xlsx`;
+        /* Verifica duplicata */
+        const existente = await checkDuplicata(
+          imovel.localizacao['CEP']         || '',
+          imovel.localizacao['Número']      || imovel.localizacao['Numero'] || '',
+          imovel.localizacao['Complemento'] || ''
+        );
 
-  XLSX.writeFile(wb, nome);
-}
+        if (existente) {
+          const confirmar = await abrirModalDuplicata(formatarEndereco(existente.localizacao));
+          if (!confirmar) {
+            mostrarToast('Importação cancelada.', 'aviso', '⚠️');
+            return;
+          }
+        }
 
-/* Inicializa */
-carregarDominios();
+        mostrarToast('Enviando para o Drive…', '', '☁️');
 
-/* Preenche label de versão no botão do header */
-document.addEventListener('DOMContentLoaded', () => {
-  const label = document.getElementById('label-versao');
-  if (label && typeof VERSAO_ATUAL !== 'undefined') {
-    label.textContent = VERSAO_ATUAL;
-  }
-});
-</script>
+        /* Salva no Drive — passa arquivo original + objeto imóvel */
+        await saveImovel(arquivo, imovel);
+
+        /* Recarrega lista */
+        const imoveis = await getImoveis();
+        atualizarCacheFiltros(imoveis);
+
+        mostrarToast(
+          `${existente ? 'Dados atualizados' : 'Imóvel importado'} com sucesso!`,
+          'sucesso', '✅'
+        );
+
+
+      } catch (erro) {
+        console.error('[index] Erro na importação:', erro);
+        mostrarToast(erro.message || 'Erro inesperado na importação.', 'erro', '❌');
+      }
+    }
+  </script>
+
 </body>
 </html>
