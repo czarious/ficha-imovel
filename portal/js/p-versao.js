@@ -1,13 +1,27 @@
-/* arquivo: p-versao.js | versao: 0.6.0 */
+/* arquivo: p-versao.js | versao: 0.6.1 */
 /* ============================================================
    p-versao.js — Controle de versão do Zillow BR · Portal
    Fonte única de verdade para versão e changelog do portal.
    Carregado em: portal/index.html e portal/p-imovel.html
    ============================================================ */
 
-const VERSAO_PORTAL = '0.6.0';
+const VERSAO_PORTAL = '0.6.1';
 
 const CHANGELOG_PORTAL = [
+  {
+    versao: '0.6.1',
+    data:   '28/Mai/2026',
+    titulo: 'Correção de autenticação OAuth',
+    grupos: [
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'Correção crítica: script do Google Identity Services passa a usar onload para garantir inicialização correta do OAuth antes do primeiro uso.',
+          'Botão "Entrar com Google" removido do header — login acontece automaticamente no fluxo de importação.',
+        ]
+      }
+    ]
+  },
   {
     versao: '0.6.0',
     data:   '28/Mai/2026',
