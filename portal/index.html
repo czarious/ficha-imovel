@@ -1,4 +1,4 @@
-<!-- arquivo: index.html | versao: 0.4.0 -->
+<!-- arquivo: index.html | versao: 0.6.0 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -7,8 +7,10 @@
   <title>Zillow BR — Portal Imobiliário</title>
   <meta name="description" content="Portal de fichas técnicas profissionais para imóveis brasileiros">
   <link rel="stylesheet" href="css/p-style.css">
-  <script src="js/p-versao.js"></script>
+  <!-- SheetJS — leitura de arquivos .xlsx/.xlsm -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Google Identity Services — OAuth 2.0 -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -22,6 +24,8 @@
         <span class="logo-nome">Zillow<sup class="logo-br">BR</sup></span>
       </a>
       <div class="header-acoes">
+        <!-- Botão login Google — visível apenas quando não autenticado -->
+        <div id="container-btn-login" style="display:none"></div>
         <button class="btn btn-secundario" onclick="acionarImportacao()" aria-label="Importar ficha técnica">
           ＋ Importar imóvel
         </button>
@@ -32,7 +36,7 @@
           style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.9);border-radius:20px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em;transition:background 0.15s;white-space:nowrap;"
           onmouseover="this.style.background='rgba(255,255,255,0.22)'"
           onmouseout="this.style.background='rgba(255,255,255,0.12)'"
-        >v<span id="label-versao-index">0.3.0</span></button>
+        >v<span id="label-versao-portal">0.6.0</span></button>
       </div>
     </div>
   </header>
@@ -195,15 +199,23 @@
 
     </div><!-- /filtros-wrap -->
 
+    <!-- Estado de carregamento -->
+    <div id="estado-carregando" style="display:none" role="region" aria-label="Carregando imóveis">
+      <div class="loading-wrap">
+        <div class="spinner" aria-hidden="true"></div>
+        <span>Carregando imóveis…</span>
+      </div>
+    </div>
+
     <!-- Estado vazio -->
-    <div id="estado-vazio" role="region" aria-label="Nenhum imóvel cadastrado">
+    <div id="estado-vazio" style="display:none" role="region" aria-label="Nenhum imóvel cadastrado">
       <div class="vazio-icone" aria-hidden="true">🏠</div>
       <h3>Nenhum imóvel ainda</h3>
       <p>Importe um arquivo <strong>.xlsx</strong> gerado pela Ficha Técnica para criar seu primeiro anúncio.</p>
       <button class="btn btn-verde" onclick="acionarImportacao()">Importar primeiro imóvel</button>
     </div>
 
-    <!-- Estado sem resultados (há imóveis mas o filtro não achou nada) -->
+    <!-- Estado sem resultados -->
     <div id="estado-sem-resultados" style="display:none" role="region" aria-label="Sem resultados">
       <div class="vazio-icone" aria-hidden="true">🔍</div>
       <h3>Nenhum imóvel encontrado</h3>
@@ -243,30 +255,49 @@
 
   <!-- ============================================================
        SCRIPTS — ordem importa
+       p-config.js deve ser o primeiro
        ============================================================ -->
+  <script src="js/p-config.js"></script>
   <script src="js/p-storage.js"></script>
   <script src="js/p-parser.js"></script>
   <script src="js/p-ui.js"></script>
   <script src="js/p-cards.js"></script>
   <script src="js/p-filtros.js"></script>
+  <script src="js/p-versao.js"></script>
 
   <script>
     /* ============================================================
-       Lógica da página index
+       Inicialização da página
        ============================================================ */
-    let _imovelPendente = null;
-
-    document.addEventListener('DOMContentLoaded', () => {
-      // Inicializa filtros com todos os imóveis — ele chama renderizarCards internamente
-      inicializarFiltros(getImoveis());
-
-      // Versão no botão do header
-      const labelVersao = document.getElementById('label-versao-index');
+    document.addEventListener('DOMContentLoaded', async () => {
+      /* Versão no botão do header */
+      const labelVersao = document.getElementById('label-versao-portal');
       if (labelVersao && typeof VERSAO_PORTAL !== 'undefined') {
         labelVersao.textContent = VERSAO_PORTAL;
       }
 
-      // Toast pendente de redirecionamento (ex: após exclusão)
+      /* Inicializa OAuth */
+      inicializarOAuth();
+
+      /* Botão de login no header */
+      renderizarBotaoLogin('container-btn-login');
+      atualizarEstadoLogin();
+
+      /* Carrega imóveis do Drive */
+      const estadoCarregando = document.getElementById('estado-carregando');
+      if (estadoCarregando) estadoCarregando.style.display = 'flex';
+
+      try {
+        const imoveis = await getImoveis();
+        inicializarFiltros(imoveis);
+      } catch (e) {
+        mostrarToast('Erro ao carregar imóveis. Verifique sua conexão.', 'erro', '❌');
+        inicializarFiltros([]);
+      } finally {
+        if (estadoCarregando) estadoCarregando.style.display = 'none';
+      }
+
+      /* Toast pendente de redirecionamento */
       const pendente = sessionStorage.getItem('zillow_br_toast');
       if (pendente) {
         try {
@@ -277,6 +308,9 @@
       }
     });
 
+    /* ============================================================
+       Importação de arquivo
+       ============================================================ */
     function acionarImportacao() {
       document.getElementById('input-excel').value = '';
       document.getElementById('input-excel').click();
@@ -286,15 +320,10 @@
       const arquivo = evento.target.files[0];
       if (!arquivo) return;
 
-      const ext = arquivo.name.toLowerCase();
-      if (!ext.endsWith('.xlsx') && !ext.endsWith('.xlsm')) {
-        mostrarToast('Apenas arquivos .xlsx ou .xlsm são aceitos.', 'erro', '❌');
-        return;
-      }
-
-      mostrarToast('Lendo arquivo…', '', '⏳');
+      mostrarToast('Validando arquivo…', '', '⏳');
 
       try {
+        /* Parseia e valida — lança erro se não for ficha legítima */
         const imovel = await parsearExcel(arquivo);
 
         if (!imovel.id || imovel.id === '__') {
@@ -302,30 +331,36 @@
           return;
         }
 
-        const existente = checkDuplicata(
+        /* Verifica duplicata */
+        const existente = await checkDuplicata(
           imovel.localizacao['CEP']         || '',
           imovel.localizacao['Número']      || imovel.localizacao['Numero'] || '',
           imovel.localizacao['Complemento'] || ''
         );
 
         if (existente) {
-          _imovelPendente = imovel;
           const confirmar = await abrirModalDuplicata(formatarEndereco(existente.localizacao));
           if (!confirmar) {
             mostrarToast('Importação cancelada.', 'aviso', '⚠️');
-            _imovelPendente = null;
             return;
           }
-          imovel.importadoEm = existente.importadoEm;
         }
 
-        saveImovel(imovel);
+        mostrarToast('Enviando para o Drive…', '', '☁️');
 
-        // Atualiza filtros com a lista nova — ele re-renderiza os cards
-        atualizarCacheFiltros(getImoveis());
+        /* Salva no Drive — passa arquivo original + objeto imóvel */
+        await saveImovel(arquivo, imovel);
 
-        mostrarToast(`${existente ? 'Dados atualizados' : 'Imóvel importado'} com sucesso!`, 'sucesso', '✅');
-        _imovelPendente = null;
+        /* Recarrega lista */
+        const imoveis = await getImoveis();
+        atualizarCacheFiltros(imoveis);
+
+        mostrarToast(
+          `${existente ? 'Dados atualizados' : 'Imóvel importado'} com sucesso!`,
+          'sucesso', '✅'
+        );
+
+        atualizarEstadoLogin();
 
       } catch (erro) {
         console.error('[index] Erro na importação:', erro);
