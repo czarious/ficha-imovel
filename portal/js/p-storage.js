@@ -1,86 +1,234 @@
-/* arquivo: p-storage.js | versao: 0.4.0 */
+/* arquivo: p-storage.js | versao: 0.6.0 */
 /* ============================================================
-   p-storage.js — Gerenciamento de dados no localStorage
-   Zillow BR Portal | Responsabilidade: CRUD de imóveis
-   Sem dependências externas — usa apenas API nativa do browser
+   p-storage.js — Gerenciamento de dados via Google Drive API
+   Zillow BR Portal | Responsabilidade: CRUD de imóveis no Drive
+   Depende de: p-config.js (DRIVE_PASTA_ID, DRIVE_API_KEY, OAUTH_CLIENT_ID)
    ============================================================ */
 
-const CHAVE_STORAGE = 'zillow_br_imoveis';
+/* ----------------------------------------------------------------
+   ESTADO DE AUTENTICAÇÃO
+   ---------------------------------------------------------------- */
+let _tokenAcesso    = null;  // token OAuth para operações de escrita
+let _clienteGoogle  = null;  // instância do Google Identity Services
 
 /**
- * Retorna todos os imóveis salvos.
- * @returns {Array<Object>}
+ * Inicializa o cliente OAuth do Google Identity Services.
+ * Chamado uma vez ao carregar a página.
  */
-function getImoveis() {
-  const dados = localStorage.getItem(CHAVE_STORAGE);
+function inicializarOAuth() {
+  if (typeof google === 'undefined' || !google.accounts) return;
+  _clienteGoogle = google.accounts.oauth2.initTokenClient({
+    client_id: OAUTH_CLIENT_ID,
+    scope:     OAUTH_ESCOPOS,
+    callback:  (resposta) => {
+      if (resposta.error) {
+        console.error('[storage] Erro OAuth:', resposta.error);
+        return;
+      }
+      _tokenAcesso = resposta.access_token;
+    }
+  });
+}
+
+/**
+ * Solicita token OAuth ao usuário (abre popup de login Google).
+ * Retorna Promise que resolve quando o token estiver disponível.
+ * @returns {Promise<string>} token de acesso
+ */
+function solicitarToken() {
+  return new Promise((resolve, reject) => {
+    if (_tokenAcesso) { resolve(_tokenAcesso); return; }
+    if (!_clienteGoogle) { reject(new Error('Cliente OAuth não inicializado.')); return; }
+
+    const clienteComCallback = google.accounts.oauth2.initTokenClient({
+      client_id: OAUTH_CLIENT_ID,
+      scope:     OAUTH_ESCOPOS,
+      callback:  (resposta) => {
+        if (resposta.error) { reject(new Error(resposta.error)); return; }
+        _tokenAcesso = resposta.access_token;
+        resolve(_tokenAcesso);
+      }
+    });
+    clienteComCallback.requestAccessToken({ prompt: 'consent' });
+  });
+}
+
+/* ----------------------------------------------------------------
+   LEITURA — pública, usa API Key
+   ---------------------------------------------------------------- */
+
+/**
+ * Lista todos os arquivos .xlsx/.xlsm na pasta do Drive.
+ * Leitura pública — não requer login.
+ * @returns {Promise<Array>} lista de objetos { id, name }
+ */
+async function listarArquivosDrive() {
+  const url = `https://www.googleapis.com/drive/v3/files?`
+    + `q='${DRIVE_PASTA_ID}'+in+parents+and+trashed=false`
+    + `&fields=files(id,name)`
+    + `&key=${DRIVE_API_KEY}`;
+
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error('Erro ao listar arquivos do Drive.');
+  const dados = await resp.json();
+  return dados.files || [];
+}
+
+/**
+ * Baixa e parseia um arquivo .xlsx do Drive pelo ID do arquivo.
+ * @param {string} fileId — ID do arquivo no Drive
+ * @param {string} fileName — nome do arquivo (para validação)
+ * @returns {Promise<Object>} objeto imóvel
+ */
+async function baixarArquivoDrive(fileId, fileName) {
+  const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${DRIVE_API_KEY}`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`Erro ao baixar arquivo ${fileName}.`);
+  const blob = await resp.blob();
+  const file = new File([blob], fileName, { type: blob.type });
+  return parsearExcel(file);
+}
+
+/**
+ * Retorna todos os imóveis da pasta Drive.
+ * Fonte de dados principal — lê direto do Google Drive.
+ * @returns {Promise<Array<Object>>}
+ */
+async function getImoveis() {
   try {
-    return dados ? JSON.parse(dados) : [];
+    const arquivos = await listarArquivosDrive();
+    const promessas = arquivos
+      .filter(f => f.name.toLowerCase().endsWith('.xlsx') || f.name.toLowerCase().endsWith('.xlsm'))
+      .map(f => baixarArquivoDrive(f.id, f.name).catch(() => null));
+    const resultados = await Promise.all(promessas);
+    return resultados.filter(Boolean);
   } catch (e) {
-    console.error('[storage] Erro ao ler localStorage:', e);
+    console.error('[storage] Erro ao carregar imóveis:', e);
     return [];
   }
 }
 
 /**
- * Persiste a lista completa de imóveis (sobrescreve).
- * @param {Array<Object>} lista
- */
-function salvarTodos(lista) {
-  localStorage.setItem(CHAVE_STORAGE, JSON.stringify(lista));
-}
-
-/**
  * Retorna um imóvel pelo ID ou null se não encontrado.
  * @param {string} id
- * @returns {Object|null}
+ * @returns {Promise<Object|null>}
  */
-function getImovelById(id) {
-  return getImoveis().find(i => i.id === id) || null;
+async function getImovelById(id) {
+  const imoveis = await getImoveis();
+  return imoveis.find(i => i.id === id) || null;
+}
+
+/* ----------------------------------------------------------------
+   ESCRITA — requer autenticação OAuth
+   ---------------------------------------------------------------- */
+
+/**
+ * Faz upload de um arquivo .xlsx para a pasta Drive.
+ * Requer token OAuth — solicita login se necessário.
+ * @param {File} arquivo — objeto File original do input
+ * @param {string} nomeArquivo — nome canônico do arquivo
+ * @returns {Promise<string>} ID do arquivo criado no Drive
+ */
+async function uploadArquivoDrive(arquivo, nomeArquivo) {
+  const token = await solicitarToken();
+
+  const metadata = JSON.stringify({
+    name:    nomeArquivo,
+    parents: [DRIVE_PASTA_ID]
+  });
+
+  const form = new FormData();
+  form.append('metadata', new Blob([metadata], { type: 'application/json' }));
+  form.append('file', arquivo);
+
+  const resp = await fetch(
+    'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
+    {
+      method:  'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body:    form
+    }
+  );
+
+  if (!resp.ok) throw new Error('Erro ao fazer upload para o Drive.');
+  const dados = await resp.json();
+  return dados.id;
 }
 
 /**
- * Verifica se já existe um imóvel com os mesmos CEP + Número + Complemento.
- * Usado para deduplicação na importação.
+ * Salva ou atualiza um imóvel no Drive.
+ * Se já existir arquivo com mesmo nome, deleta e faz novo upload.
+ * @param {File} arquivoOriginal — arquivo .xlsx do input
+ * @param {Object} imovel — objeto imóvel já parseado
+ */
+async function saveImovel(arquivoOriginal, imovel) {
+  const nomeArquivo = arquivoOriginal.name;
+
+  // Verifica se já existe arquivo com mesmo nome e deleta
+  const arquivos = await listarArquivosDrive();
+  const existente = arquivos.find(f => f.name === nomeArquivo);
+  if (existente) {
+    await deletarArquivoDrive(existente.id);
+  }
+
+  await uploadArquivoDrive(arquivoOriginal, nomeArquivo);
+}
+
+/**
+ * Deleta um arquivo do Drive pelo ID do arquivo no Drive.
+ * @param {string} driveFileId — ID do arquivo no Drive
+ */
+async function deletarArquivoDrive(driveFileId) {
+  const token = await solicitarToken();
+  const resp = await fetch(
+    `https://www.googleapis.com/drive/v3/files/${driveFileId}`,
+    {
+      method:  'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    }
+  );
+  if (!resp.ok && resp.status !== 204) throw new Error('Erro ao deletar arquivo do Drive.');
+}
+
+/**
+ * Deleta um imóvel pelo ID canônico (CEP+Numero+Complemento).
+ * Busca o arquivo correspondente na pasta e deleta.
+ * @param {string} id — ID canônico do imóvel
+ */
+async function deleteImovel(id) {
+  const arquivos = await listarArquivosDrive();
+  // O nome do arquivo começa com FT_ e contém o ID canônico
+  const arquivo = arquivos.find(f => {
+    const nomeBase = f.name.replace(/\.(xlsx|xlsm)$/i, '');
+    const partes   = nomeBase.split('_').slice(1); // remove prefixo FT
+    const idArquivo = normalizarId(partes[0] || '', partes[1] || '', partes[2] || '');
+    return idArquivo === id;
+  });
+  if (arquivo) await deletarArquivoDrive(arquivo.id);
+}
+
+/* ----------------------------------------------------------------
+   DEDUPLICAÇÃO
+   ---------------------------------------------------------------- */
+
+/**
+ * Verifica se já existe imóvel com mesmo CEP + Número + Complemento.
  * @param {string} cep
  * @param {string} numero
  * @param {string} complemento
- * @returns {Object|null} O imóvel existente ou null
+ * @returns {Promise<Object|null>}
  */
-function checkDuplicata(cep, numero, complemento) {
+async function checkDuplicata(cep, numero, complemento) {
   const id = normalizarId(cep, numero, complemento);
   return getImovelById(id);
 }
 
-/**
- * Salva um imóvel novo ou atualiza um existente.
- * Usa a posição existente na lista (update in-place) ou insere no topo (novo).
- * @param {Object} imovel — objeto com campo `id` obrigatório
- */
-function saveImovel(imovel) {
-  const lista = getImoveis();
-  const idx = lista.findIndex(i => i.id === imovel.id);
-  if (idx >= 0) {
-    lista[idx] = imovel; // atualização preserva posição na lista
-  } else {
-    lista.unshift(imovel); // novo imóvel entra no topo
-  }
-  salvarTodos(lista);
-}
-
-/**
- * Remove um imóvel pelo ID.
- * @param {string} id
- */
-function deleteImovel(id) {
-  const lista = getImoveis().filter(i => i.id !== id);
-  salvarTodos(lista);
-}
+/* ----------------------------------------------------------------
+   HELPERS
+   ---------------------------------------------------------------- */
 
 /**
  * Gera um ID canônico a partir de CEP + Número + Complemento.
- * Remove acentos, espaços e caracteres especiais — só letras e números.
- * Exemplo: "14020-260", "123", "Apto 301" → "14020260_123_apto301"
- *
  * @param {string} cep
  * @param {string} numero
  * @param {string} complemento
@@ -92,8 +240,8 @@ function normalizarId(cep, numero, complemento) {
       .toString()
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // remove marcas de acento
-      .replace(/[^a-z0-9]/g, '');      // só alfanumérico
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]/g, '');
 
   return `${limpar(cep)}_${limpar(numero)}_${limpar(complemento)}`;
 }
