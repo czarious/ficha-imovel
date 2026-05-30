@@ -1,13 +1,38 @@
-/* arquivo: f-versao.js | versao: 0.5.0 */
+/* arquivo: f-versao.js | versao: 0.6.0 */
 /* ============================================================
    f-versao.js — Controle de versão do Zillow BR · Ficha Técnica
    Fonte única de verdade para versão e changelog da ficha.
    Carregado em: ficha/index.html e ficha/f-changelog.html
    ============================================================ */
 
-const VERSAO_ATUAL = '0.5.0';
+const VERSAO_ATUAL = '0.6.0';
 
 const CHANGELOG = [
+  {
+    versao: '0.6.0',
+    data:   '29/Mai/2026',
+    titulo: 'Correções de usabilidade e padronização',
+    grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          'CEP genérico: campos Rua e Bairro ficam editáveis quando o ViaCEP não retorna logradouro, com placeholder explicativo.',
+          'CRECI-J visível apenas quando Tipo de anunciante = Imobiliária.',
+          'Campo CPF exibe CNPJ automaticamente quando Tipo = Imobiliária.',
+          'Badge numérico de sala some quando há apenas uma sala cadastrada.',
+        ]
+      },
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'dadosCadastrante renomeado para dadosAnunciante — alinhado com o portal.',
+          'Export Excel: coluna A passa a usar "Anunciante" em vez de "Cadastrante".',
+          'Numeração de quartos corrigida ao restaurar cômodo do cache — re-renderiza todos em ordem.',
+          'f-dominios.json: label "Quantidade" corrigido para "Número de tomadas" em Elétrica e Banheiro.',
+        ]
+      }
+    ]
+  },
   {
     versao: '0.5.0',
     data:   '28/Mai/2026',

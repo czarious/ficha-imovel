@@ -1,4 +1,5 @@
-<!-- arquivo: index.html | versao: 0.4.0 -->
+<!-- DESTINO: ficha/index.html -->
+<!-- arquivo: index.html | versao: 0.6.0 -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -42,7 +43,6 @@
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; gap: 12px;
   }
-  /* Seção minimizável: header clicável */
   .secao-header.minimizavel {
     cursor: pointer; user-select: none;
     transition: background 0.15s;
@@ -52,11 +52,8 @@
   .secao-header-left { display: flex; align-items: center; gap: 12px; }
   .secao-arrow { font-size: 14px; color: var(--text3); transition: transform 0.25s; flex-shrink: 0; }
   .secao-arrow.aberto { transform: rotate(180deg); }
-
-  /* Corpo colapsável das seções */
   .secao-body-wrap { overflow: hidden; transition: max-height 0.3s ease; }
   .secao-body { padding: 24px; }
-
   .secao-icone { width: 34px; height: 34px; background: var(--accent-light); color: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
   .secao-titulo { font-family: 'DM Serif Display', serif; font-size: 17px; font-weight: 400; }
   .secao-subtitulo { font-size: 12px; color: var(--text3); margin-top: 2px; }
@@ -143,30 +140,14 @@
     <h1>Ficha Técnica de Imóvel</h1>
     <span>Levantamento detalhado por cômodo</span>
   </div>
-  <!-- Botão de versão — canto superior direito -->
   <button
     id="btn-versao"
     onclick="abrirChangelog()"
     title="Ver histórico de versões"
-    style="
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: rgba(255,255,255,0.9);
-      border-radius: 20px;
-      padding: 6px 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      letter-spacing: 0.05em;
-      transition: background 0.15s;
-      white-space: nowrap;
-    "
+    style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.9);border-radius:20px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em;transition:background 0.15s;white-space:nowrap;"
     onmouseover="this.style.background='rgba(255,255,255,0.22)'"
     onmouseout="this.style.background='rgba(255,255,255,0.12)'"
-  >
-    v<span id="label-versao">0.3.0</span>
-  </button>
+  >v<span id="label-versao">0.6.0</span></button>
 </header>
 
 <div class="container">
@@ -187,34 +168,21 @@ const JSON_URL = 'https://raw.githubusercontent.com/czarious/ficha-imovel/main/f
 
 /* Estado global */
 let dom              = null;
-let dadosCadastrante = {};
+let dadosAnunciante  = {};  /* CORR-1: era dadosCadastrante */
 let dadosLocalizacao = {};
 
-/* Salas: array de { id, dados, removido } — igual aos quartos */
 let salas         = [];
 let contadorSalas = 0;
-
-/* Quartos: array de { id, dados, removido } */
 let quartos          = [];
 let contadorQuartos  = 0;
 
-/* Estado dos accordions das seções principais */
-let cadastranteAberto  = true;
-let localizacaoAberta  = true;
+let anuncianteAberto  = true;  /* CORR-1: era cadastranteAberto */
+let localizacaoAberta = true;
 
-/* Tipos de imóvel predefinidos com grupos */
 const TIPOS_IMOVEL = {
-  'Residencial': [
-    'Apartamento','Casa','Sobrado','Casa em Condomínio',
-    'Cobertura','Flat / Apart-hotel','Kitnet / Quitinete',
-    'Loft','Studio','Casa Geminada','Edícula'
-  ],
-  'Terreno / Rural': [
-    'Lote / Terreno','Chácara','Sítio','Fazenda'
-  ],
-  'Comercial': [
-    'Sala Comercial','Loja','Galpão','Prédio Comercial'
-  ]
+  'Residencial': ['Apartamento','Casa','Sobrado','Casa em Condomínio','Cobertura','Flat / Apart-hotel','Kitnet / Quitinete','Loft','Studio','Casa Geminada','Edícula'],
+  'Terreno / Rural': ['Lote / Terreno','Chácara','Sítio','Fazenda'],
+  'Comercial': ['Sala Comercial','Loja','Galpão','Prédio Comercial']
 };
 
 /* ════════════════════════════════════════════════════════
@@ -230,7 +198,7 @@ async function carregarDominios() {
     document.getElementById('app').innerHTML = `
       <div class="erro-json">
         <strong>Não foi possível carregar os domínios.</strong><br>
-        Verifique se <code>ficha/dominios/dominios.json</code> está no repositório.<br>
+        Verifique se <code>ficha/dominios/f-dominios.json</code> está no repositório.<br>
         <small>Erro: ${e.message}</small>
       </div>`;
   }
@@ -241,41 +209,37 @@ async function carregarDominios() {
    ════════════════════════════════════════════════════════ */
 function renderApp() {
   document.getElementById('app').innerHTML = `
-    <div id="sec-cadastrante"></div>
+    <div id="sec-anunciante"></div>
     <div id="sec-localizacao"></div>
     <div id="sec-comodos"></div>`;
-  renderCadastrante();
+  renderAnunciante();
   renderLocalizacao();
   renderComodos();
 }
 
 /* ════════════════════════════════════════════════════════
    ACCORDION DE SEÇÃO
-   Abre/fecha o corpo de uma seção principal (Cadastrante / Localização)
    ════════════════════════════════════════════════════════ */
 function toggleSecao(secaoId) {
   const wrap  = document.getElementById('wrap-' + secaoId);
   const arrow = document.getElementById('arrow-secao-' + secaoId);
   if (!wrap) return;
-
   const aberto = wrap.style.maxHeight && wrap.style.maxHeight !== '0px';
-
   if (aberto) {
     wrap.style.maxHeight = '0';
     if (arrow) arrow.classList.remove('aberto');
-    if (secaoId === 'cadastrante') cadastranteAberto = false;
+    if (secaoId === 'anunciante') anuncianteAberto = false;
     else localizacaoAberta = false;
   } else {
     wrap.style.maxHeight = wrap.scrollHeight + 'px';
     if (arrow) arrow.classList.add('aberto');
-    if (secaoId === 'cadastrante') cadastranteAberto = true;
+    if (secaoId === 'anunciante') anuncianteAberto = true;
     else localizacaoAberta = true;
   }
 }
 
-/* Inicializa a altura de uma seção colapsável após renderizar */
 function inicializarSecao(secaoId, aberto) {
-  const wrap = document.getElementById('wrap-' + secaoId);
+  const wrap  = document.getElementById('wrap-' + secaoId);
   const arrow = document.getElementById('arrow-secao-' + secaoId);
   if (!wrap) return;
   if (aberto) {
@@ -288,15 +252,32 @@ function inicializarSecao(secaoId, aberto) {
 }
 
 /* ════════════════════════════════════════════════════════
-   SEÇÃO CADASTRANTE — minimizável
+   SEÇÃO ANUNCIANTE — CORR-1, CORR-6, CORR-7
+   - dadosAnunciante em vez de dadosCadastrante
+   - CRECI-J condicional (só Imobiliária)
+   - CPF/CNPJ dinâmico conforme Tipo
    ════════════════════════════════════════════════════════ */
-function renderCadastrante() {
-  let campos = '';
-  dom.anunciante.campos.forEach(c => { campos += campoDom(c, dadosCadastrante, 'cadastrante'); });
+function renderAnunciante() {
+  /* Gera campos dinamicamente respeitando condicionais */
+  const tipoAtual = dadosAnunciante['tipo'] || '';
 
-  document.getElementById('sec-cadastrante').innerHTML = `
+  let campos = '';
+  dom.anunciante.campos.forEach(c => {
+    /* CORR-6: CRECI-J só para Imobiliária */
+    if (c.id === 'creci_j' && tipoAtual !== 'Imobiliária') return;
+
+    /* CORR-7: CPF vira CNPJ para Imobiliária */
+    const attrModificado = { ...c };
+    if (c.id === 'cpf' && tipoAtual === 'Imobiliária') {
+      attrModificado.label = 'CNPJ';
+    }
+
+    campos += campoDom(attrModificado, dadosAnunciante, 'anunciante');
+  });
+
+  document.getElementById('sec-anunciante').innerHTML = `
     <div class="secao">
-      <div class="secao-header minimizavel" onclick="toggleSecao('cadastrante')">
+      <div class="secao-header minimizavel" onclick="toggleSecao('anunciante')">
         <div class="secao-header-left">
           <div class="secao-icone">👤</div>
           <div>
@@ -304,27 +285,26 @@ function renderCadastrante() {
             <div class="secao-subtitulo">Quem está anunciando este imóvel</div>
           </div>
         </div>
-        <span class="secao-arrow" id="arrow-secao-cadastrante">▾</span>
+        <span class="secao-arrow" id="arrow-secao-anunciante">▾</span>
       </div>
-      <div class="secao-body-wrap" id="wrap-cadastrante" style="max-height:0">
+      <div class="secao-body-wrap" id="wrap-anunciante" style="max-height:0">
         <div class="secao-body">
           <div class="grid-2">${campos}</div>
         </div>
       </div>
     </div>`;
 
-  setTimeout(() => inicializarSecao('cadastrante', cadastranteAberto), 10);
+  setTimeout(() => inicializarSecao('anunciante', anuncianteAberto), 10);
 }
 
 /* ════════════════════════════════════════════════════════
-   SEÇÃO LOCALIZAÇÃO — com Tipo de Imóvel e minimizável
+   SEÇÃO LOCALIZAÇÃO — CORR-3: CEP genérico
    ════════════════════════════════════════════════════════ */
 function renderLocalizacao() {
   const estados = dom.estados_brasil.map(e =>
     `<option value="${e}" ${dadosLocalizacao.estado===e?'selected':''}>${e}</option>`
   ).join('');
 
-  /* Select de Tipo de Imóvel com optgroups */
   const tipoAtual = dadosLocalizacao.tipo_imovel || '';
   let opcosTipo = `<option value="">— selecione —</option>`;
   Object.entries(TIPOS_IMOVEL).forEach(([grupo, tipos]) => {
@@ -334,6 +314,10 @@ function renderLocalizacao() {
     });
     opcosTipo += `</optgroup>`;
   });
+
+  /* CORR-3: Rua e Bairro readonly só se preenchidos pelo CEP. Se vazio, editável */
+  const ruaReadonly    = dadosLocalizacao.rua    ? 'readonly' : '';
+  const bairroReadonly = dadosLocalizacao.bairro ? 'readonly' : '';
 
   document.getElementById('sec-localizacao').innerHTML = `
     <div class="secao">
@@ -350,7 +334,6 @@ function renderLocalizacao() {
       <div class="secao-body-wrap" id="wrap-localizacao" style="max-height:0">
         <div class="secao-body">
 
-          <!-- Tipo de Imóvel — destaque no topo -->
           <div class="grid-2" style="margin-bottom:6px">
             <div class="campo">
               <label>Tipo de Imóvel</label>
@@ -383,13 +366,17 @@ function renderLocalizacao() {
           <div class="grid-2">
             <div class="campo">
               <label>Rua / Logradouro</label>
-              <input type="text" id="campo-rua" readonly placeholder="Preenchido pelo CEP"
-                value="${dadosLocalizacao.rua||''}">
+              <input type="text" id="campo-rua" ${ruaReadonly}
+                placeholder="${ruaReadonly ? 'Preenchido pelo CEP' : 'Digite a rua manualmente'}"
+                value="${dadosLocalizacao.rua||''}"
+                oninput="salvarLoc('rua',this.value)">
             </div>
             <div class="campo">
               <label>Bairro</label>
-              <input type="text" id="campo-bairro" readonly placeholder="Preenchido pelo CEP"
-                value="${dadosLocalizacao.bairro||''}">
+              <input type="text" id="campo-bairro" ${bairroReadonly}
+                placeholder="${bairroReadonly ? 'Preenchido pelo CEP' : 'Digite o bairro manualmente'}"
+                value="${dadosLocalizacao.bairro||''}"
+                oninput="salvarLoc('bairro',this.value)">
             </div>
           </div>
           <div class="grid-3">
@@ -435,6 +422,7 @@ function mascaraCEP(input) {
   input.value = v;
 }
 
+/* CORR-3: remove readonly de Rua e Bairro se ViaCEP retornar vazio */
 async function buscarCEP(cep) {
   const limpo = cep.replace(/\D/g,'');
   if (limpo.length !== 8) return;
@@ -442,10 +430,34 @@ async function buscarCEP(cep) {
     const r = await fetch(`https://viacep.com.br/ws/${limpo}/json/`);
     const d = await r.json();
     if (d.erro) { alert('CEP não encontrado.'); return; }
-    document.getElementById('campo-rua').value    = d.logradouro || '';
-    document.getElementById('campo-bairro').value = d.bairro     || '';
+
+    const campoRua    = document.getElementById('campo-rua');
+    const campoBairro = document.getElementById('campo-bairro');
+
+    /* Se logradouro vier vazio (CEP genérico), remove readonly para edição manual */
+    if (d.logradouro) {
+      campoRua.value = d.logradouro;
+      campoRua.setAttribute('readonly', true);
+      campoRua.placeholder = 'Preenchido pelo CEP';
+    } else {
+      campoRua.value = '';
+      campoRua.removeAttribute('readonly');
+      campoRua.placeholder = 'CEP genérico — digite a rua manualmente';
+    }
+
+    if (d.bairro) {
+      campoBairro.value = d.bairro;
+      campoBairro.setAttribute('readonly', true);
+      campoBairro.placeholder = 'Preenchido pelo CEP';
+    } else {
+      campoBairro.value = '';
+      campoBairro.removeAttribute('readonly');
+      campoBairro.placeholder = 'CEP genérico — digite o bairro manualmente';
+    }
+
     document.getElementById('campo-cidade').value = d.localidade || '';
     document.getElementById('campo-estado').value = d.uf         || '';
+
     salvarLoc('cep',    cep);
     salvarLoc('rua',    d.logradouro || '');
     salvarLoc('bairro', d.bairro     || '');
@@ -459,7 +471,6 @@ function salvarLoc(campo, valor) { dadosLocalizacao[campo] = valor; }
 
 /* ════════════════════════════════════════════════════════
    SEÇÃO CÔMODOS
-   Salas numeráveis + Quartos
    ════════════════════════════════════════════════════════ */
 function renderComodos() {
   document.getElementById('sec-comodos').innerHTML = `
@@ -472,10 +483,8 @@ function renderComodos() {
         </div>
       </div>
       <div class="secao-body">
-        <!-- Salas -->
         <div id="lista-salas"></div>
         <button class="btn-adicionar" onclick="adicionarSala()">+ Adicionar Sala</button>
-        <!-- Quartos -->
         <div id="lista-quartos"></div>
         <button class="btn-adicionar" onclick="adicionarQuarto()">+ Adicionar Quarto</button>
       </div>
@@ -487,17 +496,18 @@ function renderComodos() {
 
 /* ── SALAS ── */
 function adicionarSala() {
-  /* Restaura primeira sala removida, se houver */
   const removida = salas.find(s => s.removido);
   if (removida) {
     removida.removido = false;
     renderBlocoSala(removida.id);
+    renumerarSalas(); /* CORR-5: atualiza badge após restaurar */
   } else {
     contadorSalas++;
     const id = 's' + contadorSalas;
     salas.push({ id, dados: {}, removido: false });
     renderBlocoSala(id);
   }
+  renumerarSalas();
   atualizarBotao();
 }
 
@@ -516,6 +526,7 @@ function renderBlocoSala(id) {
   const s   = salas.find(s => s.id === id);
   if (!s) return;
   const num  = idx + 1;
+  /* CORR-5: só numera se há mais de uma sala */
   const nome = visiveis.length > 1 ? `Sala ${num}` : 'Sala';
 
   const antigo = document.getElementById('bloco-' + id);
@@ -523,25 +534,31 @@ function renderBlocoSala(id) {
 
   const div = document.createElement('div');
   div.id = 'bloco-' + id;
-  div.innerHTML = cartaoComodo(id, nome, num, s.dados, 'Sala', true);
+  /* CORR-5: só exibe badge numérico se há mais de uma sala */
+  div.innerHTML = cartaoComodo(id, nome, visiveis.length > 1 ? num : 0, s.dados, 'Sala', true);
   document.getElementById('lista-salas').appendChild(div);
 }
 
 function renumerarSalas() {
   const visiveis = salas.filter(s => !s.removido);
   visiveis.forEach((s, idx) => {
-    const el = document.getElementById('nome-' + s.id);
-    if (el) el.textContent = visiveis.length > 1 ? `Sala ${idx+1}` : 'Sala';
+    const elNome = document.getElementById('nome-' + s.id);
+    const elNum  = document.getElementById('num-'  + s.id);
+    if (elNome) elNome.textContent = visiveis.length > 1 ? `Sala ${idx+1}` : 'Sala';
+    /* CORR-5: mostra/esconde badge numérico */
+    if (elNum) elNum.style.display = visiveis.length > 1 ? 'flex' : 'none';
   });
 }
 
-/* ── QUARTOS ── */
+/* ── QUARTOS ── CORR-4: re-renderiza todos ao restaurar */
 function adicionarQuarto() {
-  /* Restaura primeiro quarto removido, se houver */
   const removido = quartos.find(q => q.removido);
   if (removido) {
     removido.removido = false;
-    renderBlocoQuarto(removido.id);
+    /* CORR-4: re-renderiza todos os visíveis em ordem correta */
+    const lista = document.getElementById('lista-quartos');
+    lista.innerHTML = '';
+    quartos.filter(q => !q.removido).forEach(q => renderBlocoQuarto(q.id));
   } else {
     contadorQuartos++;
     const id = 'q' + contadorQuartos;
@@ -592,10 +609,9 @@ function renumerarQuartos() {
    ════════════════════════════════════════════════════════ */
 function cartaoComodo(id, nome, num, dados, tipo, removivel) {
   const pre    = contarPreenchidos(tipo, dados);
-  const tot    = contarTotal(tipo);
+  const tot    = contarTotal(tipo, dados);
   const eSuite = dados.e_suite === 'Sim';
 
-  /* Atributos comuns agrupados */
   const gruposC = {};
   dom.atributos_comuns.forEach(a => {
     if (!gruposC[a.grupo]) gruposC[a.grupo] = [];
@@ -608,7 +624,6 @@ function cartaoComodo(id, nome, num, dados, tipo, removivel) {
     attrComuns += '</div>';
   });
 
-  /* Atributos específicos do tipo */
   let attrEsp = '';
   const esp = dom.atributos_especificos[tipo];
   if (esp && esp.length > 0) {
@@ -624,7 +639,6 @@ function cartaoComodo(id, nome, num, dados, tipo, removivel) {
     });
   }
 
-  /* Subgrupo banheiro da suíte */
   let banheiro = '';
   if (tipo === 'Quarto') {
     const gruposB = {};
@@ -645,11 +659,16 @@ function cartaoComodo(id, nome, num, dados, tipo, removivel) {
       </div>`;
   }
 
+  /* CORR-5: badge numérico com id próprio para mostrar/esconder */
+  const badgeNum = num > 0
+    ? `<div class="comodo-num" id="num-${id}">${num}</div>`
+    : `<div class="comodo-num" id="num-${id}" style="display:none">1</div>`;
+
   return `
     <div class="comodo-card" id="card-${id}">
       <div class="comodo-header" onclick="toggleComodo('${id}')">
         <div class="comodo-header-left">
-          ${num > 0 ? `<div class="comodo-num">${num}</div>` : ''}
+          ${badgeNum}
           <div>
             <div class="comodo-nome" id="nome-${id}">${nome}</div>
             <div class="comodo-progresso" id="prog-${id}">${pre} de ${tot} campos preenchidos</div>
@@ -679,8 +698,8 @@ function cartaoComodo(id, nome, num, dados, tipo, removivel) {
               <select id="formato-${id}"
                 onchange="salvarDado('${id}','formato',this.value); atualizarDimensoes('${id}')">
                 <option value="">— selecione —</option>
-                <option value="Retangular"      ${dados.formato==='Retangular'      ?'selected':''}>Retangular</option>
-                <option value="Planta irregular" ${dados.formato==='Planta irregular'?'selected':''}>Planta irregular</option>
+                <option value="Retangular"       ${dados.formato==='Retangular'      ?'selected':''}>Retangular</option>
+                <option value="Planta irregular"  ${dados.formato==='Planta irregular'?'selected':''}>Planta irregular</option>
               </select>
             </div>
           </div>
@@ -691,7 +710,6 @@ function cartaoComodo(id, nome, num, dados, tipo, removivel) {
         ${attrEsp}
         ${banheiro}
 
-        <!-- Rodapé do cômodo: botão para limpar campos preenchidos -->
         <div class="comodo-footer">
           <button class="btn-limpar-comodo" onclick="limparComodo('${id}','${tipo}',event)">
             ↺ Limpar campos
@@ -776,12 +794,14 @@ function campoDom(attr, dados, scopeId) {
 }
 
 /* ════════════════════════════════════════════════════════
-   SALVAR DADOS
+   SALVAR DADOS — CORR-1 + CORR-6/7
    ════════════════════════════════════════════════════════ */
 function salvarDado(scopeId, campo, valor) {
   const id = scopeId.replace('_ban','');
-  if (id === 'cadastrante') {
-    dadosCadastrante[campo] = valor;
+  if (id === 'anunciante') {
+    dadosAnunciante[campo] = valor;
+    /* CORR-6/7: re-renderiza seção se mudou o Tipo */
+    if (campo === 'tipo') renderAnunciante();
   } else {
     const dados = getDados(id);
     dados[campo] = valor;
@@ -802,16 +822,14 @@ function getDados(id) {
 }
 
 /* ════════════════════════════════════════════════════════
-   LIMPAR CÔMODO — apaga todos os campos exceto apelido
+   LIMPAR CÔMODO
    ════════════════════════════════════════════════════════ */
 function limparComodo(id, tipo, e) {
   e.stopPropagation();
   const dados = getDados(id);
-  const apelido = dados._apelido; // preserva só o apelido
+  const apelido = dados._apelido;
   Object.keys(dados).forEach(k => delete dados[k]);
   if (apelido) dados._apelido = apelido;
-
-  /* Re-renderiza o cartão com os campos zerados */
   if (tipo === 'Sala') renderBlocoSala(id);
   else renderBlocoQuarto(id);
   atualizarBotao();
@@ -854,9 +872,9 @@ function toggleComodo(id) {
 }
 
 /* ════════════════════════════════════════════════════════
-   PROGRESSO
+   PROGRESSO — CORR: contarTotal recebe dados para verificar suite
    ════════════════════════════════════════════════════════ */
-function contarTotal(tipo) {
+function contarTotal(tipo, dados) {
   let n = 1 + dom.atributos_comuns.length;
   const esp = dom.atributos_especificos[tipo];
   if (esp) n += esp.length;
@@ -873,11 +891,10 @@ function contarPreenchidos(tipo, dados) {
 }
 
 function atualizarProgresso(id) {
-  /* Determina o tipo do cômodo */
-  const tipo = salas.find(s => s.id === id) ? 'Sala' : 'Quarto';
+  const tipo  = salas.find(s => s.id === id) ? 'Sala' : 'Quarto';
   const dados = getDados(id);
   const pre   = contarPreenchidos(tipo, dados);
-  const tot   = contarTotal(tipo);
+  const tot   = contarTotal(tipo, dados);
   const el    = document.getElementById('prog-' + id);
   if (el) el.textContent = `${pre} de ${tot} campos preenchidos`;
   const acoes = document.getElementById('acoes-' + id);
@@ -895,27 +912,25 @@ function atualizarProgresso(id) {
    BOTÃO EXPORTAR
    ════════════════════════════════════════════════════════ */
 function atualizarBotao() {
-  const btn      = document.getElementById('btnExportar');
-  const temLoc   = dadosLocalizacao.cep && dadosLocalizacao.numero;
-  const saisVisiveis    = salas.filter(s => !s.removido).length;
+  const btn             = document.getElementById('btnExportar');
+  const temLoc          = dadosLocalizacao.cep && dadosLocalizacao.numero;
+  const salasVisiveis   = salas.filter(s => !s.removido).length;
   const quartosVisiveis = quartos.filter(q => !q.removido).length;
-  btn.disabled = !(temLoc && (saisVisiveis + quartosVisiveis > 0));
+  btn.disabled = !(temLoc && (salasVisiveis + quartosVisiveis > 0));
 }
 
 /* ════════════════════════════════════════════════════════
-   EXPORTAÇÃO PARA EXCEL
-   Nome: FT_{CEP}_{Numero}_{Complemento}.xlsx
+   EXPORTAÇÃO — CORR-2: 'Anunciante' em vez de 'Cadastrante'
    ════════════════════════════════════════════════════════ */
 function exportarExcel() {
   const linhas = [['Cômodo', 'Grupo', 'Característica', 'Valor']];
 
-  /* Cadastrante */
+  /* CORR-2: coluna A = 'Anunciante' */
   dom.anunciante.campos.forEach(c => {
-    const v = dadosCadastrante[c.id];
-    if (v) linhas.push(['Cadastrante', c.grupo, c.label, v]);
+    const v = dadosAnunciante[c.id];
+    if (v) linhas.push(['Anunciante', c.grupo, c.label, v]);
   });
 
-  /* Localização — inclui Tipo de Imóvel */
   const camposLoc = [
     ['tipo_imovel','Tipo de Imóvel'],
     ['pais','País'],['cep','CEP'],['rua','Rua'],['bairro','Bairro'],
@@ -927,7 +942,6 @@ function exportarExcel() {
     if (v) linhas.push(['Imóvel', 'Localização', label, v]);
   });
 
-  /* Auxiliar: exporta um cômodo */
   const exportarComodo = (nomeComodo, tipo, dados) => {
     if (dados.formato) {
       linhas.push([nomeComodo, 'Dimensões', 'Formato', dados.formato]);
@@ -951,35 +965,31 @@ function exportarExcel() {
     }
   };
 
-  /* Salas visíveis */
-  const saisVisiveis = salas.filter(s => !s.removido);
-  saisVisiveis.forEach((s, idx) => {
-    const nome = saisVisiveis.length > 1 ? `Sala ${idx+1}` : 'Sala';
+  const salasVisiveis = salas.filter(s => !s.removido);
+  salasVisiveis.forEach((s, idx) => {
+    const nome = salasVisiveis.length > 1 ? `Sala ${idx+1}` : 'Sala';
     exportarComodo(nome, 'Sala', s.dados);
   });
 
-  /* Quartos visíveis */
   quartos.filter(q => !q.removido).forEach((q, idx) => {
     const nome = q.dados.e_suite === 'Sim' ? `Suíte ${idx+1}` : `Quarto ${idx+1}`;
     exportarComodo(nome, 'Quarto', q.dados);
   });
 
-  /* Gera workbook */
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(linhas);
   ws['!cols'] = [{wch:18},{wch:28},{wch:28},{wch:30}];
   ['A1','B1','C1','D1'].forEach(c => { if (ws[c]) ws[c].s = {font:{bold:true}}; });
   XLSX.utils.book_append_sheet(wb, ws, 'Ficha');
 
-  /* Nome: FT_{CEP}_{Numero}_{Complemento}.xlsx */
   const limpar = str => (str||'')
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^a-zA-Z0-9]/g,'').toUpperCase();
 
-  const cep   = (dadosLocalizacao.cep||'').replace(/\D/g,'') || 'SEMCEP';
-  const num   = limpar(dadosLocalizacao.numero)      || 'SN';
-  const comp  = limpar(dadosLocalizacao.complemento) || '';
-  const nome  = comp ? `FT_${cep}_${num}_${comp}.xlsx` : `FT_${cep}_${num}.xlsx`;
+  const cep  = (dadosLocalizacao.cep||'').replace(/\D/g,'') || 'SEMCEP';
+  const num  = limpar(dadosLocalizacao.numero)      || 'SN';
+  const comp = limpar(dadosLocalizacao.complemento) || '';
+  const nome = comp ? `FT_${cep}_${num}_${comp}.xlsx` : `FT_${cep}_${num}.xlsx`;
 
   XLSX.writeFile(wb, nome);
 }
@@ -987,7 +997,6 @@ function exportarExcel() {
 /* Inicializa */
 carregarDominios();
 
-/* Preenche label de versão no botão do header */
 document.addEventListener('DOMContentLoaded', () => {
   const label = document.getElementById('label-versao');
   if (label && typeof VERSAO_ATUAL !== 'undefined') {

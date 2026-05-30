@@ -1,5 +1,5 @@
 {
-  "_arquivo": "f-dominios.json | versao: 0.4.0",
+  "_arquivo": "f-dominios.json | versao: 0.6.0",
   "_comentario": "Arquivo de domínios da Ficha Técnica de Imóvel. Edite aqui para adicionar opções nos dropdowns sem mexer no HTML.",
 
   "paises": ["Brasil"],
@@ -44,7 +44,7 @@
       "opcoes": ["Gesso Rebaixado","Laje Aparente","PVC","Pintura Látex","Outro","Sem informação"]
     },
     {
-      "id": "tomadas", "label": "Quantidade", "grupo": "Elétrica", "tipo": "number"
+      "id": "tomadas", "label": "Número de tomadas", "grupo": "Elétrica", "tipo": "number"
     },
     {
       "id": "ar_condicionado", "label": "Ar condicionado", "grupo": "Climatização", "tipo": "select",
@@ -78,7 +78,7 @@
       { "id": "ban_box",      "label": "Box",      "grupo": "Banheiro — Equipamentos", "tipo": "select", "opcoes": ["Sim","Não"] },
       { "id": "ban_banheira", "label": "Banheira", "grupo": "Banheiro — Equipamentos", "tipo": "select", "opcoes": ["Sim","Não"] },
       { "id": "ban_gabinete", "label": "Gabinete", "grupo": "Banheiro — Equipamentos", "tipo": "select", "opcoes": ["Sim","Não"] },
-      { "id": "ban_tomadas",  "label": "Tomadas",  "grupo": "Banheiro — Elétrica",     "tipo": "number" }
+      { "id": "ban_tomadas",  "label": "Número de tomadas", "grupo": "Banheiro — Elétrica", "tipo": "number" }
     ]
   }
 }
