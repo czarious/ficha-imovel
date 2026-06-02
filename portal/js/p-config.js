@@ -1,4 +1,4 @@
-/* arquivo: p-config.js | versao: 0.6.0 */
+/* arquivo: p-config.js | versao: 0.6.2 */
 /* ============================================================
    p-config.js — Configurações globais do Zillow BR · Portal
    Fonte única de verdade para constantes do negócio.
@@ -20,6 +20,6 @@ const DRIVE_API_KEY   = 'AIzaSyAByaWsUts9ctHkVJ_OOiULR-6q_gvs-s4';
 
 /* ---- Google OAuth 2.0 ---- */
 const OAUTH_CLIENT_ID = '832827471837-plg29c5fp7li553vdgjmk0tf0gb1dfqd.apps.googleusercontent.com';
-const OAUTH_ESCOPOS   = 'https://www.googleapis.com/auth/drive.file';
-/* drive.file — acesso apenas aos arquivos criados pelo próprio app.
-   Não acessa nenhum outro arquivo do Drive do usuário. */
+const OAUTH_ESCOPOS   = 'https://www.googleapis.com/auth/drive';
+/* drive — acesso completo ao Drive do usuário logado.
+   Necessário para fazer upload em pastas criadas manualmente. */
