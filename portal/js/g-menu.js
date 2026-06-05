@@ -1,0 +1,26 @@
+/* arquivo: g-menu.js | versao: 0.1.0 */
+
+/* Injeta a sidebar em qualquer página.
+   A página deve declarar MENU_BASE antes de carregar este script:
+   - portal/index.html, portal/p-imovel.html: const MENU_BASE = './'
+   - ficha/ficha.html: const MENU_BASE = '../portal/'
+*/
+(function () {
+  const base = (typeof MENU_BASE !== 'undefined') ? MENU_BASE : './';
+  const path = window.location.pathname;
+  const ativo = (page) => path.endsWith(page) ? 'ativo' : '';
+
+  document.body.insertAdjacentHTML('afterbegin', `
+    <aside id="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icone">🏡</div>
+        <div class="sidebar-logo-nome">Zillow<sup class="sidebar-logo-br">BR</sup></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="${base}index.html"    class="${ativo('index.html')}">🏠 Home</a>
+        <a href="${base}cadastro.html" class="${ativo('cadastro.html')} nav-vazio">🏢 Cadastro de Imóvel</a>
+        <a href="#" class="nav-vazio">📞 Contato</a>
+        <a href="#" class="nav-vazio">❓ Suporte</a>
+      </nav>
+    </aside>`);
+})();

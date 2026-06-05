@@ -1,0 +1,175 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## O Projeto
+
+**Zillow BR** (nome em avaliação: Brillow) — proptech imobiliária com ficha técnica profunda de imóveis. Produto real em desenvolvimento, não portfólio.
+
+Repositório: https://github.com/czarious/ficha-imovel
+GitHub Pages: https://czarious.github.io/ficha-imovel/portal/
+Parceiros: Eduardo Afonso (C5P Engenharia, CREA) e Luciana (arquiteta, CREA).
+
+Duas partes:
+1. **Ficha** (`ficha/`) — formulário que coleta dados do imóvel e exporta Excel
+2. **Portal** (`portal/`) — importa os Excel, armazena no Google Drive, exibe com filtros
+
+Sem build, sem package manager, sem framework. HTML + CSS + JS puro via CDN.
+
+## Sobre o César
+
+Engenheiro Civil, Ribeirão Preto/SP. Perfil híbrido: engenharia + processos + dados.
+Não é desenvolvedor de formação — aprendeu desenvolvendo este projeto.
+**Inclua dicas de aprendizado ao longo do trabalho** (aprende por osmose).
+
+Nível técnico:
+- HTML/CSS/JS: leitura e edição guiada — intermediário
+- Git: usa GitHub Desktop, entende commit/push
+- API: já integrou Google Drive API e OAuth 2.0 neste projeto
+
+## Como Trabalhar
+
+- **Apresente o raciocínio antes de executar e aguarde confirmação**
+- Um arquivo por vez — aguarde confirmação antes do próximo
+- Textos para copiar sempre em bloco de código (` ``` `)
+- Verifique referências cruzadas antes de entregar qualquer arquivo
+- Indique o destino no topo de cada arquivo: `<!-- DESTINO: pasta/arquivo.html -->`
+- Respostas diretas e sem enrolação
+- Nunca atualize o Obsidian sem mostrar o conteúdo antes e aguardar aprovação
+
+## Fluxo de Dados
+
+```
+César preenche o formulário (ficha/index.html)
+  → exporta FT_{CEP}_{Numero}_{Complemento}.xlsx
+    → faz upload no portal (portal/index.html)
+      → p-parser.js valida e parseia o Excel
+        → p-storage.js sobe para o Google Drive
+          → arquivos listados/baixados do Drive no carregamento
+            → p-filtros.js filtra o array em memória (_todosImoveis)
+              → p-cards.js renderiza os cards
+                → clique → p-imovel.html (detalhe via p-render.js)
+```
+
+## Módulos do Portal
+
+| Arquivo | Responsabilidade |
+|---------|-----------------|
+| `p-config.js` | Fonte única de verdade: Drive folder ID, API key, Client ID, constantes |
+| `p-storage.js` | Todas as chamadas à Drive API (list, download, upload, delete) + OAuth |
+| `p-parser.js` | Validação e parse do Excel em objeto JS estruturado |
+| `p-filtros.js` | Filtragem em memória; dropdowns cascata estado→cidade |
+| `p-cards.js` | Geração de HTML dos cards e empty states |
+| `p-render.js` | Página de detalhe (badges, tabela resumo, acordeões) |
+| `p-ui.js` | Toasts (auto-dismiss 3s) e modais |
+| `p-versao.js` | String de versão e dados do changelog |
+
+## Contrato Excel
+
+O Excel é o contrato de dados entre Ficha e Portal. O parser (`p-parser.js`) exige:
+- Nome do arquivo: `FT_*.xlsx` ou `FT_*.xlsm`
+- 4 colunas: `Cômodo | Grupo | Característica | Valor`
+- Linhas obrigatórias: `Anunciante`, `Imóvel`, CEP não vazio, ao menos um cômodo
+
+Detecção de duplicata usa CEP + Numero + Complemento como chave composta.
+
+`ficha/dominios/f-dominios.json` é a fonte única para todos os dropdowns e atributos de cômodos.
+
+## Convenções Obrigatórias
+
+- Prefixo `f-` = ficha, `p-` = portal
+- Cabeçalho obrigatório em todo arquivo:
+  - JS/CSS: `/* arquivo: nome.js | versao: X.X.X */`
+  - HTML: `<!-- arquivo: nome.html | versao: X.X.X -->`
+  - JSON: campo `"_arquivo": "nome | versao: X.X.X"`
+- Versão atual: portal `0.6.1` / ficha `0.6.0`
+- Patch = Z (bug fix), Minor = Y (feature nova), Major = X (mudança radical)
+- Categorias do changelog: **Interface & Funcionalidades** e **Sistema & Código**
+- Datas no formato `DD/Mmm/AAAA`
+
+## Documentação no Obsidian
+
+Vault em `G:\Meu Drive\Obsidian\MCP-OC`, pasta `04-projetos/zillow-br/`.
+
+**Ler antes de continuar** — contém decisões que não estão no código:
+- `zillow-br-melhorias.md` — backlog completo priorizado
+- `zillow-br-historico.md` — histórico de sessões e decisões de arquitetura
+- `zillow-br-oauth-usuarios.md` — configuração do Google Cloud e OAuth
+
+Decisões importantes documentadas lá (ainda não implementadas):
+- Refatoração estrutural: repositório → `proptech`, nova estrutura de pastas
+- `g-versao.js` unificado substituindo `f-versao.js` + `p-versao.js`
+- Reestruturação dos cômodos no Excel (banheiro como cômodo independente)
+- `global.css` compartilhado + menu lateral fixo
+
+## Google Cloud
+
+- Projeto: `zillow-br`
+- Client ID OAuth: `832827471837-plg29c5fp7li553vdgjmk0tf0gb1dfqd.apps.googleusercontent.com`
+- Escopo OAuth: `https://www.googleapis.com/auth/drive`
+- API Key: restrita ao domínio `czarious.github.io` e à Drive API
+- Pasta Drive ID: `1KXAeBciVmNMf0rkhBtSNvpSEuWvxgP-t`
+- Permissão da pasta: Editor (obrigatório para upload via OAuth)
+
+## Backlog
+
+### Patch imediato — v0.6.2
+- `p-versao.js`: registrar escopo OAuth `drive.file` → `drive`, permissão da pasta Drive Leitor → Editor, usuários de teste adicionados
+
+### Alta Prioridade
+
+**Portal:**
+- Botão copiar link da ficha (`p-imovel.html?id=xxx`)
+- Avatar com iniciais do anunciante nos cards — círculo, canto superior esquerdo
+
+**Ficha:**
+- Campo Complemento: trocar texto livre por select (Apartamento, Lote, Casa, Sala, Bloco…) + número — monta automaticamente "Apartamento 13"
+- Campos novos no Anunciante: Responsável pela venda + WhatsApp do responsável
+- Campo de custos na Localização: Condomínio (R$/mês) + IPTU (R$/ano)
+- Validação obrigatória: bloquear exportação sem CEP ou Número, destaque vermelho
+
+### Média Prioridade
+
+**Portal:**
+- Contagem de leads via Google Sheets (clique no WhatsApp → registra linha)
+- Sistema de usuários — e-mail do anunciante como identificador
+
+**Ficha:**
+- Mais tipos de cômodo (aguardando lista da Luciana)
+- Atributos de cor — Piso/Cor e Parede/Cor
+- Ventilador de teto em Climatização
+- Interruptores em Elétrica
+- Preview do nome do arquivo antes de exportar
+
+### Baixa Prioridade
+- Exportar ficha como PDF
+- Validação de CRECI
+- Google Maps com PIN por CEP
+- Google Picker API (substituir escopo `drive` por `drive.file` com seleção explícita)
+- Campo de observações por cômodo
+- Reordenar cômodos (drag and drop)
+- Duplicar cômodo
+- Versão mobile
+
+### Estrutural — versão dedicada
+- Refatoração completa: repositório → `proptech`, nova estrutura de pastas, `global.css`, `g-versao.js`, menu lateral, `ficha/cadastro.html`
+- Reestruturação dos cômodos no Excel: banheiro como cômodo independente (`banheiro_1`, `banheiro_suite_1`)
+
+## Dependências Externas (CDN)
+
+- **SheetJS** `0.18.5` — leitura/escrita de Excel
+- **Google Identity Services** — OAuth 2.0
+- **Google Drive API** v3
+- **ViaCEP** — lookup de CEP (ficha only)
+- **Google Fonts** — DM Sans + DM Serif Display
+
+## Design Tokens
+
+```css
+--verde-escuro: #2B5F3E   /* primary accent */
+--areia:        #F5F3EE   /* background */
+--texto:        #1a1a1a
+--cinza-claro:  #e0ddd8
+```
+
+Breakpoint responsivo: `600px`.

@@ -1,13 +1,27 @@
-/* arquivo: f-versao.js | versao: 0.6.0 */
+/* arquivo: f-versao.js | versao: 0.6.1 */
 /* ============================================================
    f-versao.js — Controle de versão do Zillow BR · Ficha Técnica
    Fonte única de verdade para versão e changelog da ficha.
    Carregado em: ficha/index.html e ficha/f-changelog.html
    ============================================================ */
 
-const VERSAO_ATUAL = '0.6.0';
+const VERSAO_ATUAL = '0.6.1';
 
 const CHANGELOG = [
+  {
+    versao: '0.6.1',
+    data:   '05/Jun/2026',
+    titulo: 'Complemento padronizado e validação visual',
+    grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          'Campo Complemento substituído por select (Apartamento, Casa, Lote, Sala, Bloco, Andar, Conjunto) + número — monta o valor final automaticamente (ex: Apartamento 13).',
+          'CEP e Número destacados com borda vermelha quando estão vazios após o usuário adicionar um cômodo.',
+        ]
+      }
+    ]
+  },
   {
     versao: '0.6.0',
     data:   '29/Mai/2026',

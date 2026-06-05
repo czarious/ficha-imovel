@@ -7,6 +7,7 @@
   <title>Ficha Técnica — Zillow BR</title>
   <meta name="description" content="Ficha técnica detalhada do imóvel">
   <link rel="stylesheet" href="css/p-style.css">
+  <link rel="stylesheet" href="css/global.css">
   <!-- SheetJS — necessário para p-parser.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <!-- Google Identity Services — OAuth 2.0 -->
@@ -71,31 +72,20 @@
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-inner">
-      <a href="index.html" class="logo" aria-label="Zillow BR — Voltar ao portal">
-        <div class="logo-icone" aria-hidden="true">🏡</div>
-        <span class="logo-nome">Zillow<sup class="logo-br">BR</sup></span>
-      </a>
-      <div class="header-acoes">
-        <button class="btn btn-secundario" onclick="window.print()" aria-label="Imprimir">🖨️ Imprimir</button>
-        <button class="btn btn-secundario" id="btn-excluir" aria-label="Excluir">🗑️ Excluir</button>
-        <!-- Botão de versão -->
-        <button
-          onclick="window.location.href='p-changelog.html'"
-          title="Ver histórico de versões do portal"
-          style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.9);border-radius:20px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em;transition:background 0.15s;white-space:nowrap;"
-          onmouseover="this.style.background='rgba(255,255,255,0.22)'"
-          onmouseout="this.style.background='rgba(255,255,255,0.12)'"
-        >v<span id="label-versao-imovel">0.6.0</span></button>
-      </div>
-    </div>
-  </header>
+  <!-- BARRA DE AÇÕES -->
+  <div class="barra-acoes">
+    <a href="index.html" class="btn btn-fantasma">← Todos os imóveis</a>
+    <button class="btn btn-secundario" onclick="window.print()" aria-label="Imprimir">🖨️ Imprimir</button>
+    <button class="btn btn-secundario" id="btn-excluir" aria-label="Excluir">🗑️ Excluir</button>
+    <button
+      onclick="window.location.href='p-changelog.html'"
+      title="Ver histórico de versões do portal"
+      style="background:var(--verde-sutil);border:1px solid var(--borda);color:var(--verde);border-radius:20px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em;transition:background 0.15s;white-space:nowrap;"
+    >v<span id="label-versao-imovel">0.6.0</span></button>
+  </div>
 
   <!-- CONTEÚDO -->
   <main class="pagina-imovel">
-    <a href="index.html" class="ficha-voltar">← Todos os imóveis</a>
 
     <div id="ficha-container" role="main" aria-live="polite">
       <div class="loading-wrap">
@@ -135,6 +125,8 @@
   <script src="js/p-ui.js"></script>
   <script src="js/p-render.js"></script>
   <script src="js/p-versao.js"></script>
+  <script>const MENU_BASE = './';</script>
+  <script src="js/g-menu.js"></script>
 
   <script>
     /* ============================================================

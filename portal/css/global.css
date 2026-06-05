@@ -1,0 +1,109 @@
+/* arquivo: global.css | versao: 0.1.0 */
+
+/* ================================================================
+   Sidebar — componente compartilhado entre todas as páginas
+   ================================================================ */
+
+:root {
+  --sidebar-w: 220px;
+}
+
+body {
+  margin-left: var(--sidebar-w);
+}
+
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: #2B5F3E;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+  overflow-y: auto;
+  box-shadow: 3px 0 12px rgba(0,0,0,0.25);
+}
+
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+.sidebar-logo-icone {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.sidebar-logo-nome {
+  font-family: 'DM Serif Display', serif;
+  font-size: 19px;
+  margin-top: 6px;
+  color: white;
+}
+
+.sidebar-logo-br {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.65;
+  vertical-align: super;
+  margin-left: 1px;
+}
+
+.sidebar-nav {
+  padding: 10px 0;
+  flex: 1;
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 20px;
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidebar-nav a:hover {
+  background: rgba(255,255,255,0.10);
+  color: white;
+}
+
+.sidebar-nav a.ativo {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  font-weight: 500;
+}
+
+.sidebar-nav a.nav-vazio {
+  opacity: 0.35;
+  pointer-events: none;
+  cursor: default;
+}
+
+/* ================================================================
+   Barra de ações — substitui o header em cada página
+   ================================================================ */
+.barra-acoes {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 2rem 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ================================================================
+   Mobile — sidebar oculta (a expandir em versão futura)
+   ================================================================ */
+@media (max-width: 768px) {
+  body    { margin-left: 0; }
+  #sidebar { display: none; }
+  .barra-acoes { padding: 16px 1rem 0; }
+}

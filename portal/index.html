@@ -7,6 +7,7 @@
   <title>Zillow BR — Portal Imobiliário</title>
   <meta name="description" content="Portal de fichas técnicas profissionais para imóveis brasileiros">
   <link rel="stylesheet" href="css/p-style.css">
+  <link rel="stylesheet" href="css/global.css">
   <!-- SheetJS — leitura de arquivos .xlsx/.xlsm -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <!-- Google Identity Services — OAuth 2.0 -->
@@ -14,32 +15,21 @@
 </head>
 <body>
 
-  <!-- ============================================================
-       HEADER
-       ============================================================ -->
-  <header class="header">
-    <div class="header-inner">
-      <a href="index.html" class="logo" aria-label="Zillow BR — Página inicial">
-        <div class="logo-icone" aria-hidden="true">🏡</div>
-        <span class="logo-nome">Zillow<sup class="logo-br">BR</sup></span>
-      </a>
-      <div class="header-acoes">
-        <button class="btn btn-secundario" onclick="acionarImportacao()" aria-label="Importar ficha técnica">
-          ＋ Importar imóvel
-        </button>
-        <!-- Botão de versão -->
-        <button
-          onclick="window.location.href='p-changelog.html'"
-          title="Ver histórico de versões do portal"
-          style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.9);border-radius:20px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em;transition:background 0.15s;white-space:nowrap;"
-          onmouseover="this.style.background='rgba(255,255,255,0.22)'"
-          onmouseout="this.style.background='rgba(255,255,255,0.12)'"
-        >v<span id="label-versao-portal">0.6.0</span></button>
-      </div>
-    </div>
-  </header>
-
   <input type="file" id="input-excel" accept=".xlsx,.xlsm" aria-hidden="true" onchange="processarArquivo(event)">
+
+  <!-- ============================================================
+       BARRA DE AÇÕES
+       ============================================================ -->
+  <div class="barra-acoes">
+    <button class="btn btn-primario" onclick="acionarImportacao()" aria-label="Importar ficha técnica">
+      ＋ Importar imóvel
+    </button>
+    <button
+      onclick="window.location.href='p-changelog.html'"
+      title="Ver histórico de versões do portal"
+      style="background:var(--verde-sutil);border:1px solid var(--borda);color:var(--verde);border-radius:20px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em;transition:background 0.15s;white-space:nowrap;"
+    >v<span id="label-versao-portal">0.6.0</span></button>
+  </div>
 
   <!-- ============================================================
        HERO
@@ -262,6 +252,8 @@
   <script src="js/p-cards.js"></script>
   <script src="js/p-filtros.js"></script>
   <script src="js/p-versao.js"></script>
+  <script>const MENU_BASE = './';</script>
+  <script src="js/g-menu.js"></script>
 
   <script>
     /* ============================================================
