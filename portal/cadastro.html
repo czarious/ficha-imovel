@@ -1,0 +1,236 @@
+<!-- arquivo: cadastro.html | versao: 0.1.0 -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Imóvel — Zillow BR</title>
+  <meta name="description" content="Cadastre seu imóvel no portal Zillow BR">
+  <link rel="stylesheet" href="css/p-style.css">
+  <link rel="stylesheet" href="css/global.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://accounts.google.com/gsi/client" onload="inicializarOAuth()" async defer></script>
+
+  <style>
+    .passos-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 2rem 80px;
+    }
+    .passos-titulo {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: var(--texto);
+      margin-bottom: 32px;
+    }
+    .passos {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      align-items: start;
+    }
+    .passo {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      border: 1px solid var(--borda);
+      padding: 28px 24px;
+      box-shadow: var(--sombra);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .passo-acao {
+      border-color: var(--verde);
+      box-shadow: 0 4px 18px rgba(43,95,62,0.13);
+    }
+    .passo-numero {
+      width: 38px; height: 38px;
+      background: var(--verde);
+      color: white;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .passo-titulo {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      color: var(--texto);
+      line-height: 1.2;
+    }
+    .passo-descricao {
+      color: var(--texto-medio);
+      font-size: 0.9rem;
+      line-height: 1.65;
+      flex: 1;
+    }
+    .passo-descricao code {
+      background: var(--bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.82em;
+      color: var(--verde);
+    }
+    .passo-cta { margin-top: 6px; }
+    .btn-cta {
+      width: 100%;
+      justify-content: center;
+      padding: 13px 20px;
+      font-size: 0.95rem;
+    }
+    @media (max-width: 640px) {
+      .passos-wrap { padding: 32px 1rem 60px; }
+      .passos { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <input type="file" id="input-excel" accept=".xlsx,.xlsm" aria-hidden="true" onchange="processarArquivo(event)">
+
+  <!-- HERO -->
+  <section class="hero" aria-label="Cadastro de imóvel">
+    <div class="hero-conteudo">
+      <h1>Cadastre seu Imóvel</h1>
+      <p class="hero-subtitulo">
+        Preencha a ficha técnica e importe o Excel para publicar<br>
+        seu imóvel no portal com dados completos e estruturados.
+      </p>
+    </div>
+  </section>
+
+  <!-- PASSOS -->
+  <div class="passos-wrap">
+    <h2 class="passos-titulo">Como funciona</h2>
+    <div class="passos">
+
+      <!-- Passo 1 — Ação primária -->
+      <div class="passo passo-acao">
+        <div class="passo-numero">1</div>
+        <div class="passo-titulo">Preencha a Ficha Técnica</div>
+        <p class="passo-descricao">
+          Abra o formulário e preencha os dados do imóvel: localização,
+          cômodos, características e informações do anunciante.
+        </p>
+        <div class="passo-cta">
+          <a href="../ficha/index.html" class="btn btn-verde btn-cta">
+            📝 Abrir Ficha Técnica
+          </a>
+        </div>
+      </div>
+
+      <!-- Passo 2 — Informacional -->
+      <div class="passo">
+        <div class="passo-numero">2</div>
+        <div class="passo-titulo">Exporte o Excel</div>
+        <p class="passo-descricao">
+          Na ficha técnica, clique em <strong>Exportar Excel</strong>.
+          O arquivo <code>FT_CEP_Numero_Complemento.xlsx</code> será
+          salvo na sua pasta de downloads.
+        </p>
+      </div>
+
+      <!-- Passo 3 — Ação secundária -->
+      <div class="passo passo-acao">
+        <div class="passo-numero">3</div>
+        <div class="passo-titulo">Importe no Portal</div>
+        <p class="passo-descricao">
+          Selecione o arquivo <strong>.xlsx</strong> exportado. Ele será
+          validado e enviado automaticamente para o Drive — disponível
+          na listagem em segundos.
+        </p>
+        <div class="passo-cta">
+          <button class="btn btn-verde btn-cta" onclick="acionarImportacao()">
+            📄 Importar Ficha (.xlsx)
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL — Duplicata -->
+  <div class="modal-overlay" id="modal-duplicata" style="display:none"
+       role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <div class="modal">
+      <h3 class="modal-titulo" id="modal-titulo">Imóvel já cadastrado</h3>
+      <p class="modal-texto">
+        Já existe um imóvel com o mesmo <strong>CEP, número e complemento</strong>:
+      </p>
+      <p class="modal-texto" style="margin-top:0;font-style:italic;color:var(--texto);">
+        "<span id="modal-texto-detalhe"></span>"
+      </p>
+      <p class="modal-texto" style="margin-top:8px;">
+        Deseja <strong>atualizar</strong> os dados existentes ou <strong>cancelar</strong>?
+      </p>
+      <div class="modal-acoes">
+        <button class="btn btn-fantasma" id="btn-modal-cancelar">Cancelar</button>
+        <button class="btn btn-verde"    id="btn-modal-atualizar">Atualizar dados</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container" aria-live="assertive"></div>
+
+  <script src="js/p-config.js"></script>
+  <script src="js/p-storage.js"></script>
+  <script src="js/p-parser.js"></script>
+  <script src="js/p-ui.js"></script>
+  <script src="js/p-versao.js"></script>
+  <script>const MENU_BASE = './';</script>
+  <script src="js/g-menu.js"></script>
+
+  <script>
+    function acionarImportacao() {
+      document.getElementById('input-excel').value = '';
+      document.getElementById('input-excel').click();
+    }
+
+    async function processarArquivo(evento) {
+      const arquivo = evento.target.files[0];
+      if (!arquivo) return;
+
+      mostrarToast('Validando arquivo…', '', '⏳');
+
+      try {
+        const imovel = await parsearExcel(arquivo);
+
+        if (!imovel.id || imovel.id === '__') {
+          mostrarToast('Arquivo inválido: CEP ou Número não encontrado.', 'erro', '❌');
+          return;
+        }
+
+        const existente = await checkDuplicata(
+          imovel.localizacao['CEP']         || '',
+          imovel.localizacao['Número']      || imovel.localizacao['Numero'] || '',
+          imovel.localizacao['Complemento'] || ''
+        );
+
+        if (existente) {
+          const confirmar = await abrirModalDuplicata(formatarEndereco(existente.localizacao));
+          if (!confirmar) {
+            mostrarToast('Importação cancelada.', 'aviso', '⚠️');
+            return;
+          }
+        }
+
+        mostrarToast('Enviando para o Drive…', '', '☁️');
+        await saveImovel(arquivo, imovel);
+
+        sessionStorage.setItem('zillow_br_toast', JSON.stringify({
+          mensagem: `${existente ? 'Dados atualizados' : 'Imóvel importado'} com sucesso!`,
+          tipo: 'sucesso',
+          icone: '✅'
+        }));
+
+        window.location.href = 'index.html';
+
+      } catch (erro) {
+        console.error('[cadastro] Erro na importação:', erro);
+        mostrarToast(erro.message || 'Erro inesperado na importação.', 'erro', '❌');
+      }
+    }
+  </script>
+
+</body>
+</html>

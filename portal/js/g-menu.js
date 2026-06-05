@@ -6,19 +6,23 @@
    - ficha/ficha.html: const MENU_BASE = '../portal/'
 */
 (function () {
-  const base = (typeof MENU_BASE !== 'undefined') ? MENU_BASE : './';
+  const base   = (typeof MENU_BASE    !== 'undefined') ? MENU_BASE    : './';
+  const versao = (typeof VERSAO_PORTAL !== 'undefined') ? VERSAO_PORTAL : '—';
   const path = window.location.pathname;
   const ativo = (page) => path.endsWith(page) ? 'ativo' : '';
 
   document.body.insertAdjacentHTML('afterbegin', `
     <aside id="sidebar">
       <div class="sidebar-logo">
-        <div class="sidebar-logo-icone">🏡</div>
-        <div class="sidebar-logo-nome">Zillow<sup class="sidebar-logo-br">BR</sup></div>
+        <div>
+          <div class="sidebar-logo-icone">🏡</div>
+          <div class="sidebar-logo-nome">Zillow<sup class="sidebar-logo-br">BR</sup></div>
+        </div>
+        <button class="sidebar-versao" onclick="window.location.href='${base}p-changelog.html'" title="Ver histórico de versões">v${versao}</button>
       </div>
       <nav class="sidebar-nav">
         <a href="${base}index.html"    class="${ativo('index.html')}">🏠 Home</a>
-        <a href="${base}cadastro.html" class="${ativo('cadastro.html')} nav-vazio">🏢 Cadastro de Imóvel</a>
+        <a href="${base}cadastro.html" class="${ativo('cadastro.html')}">🏢 Cadastro de Imóvel</a>
         <a href="#" class="nav-vazio">📞 Contato</a>
         <a href="#" class="nav-vazio">❓ Suporte</a>
       </nav>

@@ -77,11 +77,6 @@
     <a href="index.html" class="btn btn-fantasma">← Todos os imóveis</a>
     <button class="btn btn-secundario" onclick="window.print()" aria-label="Imprimir">🖨️ Imprimir</button>
     <button class="btn btn-secundario" id="btn-excluir" aria-label="Excluir">🗑️ Excluir</button>
-    <button
-      onclick="window.location.href='p-changelog.html'"
-      title="Ver histórico de versões do portal"
-      style="background:var(--verde-sutil);border:1px solid var(--borda);color:var(--verde);border-radius:20px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em;transition:background 0.15s;white-space:nowrap;"
-    >v<span id="label-versao-imovel">0.6.0</span></button>
   </div>
 
   <!-- CONTEÚDO -->
@@ -135,12 +130,6 @@
     const _idImovel = obterParam('id');
 
     document.addEventListener('DOMContentLoaded', async () => {
-      /* Versão no botão do header */
-      const labelVersao = document.getElementById('label-versao-imovel');
-      if (labelVersao && typeof VERSAO_PORTAL !== 'undefined') {
-        labelVersao.textContent = VERSAO_PORTAL;
-      }
-
       if (!_idImovel) { renderizarFicha(null); return; }
 
       /* Busca imóvel no Drive */

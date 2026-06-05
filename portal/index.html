@@ -18,34 +18,15 @@
   <input type="file" id="input-excel" accept=".xlsx,.xlsm" aria-hidden="true" onchange="processarArquivo(event)">
 
   <!-- ============================================================
-       BARRA DE AÇÕES
-       ============================================================ -->
-  <div class="barra-acoes">
-    <button class="btn btn-primario" onclick="acionarImportacao()" aria-label="Importar ficha técnica">
-      ＋ Importar imóvel
-    </button>
-    <button
-      onclick="window.location.href='p-changelog.html'"
-      title="Ver histórico de versões do portal"
-      style="background:var(--verde-sutil);border:1px solid var(--borda);color:var(--verde);border-radius:20px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:0.05em;transition:background 0.15s;white-space:nowrap;"
-    >v<span id="label-versao-portal">0.6.0</span></button>
-  </div>
-
-  <!-- ============================================================
        HERO
        ============================================================ -->
   <section class="hero" aria-label="Boas-vindas">
     <div class="hero-conteudo">
       <h1>Fichas técnicas profissionais<br>para imóveis brasileiros</h1>
       <p class="hero-subtitulo">
-        Importe o Excel gerado pela Ficha Técnica e gerencie<br>
-        seus anúncios com dados completos e estruturados.
+        Gerencie seus anúncios com dados completos e estruturados.<br>
+        Para cadastrar um imóvel, acesse <strong>Cadastro de Imóvel</strong> no menu.
       </p>
-      <div class="hero-acoes">
-        <button class="btn btn-primario" onclick="acionarImportacao()">
-          📄 Importar Ficha Técnica (.xlsx)
-        </button>
-      </div>
     </div>
   </section>
 
@@ -260,12 +241,6 @@
        Inicialização da página
        ============================================================ */
     document.addEventListener('DOMContentLoaded', async () => {
-      /* Versão no botão do header */
-      const labelVersao = document.getElementById('label-versao-portal');
-      if (labelVersao && typeof VERSAO_PORTAL !== 'undefined') {
-        labelVersao.textContent = VERSAO_PORTAL;
-      }
-
       /* Carrega imóveis do Drive */
       const estadoCarregando = document.getElementById('estado-carregando');
       if (estadoCarregando) estadoCarregando.style.display = 'flex';

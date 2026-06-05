@@ -51,6 +51,20 @@ César preenche o formulário (ficha/index.html)
                 → clique → p-imovel.html (detalhe via p-render.js)
 ```
 
+## Módulos Compartilhados (prefixo `g-`)
+
+| Arquivo | Responsabilidade |
+|---------|-----------------|
+| `portal/css/global.css` | Sidebar CSS + tokens; `body { margin-left: var(--sidebar-w) }` |
+| `portal/js/g-menu.js` | Injeta `<aside id="sidebar">` via IIFE; cada página declara `MENU_BASE` antes de carregar |
+
+Cada página que usa o menu declara antes do script:
+```html
+<script>const MENU_BASE = './';</script>   <!-- portal/ -->
+<script>const MENU_BASE = '../portal/';</script>  <!-- ficha/ -->
+<script src="js/g-menu.js"></script>
+```
+
 ## Módulos do Portal
 
 | Arquivo | Responsabilidade |
@@ -82,7 +96,7 @@ Detecção de duplicata usa CEP + Numero + Complemento como chave composta.
   - JS/CSS: `/* arquivo: nome.js | versao: X.X.X */`
   - HTML: `<!-- arquivo: nome.html | versao: X.X.X -->`
   - JSON: campo `"_arquivo": "nome | versao: X.X.X"`
-- Versão atual: portal `0.6.1` / ficha `0.6.0`
+- Versão atual: portal `0.6.1` / ficha `0.6.1`
 - Patch = Z (bug fix), Minor = Y (feature nova), Major = X (mudança radical)
 - Categorias do changelog: **Interface & Funcionalidades** e **Sistema & Código**
 - Datas no formato `DD/Mmm/AAAA`
@@ -100,7 +114,7 @@ Decisões importantes documentadas lá (ainda não implementadas):
 - Refatoração estrutural: repositório → `proptech`, nova estrutura de pastas
 - `g-versao.js` unificado substituindo `f-versao.js` + `p-versao.js`
 - Reestruturação dos cômodos no Excel (banheiro como cômodo independente)
-- `global.css` compartilhado + menu lateral fixo
+- ~~`global.css` compartilhado + menu lateral fixo~~ **✓ implementado em v0.6.1**
 
 ## Google Cloud
 
@@ -123,10 +137,10 @@ Decisões importantes documentadas lá (ainda não implementadas):
 - Avatar com iniciais do anunciante nos cards — círculo, canto superior esquerdo
 
 **Ficha:**
-- Campo Complemento: trocar texto livre por select (Apartamento, Lote, Casa, Sala, Bloco…) + número — monta automaticamente "Apartamento 13"
+- ~~Campo Complemento: select + número, monta "Apartamento 13"~~ **✓ implementado em v0.6.1**
+- ~~Validação obrigatória: destaque vermelho sem CEP ou Número~~ **✓ implementado em v0.6.1**
 - Campos novos no Anunciante: Responsável pela venda + WhatsApp do responsável
 - Campo de custos na Localização: Condomínio (R$/mês) + IPTU (R$/ano)
-- Validação obrigatória: bloquear exportação sem CEP ou Número, destaque vermelho
 
 ### Média Prioridade
 
@@ -152,8 +166,19 @@ Decisões importantes documentadas lá (ainda não implementadas):
 - Versão mobile
 
 ### Estrutural — versão dedicada
-- Refatoração completa: repositório → `proptech`, nova estrutura de pastas, `global.css`, `g-versao.js`, menu lateral, `ficha/cadastro.html`
+- Refatoração completa: repositório → `proptech`, nova estrutura de pastas, `g-versao.js`, `ficha/cadastro.html`
+- ~~`global.css` + menu lateral~~ **✓ implementado em v0.6.1** (incrementalmente, sem quebrar)
 - Reestruturação dos cômodos no Excel: banheiro como cômodo independente (`banheiro_1`, `banheiro_suite_1`)
+
+### Refatoração incremental em andamento
+
+| Fase | Status | Descrição |
+|------|--------|-----------|
+| Fase 1 | ✓ Concluída | `global.css` + `g-menu.js` + sidebar em `index.html` e `p-imovel.html` |
+| Fase 2 | ✓ Concluída | `cadastro.html` (tutorial + 2 CTAs) + link ativo na sidebar + import removido do Home |
+| Fase 3 | Pendente | Renomear `ficha/index.html` → `ficha/ficha.html`, adicionar sidebar à ficha |
+| Fase 4 | Pendente | `g-versao.js` unificado substituindo `f-versao.js` + `p-versao.js` |
+| Fase 5 | Pendente | Renomear `p-config.js` → `g-config.js`; expandir com nome do site, slogan e constantes globais compartilhadas entre portal e ficha |
 
 ## Dependências Externas (CDN)
 
