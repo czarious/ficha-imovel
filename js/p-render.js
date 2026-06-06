@@ -1,6 +1,6 @@
 /* arquivo: p-render.js | versao: 0.4.0 */
 /* ============================================================
-   p-render.js — Renderização da ficha técnica completa (portal/p-imovel.html)
+   p-render.js — Renderização da ficha técnica completa (p-imovel.html)
    Depende de: p-ui.js (formatarData, formatarEndereco)
    ============================================================ */
 

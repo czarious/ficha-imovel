@@ -1,6 +1,6 @@
 /* arquivo: p-cards.js | versao: 0.6.0 */
 /* ============================================================
-   p-cards.js — Renderização dos cards de imóveis (portal/index.html)
+   p-cards.js — Renderização dos cards de imóveis (index.html)
    Depende de: p-ui.js (formatarData, formatarEndereco)
    ============================================================ */
 
