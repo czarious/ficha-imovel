@@ -1,13 +1,18 @@
-<!-- arquivo: f-changelog.html | versao: 0.4.0 -->
+<!-- arquivo: p-changelog.html | versao: 0.4.0 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Changelog — Zillow BR Ficha Técnica</title>
+  <title>Changelog — Zillow BR Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#F5F3EE;--surface:#FFFFFF;--surface2:#F9F8F5;--border:#E2DDD6;--text:#1A1714;--text2:#6B6560;--text3:#9C958E;--accent:#2B5F3E;--accent-light:#EAF2ED;--accent-border:#C3DBC9;--radius:10px;--shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.04);}
+    :root {
+      --bg:#F5F3EE; --surface:#FFFFFF; --surface2:#F9F8F5;
+      --border:#E2DDD6; --text:#1A1714; --text2:#6B6560; --text3:#9C958E;
+      --accent:#2B5F3E; --accent-light:#EAF2ED; --accent-border:#C3DBC9;
+      --radius:10px; --shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.04);
+    }
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;}
     header{background:var(--accent);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,0.15);}
@@ -45,42 +50,45 @@
     .rodape-info{font-size:12px;color:var(--text3);line-height:1.6;}
     .rodape-info strong{color:var(--text2);}
     .rodape-info a{color:var(--accent);}
-    @media(max-width:600px){header{padding:16px 18px;}.container{padding:28px 14px;}.versao-header,.versao-body{padding:16px 18px;}.versao-meta{text-align:left;}.timeline{padding-left:0;}.timeline::before,.versao-card::before{display:none;}}
+    @media(max-width:600px){header{padding:16px 18px;}.container{padding:28px 14px;}.versao-header{padding:16px 18px;}.versao-body{padding:16px 18px;}.versao-meta{text-align:left;}.timeline{padding-left:0;}.timeline::before{display:none;}.versao-card::before{display:none;}}
   </style>
 </head>
 <body>
 <header>
   <div class="header-left">
-    <a href="index.html" class="btn-voltar">← Voltar à Ficha</a>
-    <span class="header-titulo">Zillow BR — Ficha Técnica</span>
+    <a href="index.html" class="btn-voltar">← Voltar ao Portal</a>
+    <span class="header-titulo">Zillow BR — Portal</span>
   </div>
   <span class="header-badge" id="badge-versao">v0.3.0</span>
 </header>
+
 <div class="container">
   <div class="intro">
     <h1>Histórico de versões</h1>
-    <p>Registro completo de todas as mudanças da Ficha Técnica do Zillow BR.<br>
+    <p>Registro completo de todas as mudanças e melhorias do Portal Zillow BR.<br>
     Versão atual: <strong id="versao-atual-texto">0.3.0</strong></p>
   </div>
   <div class="timeline" id="timeline"></div>
   <div class="rodape">
     <div class="rodape-info">
-      <strong>Zillow BR — Ficha Técnica de Imóvel</strong><br>
+      <strong>Zillow BR — Portal Imobiliário</strong><br>
       Desenvolvido por César Albano · Engenheiro Civil · Ribeirão Preto/SP<br>
       <a href="https://github.com/czarious/ficha-imovel" target="_blank">czarious/ficha-imovel</a>
     </div>
     <div class="rodape-info" style="text-align:right">
-      Portal: <a href="../portal/p-changelog.html">ver changelog →</a>
+      Ficha Técnica: <a href="f-changelog.html">ver changelog →</a>
     </div>
   </div>
 </div>
-<script src="js/f-versao.js"></script>
+
+<script src="js/p-versao.js"></script>
 <script>
-  document.getElementById('badge-versao').textContent       = 'v' + VERSAO_ATUAL;
-  document.getElementById('versao-atual-texto').textContent = VERSAO_ATUAL;
+  document.getElementById('badge-versao').textContent       = 'v' + VERSAO_PORTAL;
+  document.getElementById('versao-atual-texto').textContent = VERSAO_PORTAL;
+
   const timeline = document.getElementById('timeline');
-  CHANGELOG.forEach(versao => {
-    const isAtual = versao.versao === VERSAO_ATUAL;
+  CHANGELOG_PORTAL.forEach(versao => {
+    const isAtual = versao.versao === VERSAO_PORTAL;
     const gruposHTML = versao.grupos.map(g => `
       <div class="categoria-bloco">
         <div class="categoria-titulo">${g.categoria}</div>
@@ -90,7 +98,7 @@
     card.className = 'versao-card' + (isAtual ? ' atual' : '');
     card.innerHTML = `
       <div class="versao-header">
-        <div class="versao-numero">v${versao.versao}${isAtual?'<span class="tag-atual">Atual</span>':''}</div>
+        <div class="versao-numero">v${versao.versao}${isAtual ? '<span class="tag-atual">Atual</span>' : ''}</div>
         <div class="versao-meta">
           <div class="versao-data">${versao.data}</div>
           <div class="versao-titulo">${versao.titulo}</div>

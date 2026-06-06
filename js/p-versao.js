@@ -2,7 +2,7 @@
 /* ============================================================
    p-versao.js — Controle de versão do Zillow BR · Portal
    Fonte única de verdade para versão e changelog do portal.
-   Carregado em: portal/index.html e portal/p-imovel.html
+   Carregado em: index.html, p-imovel.html e p-changelog.html
    ============================================================ */
 
 const VERSAO_PORTAL = '0.6.1';
@@ -140,5 +140,5 @@ const CHANGELOG_PORTAL = [
 ];
 
 function abrirChangelogPortal() {
-  window.location.href = '../p-changelog.html';
+  window.location.href = 'p-changelog.html';
 }

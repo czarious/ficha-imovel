@@ -2,8 +2,8 @@
 
 /* Injeta a sidebar em qualquer página.
    A página deve declarar MENU_BASE antes de carregar este script:
-   - portal/index.html, portal/p-imovel.html: const MENU_BASE = './'
-   - ficha/ficha.html: const MENU_BASE = '../portal/'
+   - Páginas do portal (raiz): const MENU_BASE = './'
+   - f-ficha.html: const MENU_BASE = './'
 */
 (function () {
   const base   = (typeof MENU_BASE    !== 'undefined') ? MENU_BASE    : './';

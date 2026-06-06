@@ -7,12 +7,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Zillow BR** (nome em avaliação: Brillow) — proptech imobiliária com ficha técnica profunda de imóveis. Produto real em desenvolvimento, não portfólio.
 
 Repositório: https://github.com/czarious/ficha-imovel
-GitHub Pages: https://czarious.github.io/ficha-imovel/portal/
+GitHub Pages: https://czarious.github.io/ficha-imovel/
 Parceiros: Eduardo Afonso (C5P Engenharia, CREA) e Luciana (arquiteta, CREA).
 
 Duas partes:
-1. **Ficha** (`ficha/`) — formulário que coleta dados do imóvel e exporta Excel
-2. **Portal** (`portal/`) — importa os Excel, armazena no Google Drive, exibe com filtros
+1. **Ficha** (`f-ficha.html`) — formulário que coleta dados do imóvel e exporta Excel
+2. **Portal** (raiz do repo) — importa os Excel, armazena no Google Drive, exibe com filtros
 
 Sem build, sem package manager, sem framework. HTML + CSS + JS puro via CDN.
 
@@ -40,9 +40,9 @@ Nível técnico:
 ## Fluxo de Dados
 
 ```
-César preenche o formulário (ficha/index.html)
+César preenche o formulário (f-ficha.html)
   → exporta FT_{CEP}_{Numero}_{Complemento}.xlsx
-    → faz upload no portal (portal/index.html)
+    → faz upload no portal (index.html)
       → p-parser.js valida e parseia o Excel
         → p-storage.js sobe para o Google Drive
           → arquivos listados/baixados do Drive no carregamento
@@ -55,13 +55,12 @@ César preenche o formulário (ficha/index.html)
 
 | Arquivo | Responsabilidade |
 |---------|-----------------|
-| `portal/css/global.css` | Sidebar CSS + tokens; `body { margin-left: var(--sidebar-w) }` |
-| `portal/js/g-menu.js` | Injeta `<aside id="sidebar">` via IIFE; cada página declara `MENU_BASE` antes de carregar |
+| `css/g-global.css` | Sidebar CSS + tokens; `body { margin-left: var(--sidebar-w) }` |
+| `js/g-menu.js` | Injeta `<aside id="sidebar">` via IIFE; cada página declara `MENU_BASE` antes de carregar |
 
-Cada página que usa o menu declara antes do script:
+Todas as páginas estão na raiz do repo, então todas usam:
 ```html
-<script>const MENU_BASE = './';</script>   <!-- portal/ -->
-<script>const MENU_BASE = '../portal/';</script>  <!-- ficha/ -->
+<script>const MENU_BASE = './';</script>
 <script src="js/g-menu.js"></script>
 ```
 
@@ -87,7 +86,7 @@ O Excel é o contrato de dados entre Ficha e Portal. O parser (`p-parser.js`) ex
 
 Detecção de duplicata usa CEP + Numero + Complemento como chave composta.
 
-`ficha/dominios/f-dominios.json` é a fonte única para todos os dropdowns e atributos de cômodos.
+`dominios/f-dominios.json` é a fonte única para todos os dropdowns e atributos de cômodos.
 
 ## Convenções Obrigatórias
 
@@ -96,7 +95,7 @@ Detecção de duplicata usa CEP + Numero + Complemento como chave composta.
   - JS/CSS: `/* arquivo: nome.js | versao: X.X.X */`
   - HTML: `<!-- arquivo: nome.html | versao: X.X.X -->`
   - JSON: campo `"_arquivo": "nome | versao: X.X.X"`
-- Versão atual: portal `0.6.1` / ficha `0.6.1`
+- Versão atual: portal `0.6.1` / ficha `0.6.2`
 - Patch = Z (bug fix), Minor = Y (feature nova), Major = X (mudança radical)
 - Categorias do changelog: **Interface & Funcionalidades** e **Sistema & Código**
 - Datas no formato `DD/Mmm/AAAA`
@@ -166,8 +165,9 @@ Decisões importantes documentadas lá (ainda não implementadas):
 - Versão mobile
 
 ### Estrutural — versão dedicada
-- Refatoração completa: repositório → `proptech`, nova estrutura de pastas, `g-versao.js`, `ficha/cadastro.html`
+- Refatoração completa: repositório → `proptech`, nova estrutura de pastas, `g-versao.js`
 - ~~`global.css` + menu lateral~~ **✓ implementado em v0.6.1** (incrementalmente, sem quebrar)
+- ~~Eliminar pastas `portal/` e `ficha/` — tudo na raiz com prefixos~~ **✓ concluído em v0.6.2**
 - Reestruturação dos cômodos no Excel: banheiro como cômodo independente (`banheiro_1`, `banheiro_suite_1`)
 
 ### Refatoração incremental em andamento
@@ -176,7 +176,7 @@ Decisões importantes documentadas lá (ainda não implementadas):
 |------|--------|-----------|
 | Fase 1 | ✓ Concluída | `global.css` + `g-menu.js` + sidebar em `index.html` e `p-imovel.html` |
 | Fase 2 | ✓ Concluída | `cadastro.html` (tutorial + 2 CTAs) + link ativo na sidebar + import removido do Home |
-| Fase 3 | Pendente | Renomear `ficha/index.html` → `ficha/ficha.html`, adicionar sidebar à ficha |
+| Fase 3 | ✓ Concluída | Sidebar adicionada à ficha + `f-ficha.html`; pastas `portal/` e `ficha/` eliminadas — tudo na raiz |
 | Fase 4 | Pendente | `g-versao.js` unificado substituindo `f-versao.js` + `p-versao.js` |
 | Fase 5 | Pendente | Renomear `p-config.js` → `g-config.js`; expandir com nome do site, slogan e constantes globais compartilhadas entre portal e ficha |
 

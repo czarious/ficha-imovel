@@ -1,11 +1,11 @@
-/* arquivo: f-versao.js | versao: 0.6.1 */
+/* arquivo: f-versao.js | versao: 0.6.2 */
 /* ============================================================
    f-versao.js — Controle de versão do Zillow BR · Ficha Técnica
    Fonte única de verdade para versão e changelog da ficha.
-   Carregado em: ficha/index.html e ficha/f-changelog.html
+   Carregado em: f-ficha.html e f-changelog.html
    ============================================================ */
 
-const VERSAO_ATUAL = '0.6.1';
+const VERSAO_ATUAL = '0.6.2';
 
 const CHANGELOG = [
   {
