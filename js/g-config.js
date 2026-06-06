@@ -1,6 +1,6 @@
-/* arquivo: p-config.js | versao: 0.6.2 */
+/* arquivo: g-config.js | versao: 0.6.2 */
 /* ============================================================
-   p-config.js — Configurações globais do Zillow BR · Portal
+   g-config.js — Configurações globais do Zillow BR
    Fonte única de verdade para constantes do negócio.
    Carregado antes de todos os outros scripts do portal.
    ============================================================ */
