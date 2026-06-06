@@ -57,6 +57,8 @@ César preenche o formulário (f-ficha.html)
 |---------|-----------------|
 | `css/g-global.css` | Sidebar CSS + tokens; `body { margin-left: var(--sidebar-w) }` |
 | `js/g-menu.js` | Injeta `<aside id="sidebar">` via IIFE; cada página declara `MENU_BASE` antes de carregar |
+| `js/g-config.js` | Fonte única de verdade: Drive folder ID, API key, Client ID, constantes do app |
+| `js/g-versao.js` | `VERSAO_PORTAL` + `VERSAO_ATUAL` + changelogs + `abrirChangelog()` / `abrirChangelogPortal()` |
 
 Todas as páginas estão na raiz do repo, então todas usam:
 ```html
@@ -68,14 +70,12 @@ Todas as páginas estão na raiz do repo, então todas usam:
 
 | Arquivo | Responsabilidade |
 |---------|-----------------|
-| `p-config.js` | Fonte única de verdade: Drive folder ID, API key, Client ID, constantes |
 | `p-storage.js` | Todas as chamadas à Drive API (list, download, upload, delete) + OAuth |
 | `p-parser.js` | Validação e parse do Excel em objeto JS estruturado |
 | `p-filtros.js` | Filtragem em memória; dropdowns cascata estado→cidade |
 | `p-cards.js` | Geração de HTML dos cards e empty states |
 | `p-render.js` | Página de detalhe (badges, tabela resumo, acordeões) |
 | `p-ui.js` | Toasts (auto-dismiss 3s) e modais |
-| `p-versao.js` | String de versão e dados do changelog |
 
 ## Contrato Excel
 
@@ -95,7 +95,7 @@ Detecção de duplicata usa CEP + Numero + Complemento como chave composta.
   - JS/CSS: `/* arquivo: nome.js | versao: X.X.X */`
   - HTML: `<!-- arquivo: nome.html | versao: X.X.X -->`
   - JSON: campo `"_arquivo": "nome | versao: X.X.X"`
-- Versão atual: portal `0.6.1` / ficha `0.6.2`
+- Versão atual: portal `0.6.2` / ficha `0.6.2`
 - Patch = Z (bug fix), Minor = Y (feature nova), Major = X (mudança radical)
 - Categorias do changelog: **Interface & Funcionalidades** e **Sistema & Código**
 - Datas no formato `DD/Mmm/AAAA`
@@ -111,7 +111,8 @@ Vault em `G:\Meu Drive\Obsidian\MCP-OC`, pasta `04-projetos/zillow-br/`.
 
 Decisões importantes documentadas lá (ainda não implementadas):
 - Refatoração estrutural: repositório → `proptech`, nova estrutura de pastas
-- `g-versao.js` unificado substituindo `f-versao.js` + `p-versao.js`
+- ~~`g-versao.js` unificado substituindo `f-versao.js` + `p-versao.js`~~ **✓ implementado em v0.6.2**
+- ~~`g-config.js` substituindo `p-config.js`~~ **✓ implementado em v0.6.2**
 - Reestruturação dos cômodos no Excel (banheiro como cômodo independente)
 - ~~`global.css` compartilhado + menu lateral fixo~~ **✓ implementado em v0.6.1**
 
@@ -126,19 +127,16 @@ Decisões importantes documentadas lá (ainda não implementadas):
 
 ## Backlog
 
-### Patch imediato — v0.6.2
-- `p-versao.js`: registrar escopo OAuth `drive.file` → `drive`, permissão da pasta Drive Leitor → Editor, usuários de teste adicionados
-
 ### Alta Prioridade
 
 **Portal:**
-- Botão copiar link da ficha (`p-imovel.html?id=xxx`)
-- Avatar com iniciais do anunciante nos cards — círculo, canto superior esquerdo
+- ~~Botão copiar link da ficha (`p-imovel.html?id=xxx`)~~ **✓ implementado em v0.6.2**
+- ~~Avatar com iniciais do anunciante nos cards — círculo, canto superior esquerdo~~ **✓ implementado em v0.6.2**
 
 **Ficha:**
 - ~~Campo Complemento: select + número, monta "Apartamento 13"~~ **✓ implementado em v0.6.1**
 - ~~Validação obrigatória: destaque vermelho sem CEP ou Número~~ **✓ implementado em v0.6.1**
-- Campos novos no Anunciante: Responsável pela venda + WhatsApp do responsável
+- ~~Campos novos no Anunciante: Responsável pela venda + WhatsApp do responsável~~ **✓ implementado em v0.6.2**
 - Campo de custos na Localização: Condomínio (R$/mês) + IPTU (R$/ano)
 
 ### Média Prioridade
@@ -165,7 +163,7 @@ Decisões importantes documentadas lá (ainda não implementadas):
 - Versão mobile
 
 ### Estrutural — versão dedicada
-- Refatoração completa: repositório → `proptech`, nova estrutura de pastas, `g-versao.js`
+- Refatoração completa: repositório → `proptech`, nova estrutura de pastas
 - ~~`global.css` + menu lateral~~ **✓ implementado em v0.6.1** (incrementalmente, sem quebrar)
 - ~~Eliminar pastas `portal/` e `ficha/` — tudo na raiz com prefixos~~ **✓ concluído em v0.6.2**
 - Reestruturação dos cômodos no Excel: banheiro como cômodo independente (`banheiro_1`, `banheiro_suite_1`)
@@ -177,8 +175,8 @@ Decisões importantes documentadas lá (ainda não implementadas):
 | Fase 1 | ✓ Concluída | `global.css` + `g-menu.js` + sidebar em `index.html` e `p-imovel.html` |
 | Fase 2 | ✓ Concluída | `cadastro.html` (tutorial + 2 CTAs) + link ativo na sidebar + import removido do Home |
 | Fase 3 | ✓ Concluída | Sidebar adicionada à ficha + `f-ficha.html`; pastas `portal/` e `ficha/` eliminadas — tudo na raiz |
-| Fase 4 | Pendente | `g-versao.js` unificado substituindo `f-versao.js` + `p-versao.js` |
-| Fase 5 | Pendente | Renomear `p-config.js` → `g-config.js`; expandir com nome do site, slogan e constantes globais compartilhadas entre portal e ficha |
+| Fase 4 | ✓ Concluída | `g-versao.js` unificado substituindo `f-versao.js` + `p-versao.js` |
+| Fase 5 | ✓ Concluída | `g-config.js` substituiu `p-config.js`; expandido com `APP_NOME` e constantes globais |
 
 ## Dependências Externas (CDN)
 
