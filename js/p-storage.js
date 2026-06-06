@@ -1,8 +1,8 @@
-/* arquivo: p-storage.js | versao: 0.6.0 */
+/* arquivo: p-storage.js | versao: 0.6.1 */
 /* ============================================================
    p-storage.js — Gerenciamento de dados via Google Drive API
    Zillow BR Portal | Responsabilidade: CRUD de imóveis no Drive
-   Depende de: p-config.js (DRIVE_PASTA_ID, DRIVE_API_KEY, OAUTH_CLIENT_ID)
+   Depende de: g-config.js (DRIVE_PASTA_ID, DRIVE_API_KEY, OAUTH_CLIENT_ID)
    ============================================================ */
 
 /* ----------------------------------------------------------------
@@ -152,7 +152,33 @@ async function uploadArquivoDrive(arquivo, nomeArquivo) {
 
   if (!resp.ok) throw new Error('Erro ao fazer upload para o Drive.');
   const dados = await resp.json();
+
+  /* Arquivos enviados via OAuth nascem privados. Sem isto, a leitura
+     pública via API Key retorna 403 e o card não aparece no portal. */
+  await tornarArquivoPublico(dados.id, token);
+
   return dados.id;
+}
+
+/**
+ * Marca um arquivo do Drive como público (qualquer pessoa com o link = leitor).
+ * Permite que o portal leia o conteúdo via API Key, sem exigir login do visitante.
+ * @param {string} driveFileId — ID do arquivo no Drive
+ * @param {string} token — token OAuth já obtido em uploadArquivoDrive
+ */
+async function tornarArquivoPublico(driveFileId, token) {
+  const resp = await fetch(
+    `https://www.googleapis.com/drive/v3/files/${driveFileId}/permissions`,
+    {
+      method:  'POST',
+      headers: {
+        Authorization:  `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ role: 'reader', type: 'anyone' })
+    }
+  );
+  if (!resp.ok) throw new Error('Erro ao tornar o arquivo público no Drive.');
 }
 
 /**
