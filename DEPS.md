@@ -10,17 +10,17 @@
 
 | Página | CSS | Scripts (em ordem de carga) |
 |--------|-----|-----------------------------|
-| `index.html` | `css/p-style.css` `css/g-global.css` | `js/p-config.js` → `js/p-storage.js` → `js/p-parser.js` → `js/p-ui.js` → `js/p-cards.js` → `js/p-filtros.js` → `js/p-versao.js` → `js/g-menu.js` |
-| `p-imovel.html` | `css/p-style.css` `css/g-global.css` | `js/p-config.js` → `js/p-storage.js` → `js/p-parser.js` → `js/p-ui.js` → `js/p-render.js` → `js/p-versao.js` → `js/g-menu.js` |
-| `cadastro.html` | `css/p-style.css` `css/g-global.css` | `js/p-config.js` → `js/p-storage.js` → `js/p-parser.js` → `js/p-ui.js` → `js/p-versao.js` → `js/g-menu.js` |
-| `p-changelog.html` | CSS inline | `js/p-versao.js` — **sem g-menu.js** (header próprio) |
+| `index.html` | `css/p-style.css` `css/g-global.css` | `js/g-config.js` → `js/p-storage.js` → `js/p-parser.js` → `js/p-ui.js` → `js/p-cards.js` → `js/p-filtros.js` → `js/g-versao.js` → `js/g-menu.js` |
+| `p-imovel.html` | `css/p-style.css` `css/g-global.css` | `js/g-config.js` → `js/p-storage.js` → `js/p-parser.js` → `js/p-ui.js` → `js/p-render.js` → `js/g-versao.js` → `js/g-menu.js` |
+| `cadastro.html` | `css/p-style.css` `css/g-global.css` | `js/g-config.js` → `js/p-storage.js` → `js/p-parser.js` → `js/p-ui.js` → `js/g-versao.js` → `js/g-menu.js` |
+| `p-changelog.html` | CSS inline | `js/g-versao.js` — **sem g-menu.js** (header próprio) |
 
 ### Ficha
 
 | Página | CSS | Scripts (em ordem de carga) |
 |--------|-----|-----------------------------|
-| `f-ficha.html` | `css/g-global.css` + CSS inline | `js/f-versao.js` → SheetJS CDN → lógica inline → `js/g-menu.js` |
-| `f-changelog.html` | CSS inline | `js/f-versao.js` — **sem g-menu.js** (header próprio) |
+| `f-ficha.html` | `css/g-global.css` + CSS inline | `js/g-versao.js` → SheetJS CDN → lógica inline → `js/g-menu.js` |
+| `f-changelog.html` | CSS inline | `js/g-versao.js` — **sem g-menu.js** (header próprio) |
 
 > **CDN em todas as páginas do portal:** SheetJS 0.18.5 · Google Identity Services  
 > **CDN só na ficha:** Google Fonts (p-style.css já importa para o portal)
@@ -51,15 +51,14 @@
 
 | Módulo | Expõe | Depende de |
 |--------|-------|------------|
-| `p-config.js` | `APP_NOME` `DRIVE_PASTA_ID` `DRIVE_API_KEY` `OAUTH_CLIENT_ID` `OAUTH_ESCOPOS` `EXCEL_PREFIXO` `EXCEL_EXTENSOES` `APP_MENSAGEM_ERRO_IMPORT` | — |
-| `p-storage.js` | `inicializarOAuth()` `solicitarToken()` `saveImovel()` `checkDuplicata()` `normalizarId()` | `p-config.js` |
-| `p-parser.js` | `parsearExcel()` `montarObjetoImovel()` `validarArquivo()` | `p-config.js` |
+| `g-config.js` | `APP_NOME` `DRIVE_PASTA_ID` `DRIVE_API_KEY` `OAUTH_CLIENT_ID` `OAUTH_ESCOPOS` `EXCEL_PREFIXO` `EXCEL_EXTENSOES` `APP_MENSAGEM_ERRO_IMPORT` | — |
+| `p-storage.js` | `inicializarOAuth()` `solicitarToken()` `saveImovel()` `checkDuplicata()` `normalizarId()` | `g-config.js` |
+| `p-parser.js` | `parsearExcel()` `montarObjetoImovel()` `validarArquivo()` | `g-config.js` |
 | `p-ui.js` | `mostrarToast()` `abrirModalDuplicata()` `fecharModal()` `formatarData()` `formatarEndereco()` `obterParam()` `renderizarBotaoLogin()` `atualizarEstadoLogin()` | — |
 | `p-filtros.js` | `inicializarFiltros()` `aplicarFiltros()` `limparTodosFiltros()` · define `_todosImoveis` | chama `renderizarCards()` de `p-cards.js` |
 | `p-cards.js` | `renderizarCards()` `criarCard()` `navegarParaImovel()` | `p-ui.js` → `formatarData()` `formatarEndereco()` · lê `_todosImoveis` de `p-filtros.js` |
 | `p-render.js` | `renderizarFicha()` | `p-ui.js` → `formatarData()` `formatarEndereco()` |
-| `p-versao.js` | `VERSAO_PORTAL` `CHANGELOG_PORTAL` `abrirChangelogPortal()` | — |
-| `f-versao.js` | `VERSAO_ATUAL` `CHANGELOG` `abrirChangelog()` | — |
+| `g-versao.js` | `VERSAO_PORTAL` `VERSAO_ATUAL` `CHANGELOG_PORTAL` `CHANGELOG` `abrirChangelogPortal()` `abrirChangelog()` | — |
 | `g-menu.js` | injeta `<aside id="sidebar">` via IIFE | lê `VERSAO_PORTAL` e `MENU_BASE` (globals da página) |
 
 ---
@@ -68,23 +67,21 @@
 
 | Global | Definido em | Usado em |
 |--------|-------------|----------|
-| `VERSAO_PORTAL` | `p-versao.js` | `g-menu.js` (badge na sidebar) |
-| `VERSAO_ATUAL` | `f-versao.js` | `f-changelog.html` (inline) · bridge em `f-ficha.html`¹ |
-| `CHANGELOG_PORTAL` | `p-versao.js` | `p-changelog.html` (inline) |
-| `CHANGELOG` | `f-versao.js` | `f-changelog.html` (inline) |
+| `VERSAO_PORTAL` | `g-versao.js` | `g-menu.js` (badge na sidebar) |
+| `VERSAO_ATUAL` | `g-versao.js` | `f-changelog.html` (inline) |
+| `CHANGELOG_PORTAL` | `g-versao.js` | `p-changelog.html` (inline) |
+| `CHANGELOG` | `g-versao.js` | `f-changelog.html` (inline) |
 | `MENU_BASE` | inline em cada HTML — sempre `'./'` | `g-menu.js` |
 | `_todosImoveis` | `p-filtros.js` | `p-cards.js` · `p-filtros.js` |
-| `APP_NOME` | `p-config.js` | `p-storage.js` · `p-parser.js` |
-| `DRIVE_PASTA_ID` | `p-config.js` | `p-storage.js` |
-| `DRIVE_API_KEY` | `p-config.js` | `p-storage.js` |
-| `OAUTH_CLIENT_ID` | `p-config.js` | `p-storage.js` |
-| `OAUTH_ESCOPOS` | `p-config.js` | `p-storage.js` |
-| `EXCEL_PREFIXO` | `p-config.js` | `p-parser.js` |
-| `EXCEL_EXTENSOES` | `p-config.js` | `p-parser.js` |
+| `APP_NOME` | `g-config.js` | `p-storage.js` · `p-parser.js` |
+| `DRIVE_PASTA_ID` | `g-config.js` | `p-storage.js` |
+| `DRIVE_API_KEY` | `g-config.js` | `p-storage.js` |
+| `OAUTH_CLIENT_ID` | `g-config.js` | `p-storage.js` |
+| `OAUTH_ESCOPOS` | `g-config.js` | `p-storage.js` |
+| `EXCEL_PREFIXO` | `g-config.js` | `p-parser.js` |
+| `EXCEL_EXTENSOES` | `g-config.js` | `p-parser.js` |
 | `dom` | `f-ficha.html` (inline, via fetch) | `f-ficha.html` (inline) |
 
-> ¹ Bridge: `const VERSAO_PORTAL = typeof VERSAO_ATUAL !== 'undefined' ? VERSAO_ATUAL : '—';`  
-> Removido após Fase 4 (g-versao.js definirá ambos).
 
 ---
 
@@ -105,5 +102,5 @@
 
 | Fase | Arquivos afetados |
 |------|------------------|
-| **Fase 4** — `g-versao.js` unificado | remove `js/f-versao.js` + `js/p-versao.js` · atualiza 6 HTMLs · remove bridge em `f-ficha.html` |
-| **Fase 5** — `p-config.js` → `g-config.js` | renomeia `js/p-config.js` · atualiza `index.html` `p-imovel.html` `cadastro.html` |
+| ~~**Fase 4**~~ | ✓ concluída — `g-versao.js` substituiu `f-versao.js` + `p-versao.js` |
+| ~~**Fase 5**~~ | ✓ concluída — `g-config.js` substituiu `p-config.js` |

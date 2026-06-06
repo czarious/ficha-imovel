@@ -63,6 +63,14 @@ function criarCard(imovel) {
   card.setAttribute('tabindex', '0');
   card.setAttribute('aria-label', `Ver ficha: ${endereco}`);
 
+  const nomeAnunciante = cad['Nome'] || '';
+  const iniciais = nomeAnunciante
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(p => p[0].toUpperCase())
+    .join('');
+
   const metaTags = [
     tipoImovel  ? `<span class="meta-tag meta-tag-tipo">${tipoImovel}</span>` : '',
     qtdComodos > 0 ? `<span class="meta-tag">🚪 ${qtdComodos} cômodo${qtdComodos !== 1 ? 's' : ''}</span>` : '',
@@ -80,6 +88,7 @@ function criarCard(imovel) {
         </svg>
         <span>Sem foto</span>
       </div>
+      ${iniciais ? `<div class="card-avatar" title="${nomeAnunciante}">${iniciais}</div>` : ''}
       ${cep ? `<div class="card-badge">CEP ${cep}</div>` : ''}
     </div>
     <div class="card-corpo">

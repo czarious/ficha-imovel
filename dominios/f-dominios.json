@@ -24,8 +24,10 @@
       { "id": "cpf",      "label": "CPF",           "grupo": "Identificação", "tipo": "text" },
       { "id": "creci",    "label": "CRECI",          "grupo": "Identificação", "tipo": "text" },
       { "id": "creci_j",  "label": "CRECI-J",        "grupo": "Identificação", "tipo": "text" },
-      { "id": "telefone", "label": "Telefone",        "grupo": "Identificação", "tipo": "text" },
-      { "id": "email",    "label": "E-mail",          "grupo": "Identificação", "tipo": "text" }
+      { "id": "telefone",             "label": "Telefone",                "grupo": "Identificação", "tipo": "text" },
+      { "id": "email",                "label": "E-mail",                  "grupo": "Identificação", "tipo": "text" },
+      { "id": "responsavel",          "label": "Responsável pela venda",  "grupo": "Responsável",   "tipo": "text" },
+      { "id": "whatsapp_responsavel", "label": "WhatsApp do responsável", "grupo": "Responsável",   "tipo": "text" }
     ]
   },
 

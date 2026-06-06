@@ -75,6 +75,7 @@
   <!-- BARRA DE AÇÕES -->
   <div class="barra-acoes">
     <a href="index.html" class="btn btn-fantasma">← Todos os imóveis</a>
+    <button class="btn btn-secundario" onclick="copiarLink()" aria-label="Copiar link">🔗 Copiar link</button>
     <button class="btn btn-secundario" onclick="window.print()" aria-label="Imprimir">🖨️ Imprimir</button>
     <button class="btn btn-secundario" id="btn-excluir" aria-label="Excluir">🗑️ Excluir</button>
   </div>
@@ -124,6 +125,14 @@
   <script src="js/g-menu.js"></script>
 
   <script>
+    function copiarLink() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        mostrarToast('Link copiado!', 'sucesso', '🔗');
+      }).catch(() => {
+        mostrarToast('Não foi possível copiar o link.', 'erro', '❌');
+      });
+    }
+
     /* ============================================================
        Inicialização
        ============================================================ */
@@ -155,7 +164,7 @@
 
     /* ============================================================
        Botão WhatsApp flutuante
-       Número vem de anunciante['Telefone'] — sem hardcode
+       Prefere WhatsApp do Responsável; cai para Telefone do anunciante.
        ============================================================ */
     function renderizarBotaoWhatsApp(imovel) {
       if (!imovel) return;
@@ -166,8 +175,9 @@
       const loc = imovel.localizacao || {};
       const cad = imovel.anunciante  || {};
 
-      /* Número: usa Telefone do anunciante, remove tudo que não é dígito */
-      const telefone = (cad['Telefone'] || '').replace(/\D/g, '');
+      /* Prefere WhatsApp do responsável; fallback para Telefone */
+      const numeroRaw = cad['WhatsApp do Responsável'] || cad['Telefone'] || '';
+      const telefone  = numeroRaw.replace(/\D/g, '');
 
       /* Endereço para a mensagem pré-preenchida */
       const endMsg = [

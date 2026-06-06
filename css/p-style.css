@@ -197,6 +197,25 @@ body  {
 .card-foto-placeholder svg { width: 52px; height: 52px; }
 .card-foto-placeholder span { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
 
+.card-avatar {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--verde);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.03em;
+  border: 2px solid rgba(255,255,255,0.7);
+  user-select: none;
+}
+
 .card-badge {
   position: absolute;
   top: 12px;
