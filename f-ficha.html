@@ -148,7 +148,7 @@
 /* ════════════════════════════════════════════════════════
    CONFIGURAÇÃO
    ════════════════════════════════════════════════════════ */
-const JSON_URL = 'https://raw.githubusercontent.com/czarious/ficha-imovel/main/dominios/f-dominios.json';
+const JSON_URL = 'dominios/f-dominios.json';
 
 /* Estado global */
 let dom              = null;
@@ -182,7 +182,7 @@ async function carregarDominios() {
     document.getElementById('app').innerHTML = `
       <div class="erro-json">
         <strong>Não foi possível carregar os domínios.</strong><br>
-        Verifique se <code>ficha/dominios/f-dominios.json</code> está no repositório.<br>
+        Verifique se <code>dominios/f-dominios.json</code> está no repositório.<br>
         <small>Erro: ${e.message}</small>
       </div>`;
   }
