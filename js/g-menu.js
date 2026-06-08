@@ -1,4 +1,4 @@
-/* arquivo: g-menu.js | versao: 0.1.0 */
+/* arquivo: g-menu.js | versao: 0.1.1 */
 
 /* Injeta a sidebar em qualquer página.
    A página deve declarar MENU_BASE antes de carregar este script:
@@ -18,7 +18,7 @@
           <div class="sidebar-logo-icone">🏡</div>
           <div class="sidebar-logo-nome">Zillow<sup class="sidebar-logo-br">BR</sup></div>
         </div>
-        <button class="sidebar-versao" onclick="window.location.href='${base}p-changelog.html'" title="Ver histórico de versões">v${versao}</button>
+        <button class="sidebar-versao" onclick="window.location.href='${base}g-changelog.html'" title="Ver histórico de versões">v${versao}</button>
       </div>
       <nav class="sidebar-nav">
         <a href="${base}index.html"    class="${ativo('index.html')}">🏠 Home</a>

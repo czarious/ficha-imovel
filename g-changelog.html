@@ -1,0 +1,188 @@
+<!-- arquivo: g-changelog.html | versao: 0.1.0 -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histórico de versões — Zillow BR</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#F5F3EE;--surface:#FFFFFF;--surface2:#F9F8F5;--border:#E2DDD6;--text:#1A1714;--text2:#6B6560;--text3:#9C958E;--accent:#2B5F3E;--accent-light:#EAF2ED;--accent-border:#C3DBC9;--radius:10px;--shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.04);}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;}
+    header{background:var(--accent);padding:20px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:0 2px 12px rgba(0,0,0,0.15);}
+    .header-left{display:flex;align-items:center;gap:16px;}
+    .btn-voltar{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:white;border-radius:8px;padding:7px 14px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:background 0.15s;}
+    .btn-voltar:hover{background:rgba(255,255,255,0.22);}
+    .header-titulo{font-family:'DM Serif Display',serif;color:white;font-size:20px;font-weight:400;}
+    .header-badge{background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;letter-spacing:0.06em;border:1px solid rgba(255,255,255,0.2);}
+    .container{max-width:800px;margin:0 auto;padding:48px 24px;}
+    .intro{margin-bottom:40px;}
+    .intro h1{font-family:'DM Serif Display',serif;font-size:32px;font-weight:400;color:var(--text);margin-bottom:10px;}
+    .intro p{font-size:15px;color:var(--text2);line-height:1.6;}
+    .versao-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden;}
+    .versao-card.atual{border-color:var(--accent-border);box-shadow:0 0 0 3px rgba(43,95,62,0.07),var(--shadow);}
+    .versao-header{padding:18px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+    .versao-card.atual .versao-header{background:var(--accent-light);}
+    .versao-numero{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;color:var(--text);display:flex;align-items:center;gap:10px;}
+    .tag-atual{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;background:var(--accent);color:white;padding:3px 10px;border-radius:20px;letter-spacing:0.05em;text-transform:uppercase;}
+    .versao-meta{text-align:right;}
+    .versao-data{font-size:13px;color:var(--text3);font-weight:500;}
+    .versao-titulo{font-size:14px;color:var(--text2);margin-top:3px;font-style:italic;}
+    .versao-body{padding:24px 28px;border-top:1px solid var(--border);}
+    .categoria-bloco{margin-bottom:28px;}
+    .categoria-bloco:last-child{margin-bottom:0;}
+    .categoria-titulo{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--accent-border);display:flex;align-items:center;gap:6px;}
+    .categoria-titulo::before{content:'';display:inline-block;width:6px;height:6px;background:var(--accent);border-radius:50%;flex-shrink:0;}
+    .itens-lista{list-style:none;display:flex;flex-direction:column;gap:8px;}
+    .itens-lista li{font-size:14px;color:var(--text);line-height:1.55;padding-left:18px;position:relative;}
+    .itens-lista li::before{content:'→';position:absolute;left:0;color:var(--text3);font-size:12px;top:2px;}
+    .rodape{margin-top:48px;padding-top:24px;border-top:1px solid var(--border);}
+    .rodape-info{font-size:12px;color:var(--text3);line-height:1.6;}
+    .rodape-info strong{color:var(--text2);}
+    .rodape-info a{color:var(--accent);}
+
+    /* ── Accordion ───────────────────────────────────── */
+    .acc-header{cursor:pointer;user-select:none;}
+    .acc-header-right{display:flex;align-items:center;gap:14px;}
+    .acc-arrow{font-size:13px;color:var(--text3);transition:transform .2s;flex-shrink:0;}
+    .acc.aberto > .acc-header .acc-arrow{transform:rotate(180deg);}
+    .acc-body{display:none;}
+    .acc.aberto > .acc-body{display:block;}
+    .acc-body-split{padding:8px 0 4px;}
+    .acc-sub{border:1px solid var(--border);border-radius:8px;margin:14px 28px;overflow:hidden;}
+    .acc-sub-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 20px;background:var(--surface2);}
+    .acc-sub-titulo{font-size:14px;font-weight:600;color:var(--text);}
+    .acc-sub .versao-body{padding:18px 20px;}
+
+    @media(max-width:600px){header{padding:16px 18px;}.container{padding:28px 14px;}.versao-header{padding:16px 18px;}.versao-body{padding:16px 18px;}.versao-meta{text-align:left;}.acc-sub{margin:12px 14px;}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-left">
+    <button class="btn-voltar" onclick="voltar()">← Voltar</button>
+    <span class="header-titulo">Zillow BR — Histórico</span>
+  </div>
+  <span class="header-badge" id="badge-versao">v0.0.0</span>
+</header>
+
+<div class="container">
+  <div class="intro">
+    <h1>Histórico de versões</h1>
+    <p>Registro completo das mudanças do Zillow BR.<br>
+    Versão atual: <strong id="versao-atual-texto">0.0.0</strong></p>
+  </div>
+
+  <div id="lista"></div>
+
+  <div class="rodape">
+    <div class="rodape-info">
+      <strong>Zillow BR — Proptech</strong><br>
+      Desenvolvido por César Albano · Engenheiro Civil · Ribeirão Preto/SP<br>
+      <a href="https://github.com/czarious/ficha-imovel" target="_blank">czarious/ficha-imovel</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/g-versao.js"></script>
+<script>
+  document.getElementById('badge-versao').textContent       = 'v' + VERSAO_PORTAL;
+  document.getElementById('versao-atual-texto').textContent = VERSAO_PORTAL;
+
+  function voltar() {
+    if (history.length > 1) history.back();
+    else window.location.href = 'index.html';
+  }
+
+  /* ── helpers de render ───────────────────────────────── */
+  function cmpVersaoDesc(a, b) {
+    const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
+    for (let i = 0; i < 3; i++) {
+      if ((pa[i] || 0) !== (pb[i] || 0)) return (pb[i] || 0) - (pa[i] || 0);
+    }
+    return 0;
+  }
+  function renderGrupos(grupos) {
+    return (grupos || []).map(g => `
+      <div class="categoria-bloco">
+        <div class="categoria-titulo">${g.categoria}</div>
+        <ul class="itens-lista">${g.itens.map(i => `<li>${i}</li>`).join('')}</ul>
+      </div>`).join('');
+  }
+
+  /* ── mapeia as 3 fontes por número de versão ─────────── */
+  const porVersao = (arr) => Object.fromEntries((arr || []).map(v => [v.versao, v]));
+  const geral  = porVersao(typeof CHANGELOG_GERAL !== 'undefined' ? CHANGELOG_GERAL : []);
+  const ficha  = porVersao(CHANGELOG);
+  const portal = porVersao(CHANGELOG_PORTAL);
+
+  const versoes = [...new Set([
+    ...Object.keys(geral), ...Object.keys(ficha), ...Object.keys(portal)
+  ])].sort(cmpVersaoDesc);
+
+  const lista = document.getElementById('lista');
+
+  versoes.forEach(v => {
+    const isAtual = (v === VERSAO_PORTAL);
+    const abertaCls = isAtual ? ' atual aberto' : '';
+    const tag = isAtual ? '<span class="tag-atual">Atual</span>' : '';
+    let bloco;
+
+    if (geral[v]) {
+      /* Unificada (≥ 0.7.1): accordion único, sem divisão */
+      const e = geral[v];
+      bloco = `
+        <div class="acc versao-card${abertaCls}">
+          <div class="acc-header versao-header">
+            <div class="versao-numero">v${v}${tag}</div>
+            <div class="acc-header-right">
+              <div class="versao-meta">
+                <div class="versao-data">${e.data || ''}</div>
+                <div class="versao-titulo">${e.titulo || ''}</div>
+              </div>
+              <span class="acc-arrow">▾</span>
+            </div>
+          </div>
+          <div class="acc-body versao-body">${renderGrupos(e.grupos)}</div>
+        </div>`;
+    } else {
+      /* Antiga (≤ 0.7.0): versão → Ficha / Portal (cada um abre sozinho) */
+      const f = ficha[v], p = portal[v];
+      const resumo = [f && f.titulo, p && p.titulo].filter(Boolean).join(' · ');
+      const sub = (rotulo, e) => e ? `
+        <div class="acc acc-sub">
+          <div class="acc-header acc-sub-header">
+            <span class="acc-sub-titulo">${rotulo} — ${e.titulo || ''}</span>
+            <span class="acc-arrow">▾</span>
+          </div>
+          <div class="acc-body versao-body">${renderGrupos(e.grupos)}</div>
+        </div>` : '';
+      bloco = `
+        <div class="acc versao-card${abertaCls}">
+          <div class="acc-header versao-header">
+            <div class="versao-numero">v${v}${tag}</div>
+            <div class="acc-header-right">
+              <div class="versao-meta"><div class="versao-titulo">${resumo}</div></div>
+              <span class="acc-arrow">▾</span>
+            </div>
+          </div>
+          <div class="acc-body acc-body-split">
+            ${sub('Ficha', f)}
+            ${sub('Portal', p)}
+          </div>
+        </div>`;
+    }
+    lista.insertAdjacentHTML('beforeend', bloco);
+  });
+
+  /* ── toggle delegado (funciona aninhado: pega o header mais próximo) ── */
+  lista.addEventListener('click', (e) => {
+    const header = e.target.closest('.acc-header');
+    if (!header) return;
+    const acc = header.closest('.acc');
+    if (acc) acc.classList.toggle('aberto');
+  });
+</script>
+</body>
+</html>

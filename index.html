@@ -1,4 +1,4 @@
-<!-- arquivo: index.html | versao: 0.6.1 -->
+<!-- arquivo: index.html | versao: 0.7.0 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -232,6 +232,7 @@
   <script src="js/p-ui.js"></script>
   <script src="js/p-cards.js"></script>
   <script src="js/p-filtros.js"></script>
+  <script src="js/p-import.js"></script>
   <script src="js/g-versao.js"></script>
   <script>const MENU_BASE = './';</script>
   <script src="js/g-menu.js"></script>
@@ -255,74 +256,21 @@
         if (estadoCarregando) estadoCarregando.style.display = 'none';
       }
 
-      /* Toast pendente de redirecionamento */
-      const pendente = sessionStorage.getItem('zillow_br_toast');
-      if (pendente) {
-        try {
-          const { mensagem, tipo, icone } = JSON.parse(pendente);
-          setTimeout(() => mostrarToast(mensagem, tipo, icone), 300);
-        } catch (e) {}
-        sessionStorage.removeItem('zillow_br_toast');
-      }
+      /* Toast deixado por outra página antes de redirecionar */
+      mostrarToastPendente();
     });
 
     /* ============================================================
-       Importação de arquivo
+       Importação — pipeline em p-import.js.
+       Aqui só o que fazer ao concluir: recarrega a lista e avisa.
        ============================================================ */
-    function acionarImportacao() {
-      document.getElementById('input-excel').value = '';
-      document.getElementById('input-excel').click();
-    }
-
-    async function processarArquivo(evento) {
-      const arquivo = evento.target.files[0];
-      if (!arquivo) return;
-
-      mostrarToast('Validando arquivo…', '', '⏳');
-
-      try {
-        /* Parseia e valida — lança erro se não for ficha legítima */
-        const imovel = await parsearExcel(arquivo);
-
-        if (!imovel.id || imovel.id === '__') {
-          mostrarToast('Arquivo inválido: CEP ou Número não encontrado.', 'erro', '❌');
-          return;
-        }
-
-        /* Verifica duplicata */
-        const existente = await checkDuplicata(
-          imovel.localizacao['CEP']         || '',
-          imovel.localizacao['Número']      || imovel.localizacao['Numero'] || '',
-          imovel.localizacao['Complemento'] || ''
-        );
-
-        if (existente) {
-          const confirmar = await abrirModalDuplicata(formatarEndereco(existente.localizacao));
-          if (!confirmar) {
-            mostrarToast('Importação cancelada.', 'aviso', '⚠️');
-            return;
-          }
-        }
-
-        mostrarToast('Enviando para o Drive…', '', '☁️');
-
-        /* Salva no Drive — passa arquivo original + objeto imóvel */
-        await saveImovel(arquivo, imovel);
-
-        /* Recarrega lista */
-        const imoveis = await getImoveis();
-        atualizarCacheFiltros(imoveis);
-
-        mostrarToast(
-          `${existente ? 'Dados atualizados' : 'Imóvel importado'} com sucesso!`,
-          'sucesso', '✅'
-        );
-
-
-      } catch (erro) {
-        console.error('[index] Erro na importação:', erro);
-        mostrarToast(erro.message || 'Erro inesperado na importação.', 'erro', '❌');
-      }
+    async function aoImportarComSucesso(existente) {
+      const imoveis = await getImoveis();
+      atualizarCacheFiltros(imoveis);
+      mostrarToast(
+        `${existente ? 'Dados atualizados' : 'Imóvel importado'} com sucesso!`,
+        'sucesso', '✅'
+      );
     }
   </script>
 

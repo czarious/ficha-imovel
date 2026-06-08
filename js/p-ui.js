@@ -1,8 +1,8 @@
-/* arquivo: p-ui.js | versao: 0.6.0 */
+/* arquivo: p-ui.js | versao: 0.6.1 */
 /* ============================================================
    p-ui.js — Utilitários de interface
    Zillow BR Portal | Responsabilidade: modais, toasts, login, helpers
-   Depende de: p-config.js (APP_NOME)
+   Depende de: g-config.js (APP_NOME)
    ============================================================ */
 
 /* ----------------------------------------------------------------
@@ -29,6 +29,21 @@ function mostrarToast(mensagem, tipo = '', icone = '') {
   container.appendChild(toast);
 
   setTimeout(() => { toast.remove(); }, 3100);
+}
+
+/**
+ * Mostra (uma vez) um toast que outra página deixou em sessionStorage
+ * antes de redirecionar. Chave: 'zillow_br_toast'. Escrito por p-import.js
+ * (cadastro) e pela exclusão em p-imovel.html.
+ */
+function mostrarToastPendente() {
+  const pendente = sessionStorage.getItem('zillow_br_toast');
+  if (!pendente) return;
+  try {
+    const { mensagem, tipo, icone } = JSON.parse(pendente);
+    setTimeout(() => mostrarToast(mensagem, tipo, icone), 300);
+  } catch (e) {}
+  sessionStorage.removeItem('zillow_br_toast');
 }
 
 /* ----------------------------------------------------------------

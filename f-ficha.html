@@ -1,5 +1,5 @@
 <!-- DESTINO: f-ficha.html -->
-<!-- arquivo: f-ficha.html | versao: 0.6.2 -->
+<!-- arquivo: f-ficha.html | versao: 0.7.0 -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -144,6 +144,8 @@
 
 <script src="js/g-versao.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- g-geo.js — geocodificação (endereço -> lat/lng) -->
+<script src="js/g-geo.js"></script>
 <script>
 /* ════════════════════════════════════════════════════════
    CONFIGURAÇÃO
@@ -460,6 +462,21 @@ async function buscarCEP(cep) {
     salvarLoc('bairro', d.bairro     || '');
     salvarLoc('cidade', d.localidade || '');
     salvarLoc('estado', d.uf         || '');
+
+    /* Geocodifica em segundo plano (best-effort) e grava lat/lng.
+       Não bloqueia o preenchimento — se falhar, exporta sem coordenada. */
+    geocodificarEndereco({
+      rua:    d.logradouro || '',
+      numero: dadosLocalizacao.numero || '',
+      cidade: d.localidade || '',
+      uf:     d.uf || ''
+    }).then(coord => {
+      if (coord) {
+        salvarLoc('lat', coord.lat);
+        salvarLoc('lng', coord.lng);
+      }
+    });
+
     atualizarBotao();
   } catch(e) { console.warn('Erro CEP:', e.message); }
 }
@@ -948,7 +965,8 @@ function exportarExcel() {
     ['tipo_imovel','Tipo de Imóvel'],
     ['pais','País'],['cep','CEP'],['rua','Rua'],['bairro','Bairro'],
     ['numero','Número'],['complemento','Complemento'],
-    ['cidade','Cidade'],['estado','Estado']
+    ['cidade','Cidade'],['estado','Estado'],
+    ['lat','Latitude'],['lng','Longitude']
   ];
   camposLoc.forEach(([id, label]) => {
     const v = dadosLocalizacao[id];

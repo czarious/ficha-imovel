@@ -6,11 +6,44 @@
    ============================================================ */
 
 /* ── VERSÕES ─────────────────────────────────────────────── */
-const VERSAO_PORTAL = '0.6.2';
-const VERSAO_ATUAL  = '0.6.2'; /* ficha */
+const VERSAO_PORTAL = '0.7.0';
+const VERSAO_ATUAL  = '0.7.0'; /* ficha */
+
+/* ── CHANGELOG UNIFICADO (≥ 0.7.1) ───────────────────────────
+   A partir da unificação, cada versão tem UMA entrada aqui (sem
+   divisão Ficha/Portal). As entradas ≤ 0.7.0 permanecem em
+   CHANGELOG (ficha) e CHANGELOG_PORTAL, exibidas divididas no
+   g-changelog.html. */
+const CHANGELOG_GERAL = [];
 
 /* ── CHANGELOG DO PORTAL ─────────────────────────────────── */
 const CHANGELOG_PORTAL = [
+  {
+    versao: '0.7.0',
+    data:   '08/Jun/2026',
+    titulo: 'Mapa de localização e reorganização do código',
+    grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          'Mapa com PIN na ficha do imóvel (p-imovel.html), no rodapé após o detalhamento por cômodo.',
+          'Legenda "localização aproximada" — o PIN reflete o nível de rua do endereço.',
+        ]
+      },
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'Mapa via Leaflet + OpenStreetMap, sem chave de API.',
+          'Adapters isolados para troca futura de provedor: p-mapa.js (renderização) e g-geo.js (geocodificação).',
+          'Coordenada lida do Excel quando disponível; arquivos antigos sem lat/lng caem no geocode na hora.',
+          'Correção: imóvel importado agora fica público automaticamente no Drive (antes nascia privado e não aparecia no portal).',
+          'Código reorganizado em módulos coesos: p-import.js (importação), p-acoes.js (ações da ficha) e p-mapa.js + g-geo.js (mapa) — facilita manutenção e troca de sistema.',
+          'Changelog unificado em g-changelog.html (Ficha e Portal em accordions); p-changelog.html e f-changelog.html removidos.',
+          'Helper mostrarToastPendente() elimina duplicação do toast de redirecionamento entre páginas.',
+        ]
+      }
+    ]
+  },
   {
     versao: '0.6.2',
     data:   '05/Jun/2026',
@@ -168,6 +201,27 @@ const CHANGELOG_PORTAL = [
 
 /* ── CHANGELOG DA FICHA ──────────────────────────────────── */
 const CHANGELOG = [
+  {
+    versao: '0.7.0',
+    data:   '08/Jun/2026',
+    titulo: 'Geocodificação automática no cadastro',
+    grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          'Ao digitar o CEP, a ficha busca as coordenadas do endereço em segundo plano — sem travar o preenchimento.',
+        ]
+      },
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'Latitude e Longitude gravadas no Excel exportado (linhas de Localização), para o mapa do portal ler direto.',
+          'Geocodificação via Nominatim/OpenStreetMap, isolada no adapter g-geo.js (troca de provedor sem mexer na ficha).',
+          'Best-effort: se a geocodificação falhar, o Excel é exportado normalmente, sem coordenada.',
+        ]
+      }
+    ]
+  },
   {
     versao: '0.6.2',
     data:   '05/Jun/2026',
@@ -370,10 +424,12 @@ const CHANGELOG = [
 ];
 
 /* ── FUNÇÕES DE NAVEGAÇÃO ────────────────────────────────── */
+/* Ambas apontam para o changelog unificado (g-changelog.html).
+   Mantidas separadas por compatibilidade com quem já as chama. */
 function abrirChangelog() {
-  window.location.href = 'f-changelog.html';
+  window.location.href = 'g-changelog.html';
 }
 
 function abrirChangelogPortal() {
-  window.location.href = 'p-changelog.html';
+  window.location.href = 'g-changelog.html';
 }

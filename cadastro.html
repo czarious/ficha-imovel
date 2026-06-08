@@ -1,4 +1,4 @@
-<!-- arquivo: cadastro.html | versao: 0.1.1 -->
+<!-- arquivo: cadastro.html | versao: 0.7.0 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -176,59 +176,21 @@
   <script src="js/p-storage.js"></script>
   <script src="js/p-parser.js"></script>
   <script src="js/p-ui.js"></script>
+  <script src="js/p-import.js"></script>
   <script src="js/g-versao.js"></script>
   <script>const MENU_BASE = './';</script>
   <script src="js/g-menu.js"></script>
 
   <script>
-    function acionarImportacao() {
-      document.getElementById('input-excel').value = '';
-      document.getElementById('input-excel').click();
-    }
-
-    async function processarArquivo(evento) {
-      const arquivo = evento.target.files[0];
-      if (!arquivo) return;
-
-      mostrarToast('Validando arquivo…', '', '⏳');
-
-      try {
-        const imovel = await parsearExcel(arquivo);
-
-        if (!imovel.id || imovel.id === '__') {
-          mostrarToast('Arquivo inválido: CEP ou Número não encontrado.', 'erro', '❌');
-          return;
-        }
-
-        const existente = await checkDuplicata(
-          imovel.localizacao['CEP']         || '',
-          imovel.localizacao['Número']      || imovel.localizacao['Numero'] || '',
-          imovel.localizacao['Complemento'] || ''
-        );
-
-        if (existente) {
-          const confirmar = await abrirModalDuplicata(formatarEndereco(existente.localizacao));
-          if (!confirmar) {
-            mostrarToast('Importação cancelada.', 'aviso', '⚠️');
-            return;
-          }
-        }
-
-        mostrarToast('Enviando para o Drive…', '', '☁️');
-        await saveImovel(arquivo, imovel);
-
-        sessionStorage.setItem('zillow_br_toast', JSON.stringify({
-          mensagem: `${existente ? 'Dados atualizados' : 'Imóvel importado'} com sucesso!`,
-          tipo: 'sucesso',
-          icone: '✅'
-        }));
-
-        window.location.href = 'index.html';
-
-      } catch (erro) {
-        console.error('[cadastro] Erro na importação:', erro);
-        mostrarToast(erro.message || 'Erro inesperado na importação.', 'erro', '❌');
-      }
+    /* Pipeline de importação está em p-import.js.
+       Aqui só o que fazer ao concluir: redireciona ao portal com toast pendente. */
+    function aoImportarComSucesso(existente) {
+      sessionStorage.setItem('zillow_br_toast', JSON.stringify({
+        mensagem: `${existente ? 'Dados atualizados' : 'Imóvel importado'} com sucesso!`,
+        tipo: 'sucesso',
+        icone: '✅'
+      }));
+      window.location.href = 'index.html';
     }
   </script>
 

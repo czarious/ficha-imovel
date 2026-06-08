@@ -59,6 +59,7 @@ César preenche o formulário (f-ficha.html)
 | `js/g-menu.js` | Injeta `<aside id="sidebar">` via IIFE; cada página declara `MENU_BASE` antes de carregar |
 | `js/g-config.js` | Fonte única de verdade: Drive folder ID, API key, Client ID, constantes do app |
 | `js/g-versao.js` | `VERSAO_PORTAL` + `VERSAO_ATUAL` + changelogs + `abrirChangelog()` / `abrirChangelogPortal()` |
+| `js/g-geo.js` | `geocodificarEndereco(endereço)` → `{lat,lng}` via Nominatim/OSM (adapter trocável) |
 
 Todas as páginas estão na raiz do repo, então todas usam:
 ```html
@@ -76,6 +77,9 @@ Todas as páginas estão na raiz do repo, então todas usam:
 | `p-cards.js` | Geração de HTML dos cards e empty states |
 | `p-render.js` | Página de detalhe (badges, tabela resumo, acordeões) |
 | `p-ui.js` | Toasts (auto-dismiss 3s) e modais |
+| `p-mapa.js` | Renderiza mapa + PIN na ficha do imóvel via Leaflet/OSM (adapter trocável) |
+| `p-import.js` | Pipeline de importação do Excel (parse→valida→duplicata→salva); usado por index e cadastro |
+| `p-acoes.js` | Ações da ficha do imóvel: copiar link, WhatsApp, excluir |
 
 ## Contrato Excel
 
@@ -83,6 +87,7 @@ O Excel é o contrato de dados entre Ficha e Portal. O parser (`p-parser.js`) ex
 - Nome do arquivo: `FT_*.xlsx` ou `FT_*.xlsm`
 - 4 colunas: `Cômodo | Grupo | Característica | Valor`
 - Linhas obrigatórias: `Anunciante`, `Imóvel`, CEP não vazio, ao menos um cômodo
+- Linhas opcionais: `Imóvel | Localização | Latitude` e `Longitude` — gravadas pela Ficha via geocodificação (Nominatim) para alimentar o mapa
 
 Detecção de duplicata usa CEP + Numero + Complemento como chave composta.
 
@@ -95,7 +100,7 @@ Detecção de duplicata usa CEP + Numero + Complemento como chave composta.
   - JS/CSS: `/* arquivo: nome.js | versao: X.X.X */`
   - HTML: `<!-- arquivo: nome.html | versao: X.X.X -->`
   - JSON: campo `"_arquivo": "nome | versao: X.X.X"`
-- Versão atual: portal `0.6.2` / ficha `0.6.2`
+- Versão atual: portal `0.7.0` / ficha `0.7.0`
 - Patch = Z (bug fix), Minor = Y (feature nova), Major = X (mudança radical)
 - Categorias do changelog: **Interface & Funcionalidades** e **Sistema & Código**
 - Datas no formato `DD/Mmm/AAAA`
@@ -155,7 +160,7 @@ Decisões importantes documentadas lá (ainda não implementadas):
 ### Baixa Prioridade
 - Exportar ficha como PDF
 - Validação de CRECI
-- Google Maps com PIN por CEP
+- ~~Mapa com PIN por endereço~~ **✓ implementado em v0.7.0** (Leaflet/OSM + geocodificação Nominatim; precisão nível-rua). Futuro: PIN arrastável na Ficha para precisão exata; migração p/ Google Maps isolada nos adapters `g-geo.js` / `p-mapa.js`
 - Google Picker API (substituir escopo `drive` por `drive.file` com seleção explícita)
 - Campo de observações por cômodo
 - Reordenar cômodos (drag and drop)
@@ -184,6 +189,8 @@ Decisões importantes documentadas lá (ainda não implementadas):
 - **Google Identity Services** — OAuth 2.0
 - **Google Drive API** v3
 - **ViaCEP** — lookup de CEP (ficha only)
+- **Leaflet** `1.9.4` — mapa (`p-imovel.html` only)
+- **Nominatim / OpenStreetMap** — geocodificação (`g-geo.js`) + tiles do mapa
 - **Google Fonts** — DM Sans + DM Serif Display
 
 ## Design Tokens
