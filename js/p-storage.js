@@ -98,7 +98,7 @@ async function getImoveis() {
   try {
     const arquivos = await listarArquivosDrive();
     const promessas = arquivos
-      .filter(f => f.name.toLowerCase().endsWith('.xlsx') || f.name.toLowerCase().endsWith('.xlsm'))
+      .filter(f => EXCEL_EXTENSOES.some(e => f.name.toLowerCase().endsWith(e)))
       .map(f => baixarArquivoDrive(f.id, f.name).catch(() => null));
     const resultados = await Promise.all(promessas);
     return resultados.filter(Boolean);

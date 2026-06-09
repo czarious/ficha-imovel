@@ -84,7 +84,7 @@ function configurarBotaoExcluir(imovel) {
         setTimeout(() => { overlay.style.display = 'none'; }, 250);
         mostrarToast('Excluindo imóvel…', '', '⏳');
         await deleteImovel(imovel.id);
-        sessionStorage.setItem('zillow_br_toast', JSON.stringify({
+        sessionStorage.setItem(TOAST_KEY, JSON.stringify({
           mensagem: 'Imóvel excluído com sucesso.',
           tipo: 'aviso',
           icone: '🗑️'

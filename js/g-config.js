@@ -8,6 +8,7 @@
 /* ---- Identidade do app ---- */
 const APP_NOME        = 'Zillow BR';
 const APP_MENSAGEM_ERRO_IMPORT = `Este arquivo não foi exportado pela Ficha Técnica — ${APP_NOME}. Verifique o arquivo e tente novamente.`;
+const TOAST_KEY       = 'zillow_br_toast';
 
 /* ---- Exportação Excel ---- */
 const EXCEL_PREFIXO   = 'FT_';

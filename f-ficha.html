@@ -1022,7 +1022,8 @@ function exportarExcel() {
   const cep  = (dadosLocalizacao.cep||'').replace(/\D/g,'') || 'SEMCEP';
   const num  = limpar(dadosLocalizacao.numero) || 'SN';
   const comp = compAbrev || '';
-  const nome = comp ? `FT_${cep}_${num}_${comp}.xlsx` : `FT_${cep}_${num}.xlsx`;
+  const ext  = EXCEL_EXTENSOES[0];
+  const nome = comp ? `${EXCEL_PREFIXO}${cep}_${num}_${comp}${ext}` : `${EXCEL_PREFIXO}${cep}_${num}${ext}`;
 
   XLSX.writeFile(wb, nome);
 }

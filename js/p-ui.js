@@ -33,17 +33,17 @@ function mostrarToast(mensagem, tipo = '', icone = '') {
 
 /**
  * Mostra (uma vez) um toast que outra página deixou em sessionStorage
- * antes de redirecionar. Chave: 'zillow_br_toast'. Escrito por p-import.js
- * (cadastro) e pela exclusão em p-imovel.html.
+ * antes de redirecionar. Chave: TOAST_KEY (g-config.js). Escrito por
+ * cadastro.html (via p-import.js) e pela exclusão em p-acoes.js.
  */
 function mostrarToastPendente() {
-  const pendente = sessionStorage.getItem('zillow_br_toast');
+  const pendente = sessionStorage.getItem(TOAST_KEY);
   if (!pendente) return;
   try {
     const { mensagem, tipo, icone } = JSON.parse(pendente);
     setTimeout(() => mostrarToast(mensagem, tipo, icone), 300);
   } catch (e) {}
-  sessionStorage.removeItem('zillow_br_toast');
+  sessionStorage.removeItem(TOAST_KEY);
 }
 
 /* ----------------------------------------------------------------
