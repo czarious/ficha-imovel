@@ -1,4 +1,4 @@
-/* arquivo: g-config.js | versao: 0.6.2 */
+/* arquivo: g-config.js | versao: 0.7.1 */
 /* ============================================================
    g-config.js — Configurações globais do Zillow BR
    Fonte única de verdade para constantes do negócio.
@@ -7,8 +7,7 @@
 
 /* ---- Identidade do app ---- */
 const APP_NOME        = 'Zillow BR';
-const APP_FICHA       = 'Ficha Cadastral';
-const APP_MENSAGEM_ERRO_IMPORT = 'Este arquivo não foi exportado pela Ficha Cadastral — Zillow BR. Verifique o arquivo e tente novamente.';
+const APP_MENSAGEM_ERRO_IMPORT = `Este arquivo não foi exportado pela Ficha Técnica — ${APP_NOME}. Verifique o arquivo e tente novamente.`;
 
 /* ---- Exportação Excel ---- */
 const EXCEL_PREFIXO   = 'FT_';

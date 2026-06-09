@@ -6,15 +6,36 @@
    ============================================================ */
 
 /* ── VERSÕES ─────────────────────────────────────────────── */
-const VERSAO_PORTAL = '0.7.0';
-const VERSAO_ATUAL  = '0.7.0'; /* ficha */
+const VERSAO_PORTAL = '0.7.1';
+const VERSAO_ATUAL  = '0.7.1'; /* ficha */
 
 /* ── CHANGELOG UNIFICADO (≥ 0.7.1) ───────────────────────────
    A partir da unificação, cada versão tem UMA entrada aqui (sem
    divisão Ficha/Portal). As entradas ≤ 0.7.0 permanecem em
    CHANGELOG (ficha) e CHANGELOG_PORTAL, exibidas divididas no
    g-changelog.html. */
-const CHANGELOG_GERAL = [];
+const CHANGELOG_GERAL = [
+  {
+    versao: '0.7.1',
+    data:   '08/Jun/2026',
+    titulo: 'Nome do site centralizado (fonte única)',
+    grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          'Changelog: data de cada versão restaurada; títulos longos agora limitados (1 linha nas versões novas, até 2 nas antigas) sem estourar o layout.',
+        ]
+      },
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'Nome do site agora vem de um único lugar — APP_NOME em g-config.js. Trocar lá muda o site inteiro: logo, títulos das abas, changelog e mensagens.',
+          'g-config.js passou a ser carregado também em g-changelog.html e f-ficha.html.',
+        ]
+      }
+    ]
+  }
+];
 
 /* ── CHANGELOG DO PORTAL ─────────────────────────────────── */
 const CHANGELOG_PORTAL = [

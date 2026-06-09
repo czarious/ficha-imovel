@@ -8,6 +8,7 @@
 (function () {
   const base   = (typeof MENU_BASE    !== 'undefined') ? MENU_BASE    : './';
   const versao = (typeof VERSAO_PORTAL !== 'undefined') ? VERSAO_PORTAL : '—';
+  const nome   = (typeof APP_NOME      !== 'undefined') ? APP_NOME      : 'Zillow BR';
   const path = window.location.pathname;
   const ativo = (page) => path.endsWith(page) ? 'ativo' : '';
 
@@ -16,7 +17,7 @@
       <div class="sidebar-logo">
         <div>
           <div class="sidebar-logo-icone">🏡</div>
-          <div class="sidebar-logo-nome">Zillow<sup class="sidebar-logo-br">BR</sup></div>
+          <div class="sidebar-logo-nome">${nome}</div>
         </div>
         <button class="sidebar-versao" onclick="window.location.href='${base}g-changelog.html'" title="Ver histórico de versões">v${versao}</button>
       </div>

@@ -43,7 +43,7 @@ function renderizarBotaoWhatsApp(imovel) {
   ].filter(Boolean).join(', ');
 
   const mensagem = encodeURIComponent(
-    `Olá! Vi o imóvel no Zillow BR (${endMsg}) e tenho interesse. Poderia me dar mais informações?`
+    `Olá! Vi o imóvel no ${APP_NOME} (${endMsg}) e tenho interesse. Poderia me dar mais informações?`
   );
 
   if (!telefone) return;

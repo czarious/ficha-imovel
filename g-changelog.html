@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Histórico de versões — Zillow BR</title>
+  <title>Histórico de versões</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root{--bg:#F5F3EE;--surface:#FFFFFF;--surface2:#F9F8F5;--border:#E2DDD6;--text:#1A1714;--text2:#6B6560;--text3:#9C958E;--accent:#2B5F3E;--accent-light:#EAF2ED;--accent-border:#C3DBC9;--radius:10px;--shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.04);}
@@ -29,6 +29,8 @@
     .versao-meta{text-align:right;}
     .versao-data{font-size:13px;color:var(--text3);font-weight:500;}
     .versao-titulo{font-size:14px;color:var(--text2);margin-top:3px;font-style:italic;}
+    .titulo-1linha{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:380px;margin-left:auto;}
+    .titulo-2linhas{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:380px;margin-left:auto;}
     .versao-body{padding:24px 28px;border-top:1px solid var(--border);}
     .categoria-bloco{margin-bottom:28px;}
     .categoria-bloco:last-child{margin-bottom:0;}
@@ -52,7 +54,7 @@
     .acc-body-split{padding:8px 0 4px;}
     .acc-sub{border:1px solid var(--border);border-radius:8px;margin:14px 28px;overflow:hidden;}
     .acc-sub-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 20px;background:var(--surface2);}
-    .acc-sub-titulo{font-size:14px;font-weight:600;color:var(--text);}
+    .acc-sub-titulo{font-size:14px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .acc-sub .versao-body{padding:18px 20px;}
 
     @media(max-width:600px){header{padding:16px 18px;}.container{padding:28px 14px;}.versao-header{padding:16px 18px;}.versao-body{padding:16px 18px;}.versao-meta{text-align:left;}.acc-sub{margin:12px 14px;}}
@@ -62,7 +64,7 @@
 <header>
   <div class="header-left">
     <button class="btn-voltar" onclick="voltar()">← Voltar</button>
-    <span class="header-titulo">Zillow BR — Histórico</span>
+    <span class="header-titulo" id="cab-titulo"></span>
   </div>
   <span class="header-badge" id="badge-versao">v0.0.0</span>
 </header>
@@ -70,7 +72,7 @@
 <div class="container">
   <div class="intro">
     <h1>Histórico de versões</h1>
-    <p>Registro completo das mudanças do Zillow BR.<br>
+    <p>Registro completo das mudanças do <span id="intro-nome"></span>.<br>
     Versão atual: <strong id="versao-atual-texto">0.0.0</strong></p>
   </div>
 
@@ -78,17 +80,24 @@
 
   <div class="rodape">
     <div class="rodape-info">
-      <strong>Zillow BR — Proptech</strong><br>
+      <strong id="rodape-nome"></strong><br>
       Desenvolvido por César Albano · Engenheiro Civil · Ribeirão Preto/SP<br>
       <a href="https://github.com/czarious/ficha-imovel" target="_blank">czarious/ficha-imovel</a>
     </div>
   </div>
 </div>
 
+<script src="js/g-config.js"></script>
 <script src="js/g-versao.js"></script>
 <script>
   document.getElementById('badge-versao').textContent       = 'v' + VERSAO_PORTAL;
   document.getElementById('versao-atual-texto').textContent = VERSAO_PORTAL;
+
+  /* Nome do site — fonte única: APP_NOME (g-config.js) */
+  document.title = 'Histórico de versões — ' + APP_NOME;
+  document.getElementById('cab-titulo').textContent  = APP_NOME + ' — Histórico';
+  document.getElementById('intro-nome').textContent  = APP_NOME;
+  document.getElementById('rodape-nome').textContent = APP_NOME + ' — Proptech';
 
   function voltar() {
     if (history.length > 1) history.back();
@@ -139,7 +148,7 @@
             <div class="acc-header-right">
               <div class="versao-meta">
                 <div class="versao-data">${e.data || ''}</div>
-                <div class="versao-titulo">${e.titulo || ''}</div>
+                <div class="versao-titulo titulo-1linha">${e.titulo || ''}</div>
               </div>
               <span class="acc-arrow">▾</span>
             </div>
@@ -150,6 +159,7 @@
       /* Antiga (≤ 0.7.0): versão → Ficha / Portal (cada um abre sozinho) */
       const f = ficha[v], p = portal[v];
       const resumo = [f && f.titulo, p && p.titulo].filter(Boolean).join(' · ');
+      const data   = (f && f.data) || (p && p.data) || '';
       const sub = (rotulo, e) => e ? `
         <div class="acc acc-sub">
           <div class="acc-header acc-sub-header">
@@ -163,7 +173,7 @@
           <div class="acc-header versao-header">
             <div class="versao-numero">v${v}${tag}</div>
             <div class="acc-header-right">
-              <div class="versao-meta"><div class="versao-titulo">${resumo}</div></div>
+              <div class="versao-meta"><div class="versao-data">${data}</div><div class="versao-titulo titulo-2linhas">${resumo}</div></div>
               <span class="acc-arrow">▾</span>
             </div>
           </div>

@@ -100,7 +100,7 @@ Detecção de duplicata usa CEP + Numero + Complemento como chave composta.
   - JS/CSS: `/* arquivo: nome.js | versao: X.X.X */`
   - HTML: `<!-- arquivo: nome.html | versao: X.X.X -->`
   - JSON: campo `"_arquivo": "nome | versao: X.X.X"`
-- Versão atual: portal `0.7.0` / ficha `0.7.0`
+- Versão atual: portal `0.7.1` / ficha `0.7.1`
 - Patch = Z (bug fix), Minor = Y (feature nova), Major = X (mudança radical)
 - Categorias do changelog: **Interface & Funcionalidades** e **Sistema & Código**
 - Datas no formato `DD/Mmm/AAAA`

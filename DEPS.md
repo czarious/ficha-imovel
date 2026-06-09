@@ -1,6 +1,6 @@
 # DEPS.md — Mapa de dependências do Zillow BR
 > Atualizar sempre que adicionar, remover ou renomear arquivo, link ou dependência.  
-> Auditado em: 08/Jun/2026 · versão portal 0.7.0 / ficha 0.7.0
+> Auditado em: 08/Jun/2026 · versão portal 0.7.1 / ficha 0.7.1
 
 ---
 
@@ -13,13 +13,13 @@
 | `index.html` | `css/p-style.css` `css/g-global.css` | `js/g-config.js` → `js/p-storage.js` → `js/p-parser.js` → `js/p-ui.js` → `js/p-cards.js` → `js/p-filtros.js` → `js/p-import.js` → `js/g-versao.js` → `js/g-menu.js` |
 | `p-imovel.html` | `css/p-style.css` `css/g-global.css` + Leaflet CSS (CDN) | `js/g-config.js` → `js/p-storage.js` → `js/p-parser.js` → `js/p-ui.js` → `js/p-render.js` → `js/g-geo.js` → `js/p-mapa.js` → `js/p-acoes.js` → `js/g-versao.js` → `js/g-menu.js` |
 | `cadastro.html` | `css/p-style.css` `css/g-global.css` | `js/g-config.js` → `js/p-storage.js` → `js/p-parser.js` → `js/p-ui.js` → `js/p-import.js` → `js/g-versao.js` → `js/g-menu.js` |
-| `g-changelog.html` | CSS inline | `js/g-versao.js` — **sem g-menu.js** (header próprio); changelog unificado Ficha+Portal em accordion |
+| `g-changelog.html` | CSS inline | `js/g-config.js` → `js/g-versao.js` — **sem g-menu.js** (header próprio); changelog unificado em accordion; nome via `APP_NOME` |
 
 ### Ficha
 
 | Página | CSS | Scripts (em ordem de carga) |
 |--------|-----|-----------------------------|
-| `f-ficha.html` | `css/g-global.css` + CSS inline | `js/g-versao.js` → SheetJS CDN → `js/g-geo.js` → lógica inline → `js/g-menu.js` |
+| `f-ficha.html` | `css/g-global.css` + CSS inline | `js/g-config.js` → `js/g-versao.js` → SheetJS CDN → `js/g-geo.js` → lógica inline → `js/g-menu.js` |
 
 > `g-changelog.html` é compartilhado (Ficha + Portal) — listado na seção Portal acima.
 
@@ -76,7 +76,7 @@
 | `CHANGELOG_GERAL` | `g-versao.js` | `g-changelog.html` (entradas unificadas ≥ 0.7.1) |
 | `MENU_BASE` | inline em cada HTML — sempre `'./'` | `g-menu.js` |
 | `_todosImoveis` | `p-filtros.js` | `p-cards.js` · `p-filtros.js` |
-| `APP_NOME` | `g-config.js` | `p-storage.js` · `p-parser.js` |
+| `APP_NOME` | `g-config.js` | **nome do site (fonte única)**: `g-menu.js` (logo) · `p-acoes.js` (msg WhatsApp) · `p-render.js`/`index.html`/`cadastro.html`/`g-changelog.html` (títulos) · base de `APP_MENSAGEM_ERRO_IMPORT` |
 | `DRIVE_PASTA_ID` | `g-config.js` | `p-storage.js` |
 | `DRIVE_API_KEY` | `g-config.js` | `p-storage.js` |
 | `OAUTH_CLIENT_ID` | `g-config.js` | `p-storage.js` |

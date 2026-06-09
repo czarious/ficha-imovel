@@ -23,7 +23,7 @@ function renderizarFicha(imovel) {
   const loc = imovel.localizacao || {};
   const cad = imovel.anunciante || {};
   const endereco = formatarEndereco(loc);
-  document.title = `${endereco} — Zillow BR`;
+  document.title = `${endereco} — ${APP_NOME}`;
 
   let html = `
     <header class="ficha-cabecalho">
