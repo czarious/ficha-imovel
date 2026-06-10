@@ -1,4 +1,4 @@
-/* arquivo: g-menu.js | versao: 0.1.1 */
+/* arquivo: g-menu.js | versao: 0.7.1 */
 
 /* Injeta a sidebar em qualquer página.
    A página deve declarar MENU_BASE antes de carregar este script:

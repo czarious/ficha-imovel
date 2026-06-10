@@ -1,4 +1,4 @@
-/* arquivo: g-geo.js | versao: 0.1.0 */
+/* arquivo: g-geo.js | versao: 0.7.1 */
 /* ============================================================
    g-geo.js — Camada de geocodificação (endereço -> coordenada)
    Compartilhado: Ficha (grava lat/lng no Excel) + Portal (fallback)

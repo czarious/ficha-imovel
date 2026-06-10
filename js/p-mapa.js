@@ -1,4 +1,4 @@
-/* arquivo: p-mapa.js | versao: 0.1.0 */
+/* arquivo: p-mapa.js | versao: 0.7.1 */
 /* ============================================================
    p-mapa.js — Camada de renderização do mapa (Portal)
    Provedor atual: Leaflet + tiles OpenStreetMap (grátis, sem chave).

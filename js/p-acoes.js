@@ -1,4 +1,4 @@
-/* arquivo: p-acoes.js | versao: 0.1.0 */
+/* arquivo: p-acoes.js | versao: 0.7.1 */
 /* ============================================================
    p-acoes.js — Ações da ficha do imóvel (p-imovel.html)
 
@@ -33,7 +33,7 @@ function renderizarBotaoWhatsApp(imovel) {
   const cad = imovel.anunciante  || {};
 
   /* Prefere WhatsApp do responsável; fallback para Telefone */
-  const numeroRaw = cad['WhatsApp do Responsável'] || cad['Telefone'] || '';
+  const numeroRaw = cad['WhatsApp do responsável'] || cad['Telefone'] || '';
   const telefone  = numeroRaw.replace(/\D/g, '');
 
   /* Endereço para a mensagem pré-preenchida */

@@ -1,4 +1,4 @@
-/* arquivo: p-style.css | versao: 0.4.0 */
+/* arquivo: p-style.css | versao: 0.7.1 */
 /* ============================================================
    Zillow BR — Estilos Globais
    Paleta: fundo #F5F3EE | verde #2B5F3E | DM Sans + DM Serif Display
@@ -834,7 +834,7 @@ body  {
 }
 
 /* ================================================================
-   FICHA TÉCNICA v0.3.0 — accordion + tabela resumo
+   FICHA TÉCNICA — accordion + tabela resumo
    ================================================================ */
 
 /* ── Seção accordion (Localização / Anunciante) ── */
@@ -996,28 +996,3 @@ body  {
   white-space: nowrap;
 }
 
-/* ================================================================
-   BOTÃO WHATSAPP
-   ================================================================ */
-.btn-whatsapp {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: #25D366;
-  color: white;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 11px 20px;
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background var(--trans), transform var(--trans);
-  box-shadow: 0 2px 8px rgba(37,211,102,0.3);
-}
-.btn-whatsapp:hover {
-  background: #1ebe5d;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(37,211,102,0.4);
-}

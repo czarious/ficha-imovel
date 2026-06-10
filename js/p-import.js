@@ -1,4 +1,4 @@
-/* arquivo: p-import.js | versao: 0.1.0 */
+/* arquivo: p-import.js | versao: 0.7.1 */
 /* ============================================================
    p-import.js — Pipeline de importação de Excel (Portal)
 
