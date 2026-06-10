@@ -608,19 +608,16 @@ function renderBlocoAmbiente(id) {
   const idx   = visiveis.findIndex(x => x.id === id);
   const num   = idx + 1;
   const total = visiveis.length;
-  let nome = a.tipo;
-  if (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim') {
-    nome = total > 1 ? `Suíte ${num}` : 'Suíte';
-  } else if (total > 1) {
-    nome = `${a.tipo} ${num}`;
-  }
+  const nome = (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim')
+    ? `Suíte ${num}`
+    : `${a.tipo} ${num}`;
 
   const antigo = document.getElementById('bloco-' + id);
   if (antigo) antigo.remove();
 
   const div = document.createElement('div');
   div.id = 'bloco-' + id;
-  div.innerHTML = cartaoComodo(id, nome, total > 1 ? num : 0, a.dados, a.tipo, true);
+  div.innerHTML = cartaoComodo(id, nome, num, a.dados, a.tipo, true);
   document.getElementById('lista-ambientes').appendChild(div);
   if (a.tipo === 'Quarto') atualizarBanheiroSuite(id);
 }
@@ -634,16 +631,13 @@ function renumerarAmbientes() {
     idxPorTipo[a.tipo] = (idxPorTipo[a.tipo] || 0) + 1;
     const num   = idxPorTipo[a.tipo];
     const total = contPorTipo[a.tipo];
-    let nome;
-    if (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim') {
-      nome = total > 1 ? `Suíte ${num}` : 'Suíte';
-    } else {
-      nome = total > 1 ? `${a.tipo} ${num}` : a.tipo;
-    }
+    const nome = (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim')
+      ? `Suíte ${num}`
+      : `${a.tipo} ${num}`;
     const elNome = document.getElementById('nome-' + a.id);
     const elNum  = document.getElementById('num-'  + a.id);
     if (elNome) elNome.textContent = nome;
-    if (elNum)  elNum.style.display = total > 1 ? 'flex' : 'none';
+    if (elNum)  elNum.style.display = 'flex';
   });
 }
 
@@ -703,10 +697,7 @@ function cartaoComodo(id, nome, num, dados, tipo, removivel) {
       </div>`;
   }
 
-  /* CORR-5: badge numérico com id próprio para mostrar/esconder */
-  const badgeNum = num > 0
-    ? `<div class="comodo-num" id="num-${id}">${num}</div>`
-    : `<div class="comodo-num" id="num-${id}" style="display:none">1</div>`;
+  const badgeNum = `<div class="comodo-num" id="num-${id}">${num}</div>`;
 
   return `
     <div class="comodo-card" id="card-${id}">
@@ -893,14 +884,8 @@ function atualizarNomeAmbiente(id) {
   const idx = visiveis.findIndex(a => a.id === id);
   if (idx < 0) return;
   const num    = idx + 1;
-  const total  = visiveis.length;
   const eSuite = amb.tipo === 'Quarto' && amb.dados.e_suite === 'Sim';
-  let nome;
-  if (eSuite) {
-    nome = total > 1 ? `Suíte ${num}` : 'Suíte';
-  } else {
-    nome = total > 1 ? `${amb.tipo} ${num}` : amb.tipo;
-  }
+  const nome   = eSuite ? `Suíte ${num}` : `${amb.tipo} ${num}`;
   const el = document.getElementById('nome-' + id);
   if (el) el.textContent = nome;
   const acoes = document.getElementById('acoes-' + id);
@@ -1031,21 +1016,13 @@ function exportarExcel() {
     }
   };
 
-  const contTotalPorTipo = {};
-  ambientes.filter(a => !a.removido).forEach(a => {
-    contTotalPorTipo[a.tipo] = (contTotalPorTipo[a.tipo] || 0) + 1;
-  });
   const contAtualPorTipo = {};
   ambientes.filter(a => !a.removido).forEach(a => {
     contAtualPorTipo[a.tipo] = (contAtualPorTipo[a.tipo] || 0) + 1;
-    const num   = contAtualPorTipo[a.tipo];
-    const total = contTotalPorTipo[a.tipo];
-    let nomeAmb;
-    if (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim') {
-      nomeAmb = total > 1 ? `Suíte ${num}` : 'Suíte';
-    } else {
-      nomeAmb = total > 1 ? `${a.tipo} ${num}` : a.tipo;
-    }
+    const num    = contAtualPorTipo[a.tipo];
+    const nomeAmb = (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim')
+      ? `Suíte ${num}`
+      : `${a.tipo} ${num}`;
     exportarComodo(nomeAmb, a.tipo, a.dados);
   });
 
