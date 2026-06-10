@@ -1,5 +1,5 @@
 {
-  "_arquivo": "f-dominios.json | versao: 0.6.0",
+  "_arquivo": "f-dominios.json | versao: 0.7.2",
   "_comentario": "Arquivo de domínios da Ficha Técnica de Imóvel. Edite aqui para adicionar opções nos dropdowns sem mexer no HTML.",
 
   "paises": ["Brasil"],
@@ -10,7 +10,7 @@
     "RS","RO","RR","SC","SP","SE","TO"
   ],
 
-  "tipos_fixos": ["Sala"],
+  "tipos_ambiente": ["Quarto", "Sala", "Cozinha", "Banheiro"],
 
   "anunciante": {
     "_comentario": "Campos do anunciante — corretor, proprietário ou imobiliária",
@@ -55,7 +55,7 @@
   ],
 
   "atributos_especificos": {
-    "_comentario": "Atributos extras por tipo de cômodo. Adicione novos tipos aqui.",
+    "_comentario": "Atributos extras por tipo de ambiente. Adicione novos tipos aqui — o render os carrega automaticamente.",
     "Sala": [
       { "id": "sacada",  "label": "Sacada",  "grupo": "Configuração", "tipo": "select", "opcoes": ["Sim","Não"] },
       { "id": "lareira", "label": "Lareira", "grupo": "Configuração", "tipo": "select", "opcoes": ["Sim","Não"] }
@@ -63,7 +63,13 @@
     "Quarto": [
       { "id": "armario_embutido", "label": "Armário embutido", "grupo": "Configuração", "tipo": "select", "opcoes": ["Sim","Não"] },
       { "id": "e_suite",          "label": "É suíte",          "grupo": "Configuração", "tipo": "select", "opcoes": ["Sim","Não"] }
-    ]
+    ],
+    "Banheiro": [
+      { "id": "ban_box",      "label": "Box",      "grupo": "Equipamentos", "tipo": "select", "opcoes": ["Sim","Não"] },
+      { "id": "ban_banheira", "label": "Banheira", "grupo": "Equipamentos", "tipo": "select", "opcoes": ["Sim","Não"] },
+      { "id": "ban_gabinete", "label": "Gabinete", "grupo": "Equipamentos", "tipo": "select", "opcoes": ["Sim","Não"] }
+    ],
+    "Cozinha": []
   },
 
   "atributos_banheiro_suite": {

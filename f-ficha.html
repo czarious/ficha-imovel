@@ -1,5 +1,5 @@
 <!-- DESTINO: f-ficha.html -->
-<!-- arquivo: f-ficha.html | versao: 0.7.0 -->
+<!-- arquivo: f-ficha.html | versao: 0.7.2 -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -113,6 +113,17 @@
   /* ── DIVISOR DE GRUPO ── */
   .grupo-label { font-size: 10px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin: 20px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
 
+  /* ── SELETOR DE TIPO DE AMBIENTE ── */
+  .seletor-ambiente { margin-bottom: 4px; }
+  .seletor-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); }
+  .seletor-row .select-wrap { flex: 1; min-width: 160px; }
+  .seletor-row input[type="text"] { flex: 1; min-width: 140px; border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--surface); outline: none; }
+  .seletor-row input[type="text"]:focus { border-color: var(--accent); }
+  .btn-confirmar-amb { background: var(--accent); color: white; border: none; border-radius: var(--radius); padding: 10px 18px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+  .btn-confirmar-amb:hover { opacity: 0.88; }
+  .btn-cancelar-amb { background: none; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text2); cursor: pointer; white-space: nowrap; }
+  .btn-cancelar-amb:hover { background: var(--surface); }
+
   /* ── BOTÕES ── */
   .btn-adicionar { width: 100%; padding: 12px; border: 2px dashed var(--border-strong); border-radius: var(--radius); background: none; color: var(--accent); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; margin-bottom: 8px; }
   .btn-adicionar:hover { border-color: var(--accent); background: var(--accent-light); }
@@ -158,10 +169,8 @@ let dom              = null;
 let dadosAnunciante  = {};  /* CORR-1: era dadosCadastrante */
 let dadosLocalizacao = {};
 
-let salas         = [];
-let contadorSalas = 0;
-let quartos          = [];
-let contadorQuartos  = 0;
+let ambientes         = [];
+let contadorAmbientes = 0;
 
 let anuncianteAberto  = true;  /* CORR-1: era cadastranteAberto */
 let localizacaoAberta = true;
@@ -488,136 +497,156 @@ function salvarLoc(campo, valor) { dadosLocalizacao[campo] = valor; }
    SEÇÃO CÔMODOS
    ════════════════════════════════════════════════════════ */
 function renderComodos() {
+  const opcoesHtml = dom.tipos_ambiente
+    .map(t => `<option value="${t}">${t}</option>`).join('') +
+    '<option value="__outro__">Outro...</option>';
+
   document.getElementById('sec-comodos').innerHTML = `
     <div class="secao">
       <div class="secao-header">
         <div class="secao-icone">🏠</div>
         <div>
-          <div class="secao-titulo">Cômodos</div>
-          <div class="secao-subtitulo">Adicione e detalhe cada ambiente</div>
+          <div class="secao-titulo">Ambientes</div>
+          <div class="secao-subtitulo">Adicione e detalhe cada ambiente do imóvel</div>
         </div>
       </div>
       <div class="secao-body">
-        <div id="lista-salas"></div>
-        <button class="btn-adicionar" onclick="adicionarSala()">+ Adicionar Sala</button>
-        <div id="lista-quartos"></div>
-        <button class="btn-adicionar" onclick="adicionarQuarto()">+ Adicionar Quarto</button>
+        <div id="lista-ambientes"></div>
+        <div class="seletor-ambiente" id="seletor-ambiente" style="display:none">
+          <div class="seletor-row">
+            <div class="select-wrap" style="flex:1;min-width:160px">
+              <select id="select-tipo-amb" onchange="onChangeTipoAmb(this.value)">
+                <option value="">— tipo de ambiente —</option>
+                ${opcoesHtml}
+              </select>
+            </div>
+            <input id="input-tipo-custom" type="text" placeholder="Ex: Sala de Jogos"
+              style="display:none">
+            <button class="btn-confirmar-amb" onclick="confirmarAmbiente()">Adicionar</button>
+            <button class="btn-cancelar-amb"  onclick="cancelarSeletor()">Cancelar</button>
+          </div>
+        </div>
+        <button class="btn-adicionar" id="btn-add-ambiente" onclick="abrirSeletor()">+ Adicionar Ambiente</button>
       </div>
     </div>`;
 
-  salas.filter(s => !s.removido).forEach(s => renderBlocoSala(s.id));
-  quartos.filter(q => !q.removido).forEach(q => renderBlocoQuarto(q.id));
+  ambientes.filter(a => !a.removido).forEach(a => renderBlocoAmbiente(a.id));
 }
 
-/* ── SALAS ── */
-function adicionarSala() {
-  const removida = salas.find(s => s.removido);
-  if (removida) {
-    removida.removido = false;
-    renderBlocoSala(removida.id);
-    renumerarSalas(); /* CORR-5: atualiza badge após restaurar */
-  } else {
-    contadorSalas++;
-    const id = 's' + contadorSalas;
-    salas.push({ id, dados: {}, removido: false });
-    renderBlocoSala(id);
-  }
-  renumerarSalas();
-  atualizarBotao();
+/* ── SELETOR DE TIPO ── */
+function abrirSeletor() {
+  document.getElementById('seletor-ambiente').style.display = '';
+  document.getElementById('btn-add-ambiente').style.display = 'none';
+  document.getElementById('select-tipo-amb').value = '';
+  const inp = document.getElementById('input-tipo-custom');
+  inp.style.display = 'none';
+  inp.value = '';
 }
 
-function removerSala(id, e) {
-  e.stopPropagation();
-  const s = salas.find(s => s.id === id);
-  if (s) s.removido = true;
-  document.getElementById('bloco-' + id)?.remove();
-  renumerarSalas();
-  atualizarBotao();
+function cancelarSeletor() {
+  document.getElementById('seletor-ambiente').style.display = 'none';
+  document.getElementById('btn-add-ambiente').style.display = '';
 }
 
-function renderBlocoSala(id) {
-  const visiveis = salas.filter(s => !s.removido);
-  const idx = visiveis.findIndex(s => s.id === id);
-  const s   = salas.find(s => s.id === id);
-  if (!s) return;
-  const num  = idx + 1;
-  /* CORR-5: só numera se há mais de uma sala */
-  const nome = visiveis.length > 1 ? `Sala ${num}` : 'Sala';
-
-  const antigo = document.getElementById('bloco-' + id);
-  if (antigo) antigo.remove();
-
-  const div = document.createElement('div');
-  div.id = 'bloco-' + id;
-  /* CORR-5: só exibe badge numérico se há mais de uma sala */
-  div.innerHTML = cartaoComodo(id, nome, visiveis.length > 1 ? num : 0, s.dados, 'Sala', true);
-  document.getElementById('lista-salas').appendChild(div);
+function onChangeTipoAmb(val) {
+  const inp = document.getElementById('input-tipo-custom');
+  inp.style.display = val === '__outro__' ? '' : 'none';
+  if (val !== '__outro__') inp.value = '';
 }
 
-function renumerarSalas() {
-  const visiveis = salas.filter(s => !s.removido);
-  visiveis.forEach((s, idx) => {
-    const elNome = document.getElementById('nome-' + s.id);
-    const elNum  = document.getElementById('num-'  + s.id);
-    if (elNome) elNome.textContent = visiveis.length > 1 ? `Sala ${idx+1}` : 'Sala';
-    /* CORR-5: mostra/esconde badge numérico */
-    if (elNum) elNum.style.display = visiveis.length > 1 ? 'flex' : 'none';
-  });
+function normalizarTipo(str) {
+  return str.trim()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/\b\w/g, l => l.toUpperCase());
 }
 
-/* ── QUARTOS ── CORR-4: re-renderiza todos ao restaurar */
-function adicionarQuarto() {
-  const removido = quartos.find(q => q.removido);
+function confirmarAmbiente() {
+  const sel = document.getElementById('select-tipo-amb').value;
+  const inp = document.getElementById('input-tipo-custom').value.trim();
+  let tipo = '';
+  if (sel === '__outro__') {
+    if (!inp) { document.getElementById('input-tipo-custom').focus(); return; }
+    tipo = normalizarTipo(inp);
+  } else if (sel) {
+    tipo = sel;
+  } else { return; }
+  cancelarSeletor();
+  adicionarAmbiente(tipo);
+}
+
+/* ── AMBIENTES ── */
+function adicionarAmbiente(tipo) {
+  const removido = ambientes.find(a => a.removido && a.tipo === tipo);
   if (removido) {
     removido.removido = false;
-    /* CORR-4: re-renderiza todos os visíveis em ordem correta */
-    const lista = document.getElementById('lista-quartos');
-    lista.innerHTML = '';
-    quartos.filter(q => !q.removido).forEach(q => renderBlocoQuarto(q.id));
+    document.getElementById('lista-ambientes').innerHTML = '';
+    ambientes.filter(a => !a.removido).forEach(a => renderBlocoAmbiente(a.id));
   } else {
-    contadorQuartos++;
-    const id = 'q' + contadorQuartos;
-    quartos.push({ id, dados: {}, removido: false });
-    renderBlocoQuarto(id);
+    contadorAmbientes++;
+    const id = 'a' + contadorAmbientes;
+    ambientes.push({ id, tipo, dados: {}, removido: false });
+    renderBlocoAmbiente(id);
   }
+  renumerarAmbientes();
   atualizarBotao();
 }
 
-function removerQuarto(id, e) {
+function removerAmbiente(id, e) {
   e.stopPropagation();
-  const q = quartos.find(q => q.id === id);
-  if (q) q.removido = true;
+  const a = ambientes.find(a => a.id === id);
+  if (a) a.removido = true;
   document.getElementById('bloco-' + id)?.remove();
-  renumerarQuartos();
+  renumerarAmbientes();
   atualizarBotao();
 }
 
-function renderBlocoQuarto(id) {
-  const visiveis = quartos.filter(q => !q.removido);
-  const idx  = visiveis.findIndex(q => q.id === id);
-  const q    = quartos.find(q => q.id === id);
-  if (!q) return;
-  const num    = idx + 1;
-  const eSuite = q.dados.e_suite === 'Sim';
-  const nome   = eSuite ? `Suíte ${num}` : `Quarto ${num}`;
+function renderBlocoAmbiente(id) {
+  const a = ambientes.find(a => a.id === id);
+  if (!a) return;
+  const visiveis = ambientes.filter(x => !x.removido && x.tipo === a.tipo);
+  const idx   = visiveis.findIndex(x => x.id === id);
+  const num   = idx + 1;
+  const total = visiveis.length;
+  let nome = a.tipo;
+  if (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim') {
+    nome = total > 1 ? `Suíte ${num}` : 'Suíte';
+  } else if (total > 1) {
+    nome = `${a.tipo} ${num}`;
+  }
 
   const antigo = document.getElementById('bloco-' + id);
   if (antigo) antigo.remove();
 
   const div = document.createElement('div');
   div.id = 'bloco-' + id;
-  div.innerHTML = cartaoComodo(id, nome, num, q.dados, 'Quarto', true);
-  document.getElementById('lista-quartos').appendChild(div);
-  atualizarBanheiroSuite(id);
+  div.innerHTML = cartaoComodo(id, nome, total > 1 ? num : 0, a.dados, a.tipo, true);
+  document.getElementById('lista-ambientes').appendChild(div);
+  if (a.tipo === 'Quarto') atualizarBanheiroSuite(id);
 }
 
-function renumerarQuartos() {
-  const visiveis = quartos.filter(q => !q.removido);
-  visiveis.forEach((q, idx) => {
-    const el = document.getElementById('nome-' + q.id);
-    if (el) el.textContent = q.dados.e_suite === 'Sim' ? `Suíte ${idx+1}` : `Quarto ${idx+1}`;
+function renumerarAmbientes() {
+  const visiveis = ambientes.filter(a => !a.removido);
+  const contPorTipo = {};
+  visiveis.forEach(a => { contPorTipo[a.tipo] = (contPorTipo[a.tipo] || 0) + 1; });
+  const idxPorTipo = {};
+  visiveis.forEach(a => {
+    idxPorTipo[a.tipo] = (idxPorTipo[a.tipo] || 0) + 1;
+    const num   = idxPorTipo[a.tipo];
+    const total = contPorTipo[a.tipo];
+    let nome;
+    if (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim') {
+      nome = total > 1 ? `Suíte ${num}` : 'Suíte';
+    } else {
+      nome = total > 1 ? `${a.tipo} ${num}` : a.tipo;
+    }
+    const elNome = document.getElementById('nome-' + a.id);
+    const elNum  = document.getElementById('num-'  + a.id);
+    if (elNome) elNome.textContent = nome;
+    if (elNum)  elNum.style.display = total > 1 ? 'flex' : 'none';
   });
 }
+
 
 /* ════════════════════════════════════════════════════════
    CARTÃO DE CÔMODO
@@ -692,7 +721,7 @@ function cartaoComodo(id, nome, num, dados, tipo, removivel) {
         <div class="comodo-acoes" id="acoes-${id}">
           ${eSuite ? '<span class="badge-suite">Suíte</span>' : ''}
           ${pre===tot && tot>0 ? '<span class="badge-ok">✓ Completo</span>' : ''}
-          ${removivel ? `<button class="btn-remover" onclick="${tipo==='Sala'?'removerSala':'removerQuarto'}('${id}',event)">✕</button>` : ''}
+          ${removivel ? `<button class="btn-remover" onclick="removerAmbiente('${id}',event)">✕</button>` : ''}
           <span class="comodo-arrow aberto" id="arrow-${id}">▾</span>
         </div>
       </div>
@@ -822,7 +851,7 @@ function salvarDado(scopeId, campo, valor) {
     dados[campo] = valor;
     if (campo === 'e_suite') {
       atualizarBanheiroSuite(id);
-      atualizarNomeQuarto(id);
+      atualizarNomeAmbiente(id);
     }
   }
   atualizarProgresso(id);
@@ -830,10 +859,8 @@ function salvarDado(scopeId, campo, valor) {
 }
 
 function getDados(id) {
-  const sala = salas.find(s => s.id === id);
-  if (sala) return sala.dados;
-  const quarto = quartos.find(q => q.id === id);
-  return quarto ? quarto.dados : {};
+  const amb = ambientes.find(a => a.id === id);
+  return amb ? amb.dados : {};
 }
 
 /* ════════════════════════════════════════════════════════
@@ -845,8 +872,7 @@ function limparComodo(id, tipo, e) {
   const apelido = dados._apelido;
   Object.keys(dados).forEach(k => delete dados[k]);
   if (apelido) dados._apelido = apelido;
-  if (tipo === 'Sala') renderBlocoSala(id);
-  else renderBlocoQuarto(id);
+  renderBlocoAmbiente(id);
   atualizarBotao();
 }
 
@@ -860,14 +886,23 @@ function atualizarBanheiroSuite(id) {
   if (ban) ban.classList.toggle('visivel', eSuite);
 }
 
-function atualizarNomeQuarto(id) {
-  const visiveis = quartos.filter(q => !q.removido);
-  const idx = visiveis.findIndex(q => q.id === id);
+function atualizarNomeAmbiente(id) {
+  const amb = ambientes.find(a => a.id === id);
+  if (!amb) return;
+  const visiveis = ambientes.filter(a => !a.removido && a.tipo === amb.tipo);
+  const idx = visiveis.findIndex(a => a.id === id);
   if (idx < 0) return;
   const num    = idx + 1;
-  const eSuite = quartos.find(q => q.id === id)?.dados.e_suite === 'Sim';
-  const el     = document.getElementById('nome-' + id);
-  if (el) el.textContent = eSuite ? `Suíte ${num}` : `Quarto ${num}`;
+  const total  = visiveis.length;
+  const eSuite = amb.tipo === 'Quarto' && amb.dados.e_suite === 'Sim';
+  let nome;
+  if (eSuite) {
+    nome = total > 1 ? `Suíte ${num}` : 'Suíte';
+  } else {
+    nome = total > 1 ? `${amb.tipo} ${num}` : amb.tipo;
+  }
+  const el = document.getElementById('nome-' + id);
+  if (el) el.textContent = nome;
   const acoes = document.getElementById('acoes-' + id);
   if (!acoes) return;
   const badgeExist = acoes.querySelector('.badge-suite');
@@ -906,7 +941,8 @@ function contarPreenchidos(tipo, dados) {
 }
 
 function atualizarProgresso(id) {
-  const tipo  = salas.find(s => s.id === id) ? 'Sala' : 'Quarto';
+  const amb   = ambientes.find(a => a.id === id);
+  const tipo  = amb ? amb.tipo : '';
   const dados = getDados(id);
   const pre   = contarPreenchidos(tipo, dados);
   const tot   = contarTotal(tipo, dados);
@@ -929,9 +965,7 @@ function atualizarProgresso(id) {
 function atualizarBotao() {
   const btn             = document.getElementById('btnExportar');
   const temLoc          = dadosLocalizacao.cep && dadosLocalizacao.numero;
-  const salasVisiveis   = salas.filter(s => !s.removido).length;
-  const quartosVisiveis = quartos.filter(q => !q.removido).length;
-  const temComodo       = salasVisiveis + quartosVisiveis > 0;
+  const temComodo       = ambientes.filter(a => !a.removido).length > 0;
   btn.disabled = !(temLoc && temComodo);
 
   if (temComodo) {
@@ -997,15 +1031,22 @@ function exportarExcel() {
     }
   };
 
-  const salasVisiveis = salas.filter(s => !s.removido);
-  salasVisiveis.forEach((s, idx) => {
-    const nome = salasVisiveis.length > 1 ? `Sala ${idx+1}` : 'Sala';
-    exportarComodo(nome, 'Sala', s.dados);
+  const contTotalPorTipo = {};
+  ambientes.filter(a => !a.removido).forEach(a => {
+    contTotalPorTipo[a.tipo] = (contTotalPorTipo[a.tipo] || 0) + 1;
   });
-
-  quartos.filter(q => !q.removido).forEach((q, idx) => {
-    const nome = q.dados.e_suite === 'Sim' ? `Suíte ${idx+1}` : `Quarto ${idx+1}`;
-    exportarComodo(nome, 'Quarto', q.dados);
+  const contAtualPorTipo = {};
+  ambientes.filter(a => !a.removido).forEach(a => {
+    contAtualPorTipo[a.tipo] = (contAtualPorTipo[a.tipo] || 0) + 1;
+    const num   = contAtualPorTipo[a.tipo];
+    const total = contTotalPorTipo[a.tipo];
+    let nomeAmb;
+    if (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim') {
+      nomeAmb = total > 1 ? `Suíte ${num}` : 'Suíte';
+    } else {
+      nomeAmb = total > 1 ? `${a.tipo} ${num}` : a.tipo;
+    }
+    exportarComodo(nomeAmb, a.tipo, a.dados);
   });
 
   const wb = XLSX.utils.book_new();
