@@ -1,4 +1,4 @@
-/* arquivo: p-filtros.js | versao: 0.6.0 */
+/* arquivo: p-filtros.js | versao: 0.7.1 */
 /* ============================================================
    p-filtros.js — Filtragem, busca e ordenação de imóveis
    Depende de: p-cards.js (renderizarCards), p-ui.js (formatarEndereco)
@@ -28,8 +28,7 @@ function atualizarCacheFiltros(imoveis) {
 function popularDropdowns(imoveis) {
   const estados     = extrairUnicos(imoveis, i => i.localizacao?.['Estado']);
   const cidades     = extrairUnicos(imoveis, i => i.localizacao?.['Cidade']);
-  const anunciantes = extrairUnicos(imoveis, i => i.anunciante?.['Tipo']);
-  /* Tipo de imóvel — adicionado v0.3.0 */
+  const anunciantes = extrairUnicos(imoveis, i => i.anunciante?.['Tipo de anunciante']);
   const tiposImovel = extrairUnicos(imoveis, i =>
     i.localizacao?.['Tipo de Imóvel'] || i.localizacao?.['Tipo de Imovel']
   );
@@ -136,7 +135,7 @@ function aplicarFiltros() {
   if (estado)      resultado = resultado.filter(i => i.localizacao?.['Estado'] === estado);
   if (cidade)      resultado = resultado.filter(i => i.localizacao?.['Cidade'] === cidade);
   if (comodos > 0) resultado = resultado.filter(i => (i.comodos?.length || 0) >= comodos);
-  if (anunciante)  resultado = resultado.filter(i => i.anunciante?.['Tipo'] === anunciante);
+  if (anunciante)  resultado = resultado.filter(i => i.anunciante?.['Tipo de anunciante'] === anunciante);
   if (tipoImovel)  resultado = resultado.filter(i =>
     (i.localizacao?.['Tipo de Imóvel'] || i.localizacao?.['Tipo de Imovel']) === tipoImovel
   );

@@ -1,7 +1,6 @@
-/* arquivo: g-versao.js | versao: 0.1.0 */
+/* arquivo: g-versao.js | versao: 0.7.1 */
 /* ============================================================
    g-versao.js — Controle de versão unificado do Zillow BR
-   Substitui f-versao.js e p-versao.js (Fase 4).
    Carregado em: todas as páginas do portal e da ficha.
    ============================================================ */
 

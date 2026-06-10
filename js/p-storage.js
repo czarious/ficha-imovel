@@ -1,4 +1,4 @@
-/* arquivo: p-storage.js | versao: 0.6.1 */
+/* arquivo: p-storage.js | versao: 0.7.1 */
 /* ============================================================
    p-storage.js — Gerenciamento de dados via Google Drive API
    Zillow BR Portal | Responsabilidade: CRUD de imóveis no Drive
