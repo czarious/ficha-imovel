@@ -1,11 +1,12 @@
 <!-- DESTINO: f-ficha.html -->
-<!-- arquivo: f-ficha.html | versao: 0.7.2 -->
+<!-- arquivo: f-ficha.html | versao: 0.7.3 -->
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ficha Técnica de Imóvel</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/g-global.css">
 <style>
@@ -156,7 +157,6 @@
 <script src="js/g-config.js"></script>
 <script src="js/g-versao.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<!-- g-geo.js — geocodificação (endereço -> lat/lng) -->
 <script src="js/g-geo.js"></script>
 <script>
 /* ════════════════════════════════════════════════════════
@@ -166,13 +166,13 @@ const JSON_URL = 'dominios/f-dominios.json';
 
 /* Estado global */
 let dom              = null;
-let dadosAnunciante  = {};  /* CORR-1: era dadosCadastrante */
+let dadosAnunciante  = {};
 let dadosLocalizacao = {};
 
 let ambientes         = [];
 let contadorAmbientes = 0;
 
-let anuncianteAberto  = true;  /* CORR-1: era cadastranteAberto */
+let anuncianteAberto  = true;
 let localizacaoAberta = true;
 
 const TIPOS_IMOVEL = {
@@ -248,10 +248,7 @@ function inicializarSecao(secaoId, aberto) {
 }
 
 /* ════════════════════════════════════════════════════════
-   SEÇÃO ANUNCIANTE — CORR-1, CORR-6, CORR-7
-   - dadosAnunciante em vez de dadosCadastrante
-   - CRECI-J condicional (só Imobiliária)
-   - CPF/CNPJ dinâmico conforme Tipo
+   SEÇÃO ANUNCIANTE
    ════════════════════════════════════════════════════════ */
 function renderAnunciante() {
   /* Gera campos dinamicamente respeitando condicionais */
@@ -259,10 +256,8 @@ function renderAnunciante() {
 
   let campos = '';
   dom.anunciante.campos.forEach(c => {
-    /* CORR-6: CRECI-J só para Imobiliária */
     if (c.id === 'creci_j' && tipoAtual !== 'Imobiliária') return;
 
-    /* CORR-7: CPF vira CNPJ para Imobiliária */
     const attrModificado = { ...c };
     if (c.id === 'cpf' && tipoAtual === 'Imobiliária') {
       attrModificado.label = 'CNPJ';
@@ -294,7 +289,7 @@ function renderAnunciante() {
 }
 
 /* ════════════════════════════════════════════════════════
-   SEÇÃO LOCALIZAÇÃO — CORR-3: CEP genérico
+   SEÇÃO LOCALIZAÇÃO
    ════════════════════════════════════════════════════════ */
 function renderLocalizacao() {
   const estados = dom.estados_brasil.map(e =>
@@ -311,7 +306,6 @@ function renderLocalizacao() {
     opcosTipo += `</optgroup>`;
   });
 
-  /* CORR-3: Rua e Bairro readonly só se preenchidos pelo CEP. Se vazio, editável */
   const ruaReadonly    = dadosLocalizacao.rua    ? 'readonly' : '';
   const bairroReadonly = dadosLocalizacao.bairro ? 'readonly' : '';
 
@@ -431,7 +425,6 @@ function mascaraCEP(input) {
   input.value = v;
 }
 
-/* CORR-3: remove readonly de Rua e Bairro se ViaCEP retornar vazio */
 async function buscarCEP(cep) {
   const limpo = cep.replace(/\D/g,'');
   if (limpo.length !== 8) return;
@@ -494,7 +487,7 @@ async function buscarCEP(cep) {
 function salvarLoc(campo, valor) { dadosLocalizacao[campo] = valor; }
 
 /* ════════════════════════════════════════════════════════
-   SEÇÃO CÔMODOS
+   SEÇÃO AMBIENTES
    ════════════════════════════════════════════════════════ */
 function renderComodos() {
   const opcoesHtml = dom.tipos_ambiente
@@ -605,9 +598,8 @@ function renderBlocoAmbiente(id) {
   const a = ambientes.find(a => a.id === id);
   if (!a) return;
   const visiveis = ambientes.filter(x => !x.removido && x.tipo === a.tipo);
-  const idx   = visiveis.findIndex(x => x.id === id);
-  const num   = idx + 1;
-  const total = visiveis.length;
+  const idx  = visiveis.findIndex(x => x.id === id);
+  const num  = idx + 1;
   const nome = (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim')
     ? `Suíte ${num}`
     : `${a.tipo} ${num}`;
@@ -623,14 +615,11 @@ function renderBlocoAmbiente(id) {
 }
 
 function renumerarAmbientes() {
-  const visiveis = ambientes.filter(a => !a.removido);
-  const contPorTipo = {};
-  visiveis.forEach(a => { contPorTipo[a.tipo] = (contPorTipo[a.tipo] || 0) + 1; });
+  const visiveis  = ambientes.filter(a => !a.removido);
   const idxPorTipo = {};
   visiveis.forEach(a => {
     idxPorTipo[a.tipo] = (idxPorTipo[a.tipo] || 0) + 1;
-    const num   = idxPorTipo[a.tipo];
-    const total = contPorTipo[a.tipo];
+    const num  = idxPorTipo[a.tipo];
     const nome = (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim')
       ? `Suíte ${num}`
       : `${a.tipo} ${num}`;
@@ -640,7 +629,6 @@ function renumerarAmbientes() {
     if (elNum)  elNum.style.display = 'flex';
   });
 }
-
 
 /* ════════════════════════════════════════════════════════
    CARTÃO DE CÔMODO
@@ -746,7 +734,7 @@ function cartaoComodo(id, nome, num, dados, tipo, removivel) {
         ${banheiro}
 
         <div class="comodo-footer">
-          <button class="btn-limpar-comodo" onclick="limparComodo('${id}','${tipo}',event)">
+          <button class="btn-limpar-comodo" onclick="limparComodo('${id}',event)">
             ↺ Limpar campos
           </button>
         </div>
@@ -829,13 +817,12 @@ function campoDom(attr, dados, scopeId) {
 }
 
 /* ════════════════════════════════════════════════════════
-   SALVAR DADOS — CORR-1 + CORR-6/7
+   SALVAR DADOS
    ════════════════════════════════════════════════════════ */
 function salvarDado(scopeId, campo, valor) {
   const id = scopeId.replace('_ban','');
   if (id === 'anunciante') {
     dadosAnunciante[campo] = valor;
-    /* CORR-6/7: re-renderiza seção se mudou o Tipo */
     if (campo === 'tipo') renderAnunciante();
   } else {
     const dados = getDados(id);
@@ -857,7 +844,7 @@ function getDados(id) {
 /* ════════════════════════════════════════════════════════
    LIMPAR CÔMODO
    ════════════════════════════════════════════════════════ */
-function limparComodo(id, tipo, e) {
+function limparComodo(id, e) {
   e.stopPropagation();
   const dados = getDados(id);
   const apelido = dados._apelido;
@@ -907,7 +894,7 @@ function toggleComodo(id) {
 }
 
 /* ════════════════════════════════════════════════════════
-   PROGRESSO — CORR: contarTotal recebe dados para verificar suite
+   PROGRESSO
    ════════════════════════════════════════════════════════ */
 function contarTotal(tipo, dados) {
   let n = 1 + dom.atributos_comuns.length;
@@ -970,12 +957,11 @@ function montarComplemento() {
 }
 
 /* ════════════════════════════════════════════════════════
-   EXPORTAÇÃO — CORR-2: 'Anunciante' em vez de 'Cadastrante'
+   EXPORTAÇÃO
    ════════════════════════════════════════════════════════ */
 function exportarExcel() {
   const linhas = [['Cômodo', 'Grupo', 'Característica', 'Valor']];
 
-  /* CORR-2: coluna A = 'Anunciante' */
   dom.anunciante.campos.forEach(c => {
     const v = dadosAnunciante[c.id];
     if (v) linhas.push(['Anunciante', c.grupo, c.label, v]);
