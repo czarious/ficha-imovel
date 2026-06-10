@@ -21,7 +21,7 @@ function copiarLink() {
 
 /* ============================================================
    Botão WhatsApp flutuante
-   Prefere WhatsApp do Responsável; cai para Telefone do anunciante.
+   Prefere WhatsApp do responsável; cai para Telefone do anunciante.
    ============================================================ */
 function renderizarBotaoWhatsApp(imovel) {
   if (!imovel) return;

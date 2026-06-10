@@ -1,4 +1,4 @@
-/* arquivo: p-ui.js | versao: 0.6.1 */
+/* arquivo: p-ui.js | versao: 0.7.1 */
 /* ============================================================
    p-ui.js — Utilitários de interface
    Zillow BR Portal | Responsabilidade: modais, toasts, login, helpers
