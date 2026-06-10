@@ -1,4 +1,4 @@
-/* arquivo: p-cards.js | versao: 0.6.0 */
+/* arquivo: p-cards.js | versao: 0.7.1 */
 /* ============================================================
    p-cards.js — Renderização dos cards de imóveis (index.html)
    Depende de: p-ui.js (formatarData, formatarEndereco)
@@ -52,8 +52,7 @@ function criarCard(imovel) {
   const cidade     = [loc['Cidade'], loc['Estado']].filter(Boolean).join(', ');
   const cep        = loc['CEP'] || '';
   const qtdComodos = imovel.comodos ? imovel.comodos.length : 0;
-  const tipoCad    = cad['Tipo'] || 'Anunciante';
-  /* Tipo de imóvel — adicionado v0.3.0 */
+  const tipoCad    = cad['Tipo de anunciante'] || 'Anunciante';
   const tipoImovel = loc['Tipo de Imóvel'] || loc['Tipo de Imovel'] || '';
 
   const card = document.createElement('article');
@@ -63,7 +62,7 @@ function criarCard(imovel) {
   card.setAttribute('tabindex', '0');
   card.setAttribute('aria-label', `Ver ficha: ${endereco}`);
 
-  const nomeAnunciante = cad['Nome'] || '';
+  const nomeAnunciante = cad['Nome completo'] || '';
   const iniciais = nomeAnunciante
     .split(' ')
     .filter(Boolean)
