@@ -1,6 +1,6 @@
 # DEPS.md — Mapa de dependências do Zillow BR
 > Atualizar sempre que adicionar, remover ou renomear arquivo, link ou dependência.  
-> Auditado em: 08/Jun/2026 · versão portal 0.7.1 / ficha 0.7.1
+> Auditado em: 10/Jun/2026 · versão portal 0.7.1 / ficha 0.7.3
 
 ---
 
@@ -49,8 +49,8 @@
 
 | Módulo | Expõe | Depende de |
 |--------|-------|------------|
-| `g-config.js` | `APP_NOME` `DRIVE_PASTA_ID` `DRIVE_API_KEY` `OAUTH_CLIENT_ID` `OAUTH_ESCOPOS` `EXCEL_PREFIXO` `EXCEL_EXTENSOES` `APP_MENSAGEM_ERRO_IMPORT` | — |
-| `p-storage.js` | `inicializarOAuth()` `solicitarToken()` `saveImovel()` `checkDuplicata()` `normalizarId()` | `g-config.js` |
+| `g-config.js` | `APP_NOME` `TOAST_KEY` `DRIVE_PASTA_ID` `DRIVE_API_KEY` `OAUTH_CLIENT_ID` `OAUTH_ESCOPOS` `EXCEL_PREFIXO` `EXCEL_EXTENSOES` `APP_MENSAGEM_ERRO_IMPORT` | — |
+| `p-storage.js` | `inicializarOAuth()` `solicitarToken()` `getImoveis()` `getImovelById()` `saveImovel()` `deleteImovel()` `checkDuplicata()` `normalizarId()` | `g-config.js` |
 | `p-parser.js` | `parsearExcel()` `montarObjetoImovel()` `validarArquivo()` | `g-config.js` |
 | `p-ui.js` | `mostrarToast()` `mostrarToastPendente()` `abrirModalDuplicata()` `fecharModal()` `formatarData()` `formatarEndereco()` `obterParam()` `renderizarBotaoLogin()` `atualizarEstadoLogin()` | — |
 | `p-filtros.js` | `inicializarFiltros()` `aplicarFiltros()` `limparTodosFiltros()` · define `_todosImoveis` | chama `renderizarCards()` de `p-cards.js` |
@@ -70,12 +70,13 @@
 | Global | Definido em | Usado em |
 |--------|-------------|----------|
 | `VERSAO_PORTAL` | `g-versao.js` | `g-menu.js` (badge) · `g-changelog.html` (badge + versão atual) |
-| `VERSAO_ATUAL` | `g-versao.js` | alinhado a `VERSAO_PORTAL` (ambos 0.7.0) |
+| `VERSAO_ATUAL` | `g-versao.js` | alinhado a `VERSAO_PORTAL` (ambos 0.7.1) |
 | `CHANGELOG_PORTAL` | `g-versao.js` | `g-changelog.html` (entradas Portal ≤ 0.7.0) |
 | `CHANGELOG` | `g-versao.js` | `g-changelog.html` (entradas Ficha ≤ 0.7.0) |
 | `CHANGELOG_GERAL` | `g-versao.js` | `g-changelog.html` (entradas unificadas ≥ 0.7.1) |
 | `MENU_BASE` | inline em cada HTML — sempre `'./'` | `g-menu.js` |
 | `_todosImoveis` | `p-filtros.js` | `p-cards.js` · `p-filtros.js` |
+| `TOAST_KEY` | `g-config.js` | `p-ui.js` (mostrarToastPendente) · `p-acoes.js` (excluir) · `cadastro.html` (redirect após importação) |
 | `APP_NOME` | `g-config.js` | **nome do site (fonte única)**: `g-menu.js` (logo) · `p-acoes.js` (msg WhatsApp) · `p-render.js`/`index.html`/`cadastro.html`/`g-changelog.html` (títulos) · base de `APP_MENSAGEM_ERRO_IMPORT` |
 | `DRIVE_PASTA_ID` | `g-config.js` | `p-storage.js` |
 | `DRIVE_API_KEY` | `g-config.js` | `p-storage.js` |
@@ -104,9 +105,3 @@
 
 ---
 
-## 6. Fases pendentes que impactam este arquivo
-
-| Fase | Arquivos afetados |
-|------|------------------|
-| ~~**Fase 4**~~ | ✓ concluída — `g-versao.js` substituiu `f-versao.js` + `p-versao.js` |
-| ~~**Fase 5**~~ | ✓ concluída — `g-config.js` substituiu `p-config.js` |
