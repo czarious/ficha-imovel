@@ -1,5 +1,5 @@
 <!-- DESTINO: f-ficha.html -->
-<!-- arquivo: f-ficha.html | versao: 0.7.3 -->
+<!-- arquivo: f-ficha.html | versao: 0.7.4 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -73,6 +73,12 @@
   /* ── ÁREA CALCULADA ── */
   .area-display { background: var(--accent-light); border: 1px solid var(--accent-border); border-radius: 8px; padding: 10px 13px; font-size: 15px; color: var(--accent); font-weight: 500; display: flex; align-items: center; gap: 5px; min-height: 41px; }
   .area-display small { font-size: 11px; font-weight: 400; color: #5A9470; }
+
+  /* ── TOOLTIP ⓘ ── */
+  .campo-tip { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: var(--accent-light); color: var(--accent); font-size: 10px; font-weight: 700; cursor: pointer; position: relative; vertical-align: middle; margin-left: 5px; flex-shrink: 0; user-select: none; }
+  .campo-tip .tooltip-pop { display: none; position: absolute; bottom: calc(100% + 8px); left: 0; width: 260px; max-width: 80vw; background: #1a1a1a; color: #f5f5f5; font-size: 12px; line-height: 1.55; padding: 10px 13px; border-radius: 8px; z-index: 999; text-transform: none; font-weight: 400; letter-spacing: 0; box-shadow: 0 4px 16px rgba(0,0,0,0.25); pointer-events: none; white-space: normal; }
+  .campo-tip:hover .tooltip-pop,
+  .campo-tip.ativo .tooltip-pop { display: block; }
 
   /* ── APELIDO ── */
   .apelido-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
@@ -180,6 +186,11 @@ const TIPOS_IMOVEL = {
   'Terreno / Rural': ['Lote / Terreno','Chácara','Sítio','Fazenda'],
   'Comercial': ['Sala Comercial','Loja','Galpão','Prédio Comercial']
 };
+
+/* Grupos para visibilidade condicional dos campos de área */
+const TIPOS_COM_CONDOMINIO = ['Apartamento','Casa em Condomínio','Cobertura','Flat / Apart-hotel'];
+const TIPOS_SEM_TERRENO    = ['Apartamento','Cobertura','Flat / Apart-hotel','Kitnet / Quitinete','Loft','Studio','Sala Comercial'];
+const TIPOS_SEM_EDIFICACAO = ['Lote / Terreno'];
 
 /* ════════════════════════════════════════════════════════
    CARREGAMENTO DO JSON
@@ -328,10 +339,66 @@ function renderLocalizacao() {
             <div class="campo">
               <label>Tipo de Imóvel</label>
               <div class="select-wrap">
-                <select onchange="salvarLoc('tipo_imovel',this.value)">${opcosTipo}</select>
+                <select onchange="salvarLoc('tipo_imovel',this.value); atualizarVisibilidadeAreas()">${opcosTipo}</select>
               </div>
             </div>
             <div></div>
+          </div>
+
+          <!-- ── BLOCO DE ÁREAS ── -->
+          <div id="bloco-areas" style="display:none">
+            <div class="grupo-label" style="margin-top:8px">Áreas</div>
+
+            <div class="grid-2" id="row-area-terreno">
+              <div class="campo">
+                <label>Área do terreno (m²) <span class="campo-tip" tabindex="0">ⓘ<span class="tooltip-pop">Superfície total do lote ou gleba onde o imóvel está implantado, incluindo área construída e descoberta. Dado que consta na matrícula no Cartório de Registro de Imóveis.</span></span></label>
+                <input type="number" id="campo-area-terreno" min="0" step="0.01" placeholder="Ex: 300.00"
+                  value="${dadosLocalizacao.area_terreno||''}"
+                  oninput="salvarLoc('area_terreno',this.value); calcularAreaTotal()">
+              </div>
+              <div></div>
+            </div>
+
+            <div class="grid-2" id="row-area-privativa-util">
+              <div class="campo">
+                <label>Área privativa (m²) <span class="campo-tip" tabindex="0">ⓘ<span class="tooltip-pop">Área de uso exclusivo do proprietário conforme matrícula. Inclui o espaço interno e o espaço ocupado pelas paredes. Base para o cálculo do custo por m². Ref: ABNT NBR 12.721.</span></span></label>
+                <input type="number" id="campo-area-privativa" min="0" step="0.01" placeholder="Ex: 72.00"
+                  value="${dadosLocalizacao.area_privativa||''}"
+                  oninput="salvarLoc('area_privativa',this.value); calcularAreaTotal()">
+              </div>
+              <div class="campo">
+                <label>Área útil (m²) <span class="campo-tip" tabindex="0">ⓘ<span class="tooltip-pop">Soma das áreas dos cômodos sem contar paredes e pilares. "Área de vassoura". Em média 10–15% menor que a área privativa. Opcional — não é derivada da soma dos ambientes cadastrados.</span></span></label>
+                <input type="number" id="campo-area-util" min="0" step="0.01" placeholder="Opcional"
+                  value="${dadosLocalizacao.area_util||''}"
+                  oninput="salvarLoc('area_util',this.value)">
+              </div>
+            </div>
+
+            <div class="grid-2" id="row-area-comum" style="display:none">
+              <div class="campo">
+                <label>Área comum — fração ideal (m²) <span class="campo-tip" tabindex="0">ⓘ<span class="tooltip-pop">Parcela das áreas coletivas do condomínio (hall, escadas, salão, piscina) atribuída proporcionalmente a esta unidade. Consta na matrícula. Ref: Lei nº 4.591/64.</span></span></label>
+                <input type="number" id="campo-area-comum" min="0" step="0.01" placeholder="Ex: 9.50"
+                  value="${dadosLocalizacao.area_comum||''}"
+                  oninput="salvarLoc('area_comum',this.value); calcularAreaTotal()">
+              </div>
+              <div class="campo">
+                <label>Fração ideal (%) <span class="campo-tip" tabindex="0">ⓘ<span class="tooltip-pop">Percentual do terreno e das coisas comuns do condomínio que pertence a esta unidade. Base para rateio de condomínio e IPTU. Ref: ABNT NBR 12.721 e Lei nº 4.591/64, art. 3º.</span></span></label>
+                <input type="number" id="campo-fracao-ideal" min="0" step="0.01" max="100" placeholder="Ex: 1.85"
+                  value="${dadosLocalizacao.fracao_ideal||''}"
+                  oninput="salvarLoc('fracao_ideal',this.value)">
+              </div>
+            </div>
+
+            <div class="grid-2" id="row-area-total">
+              <div class="campo">
+                <label>Área total (m²) <span class="campo-tip" tabindex="0">ⓘ<span class="tooltip-pop">Soma da área privativa com a área comum (fração ideal). Para imóveis sem condomínio: Área Total = Área Privativa. Para terrenos: Área Total = Área do Terreno. Ref: ABNT NBR 12.721.</span></span></label>
+                <div class="area-display" id="display-area-total">
+                  <span id="val-area-total">${dadosLocalizacao.area_total ? dadosLocalizacao.area_total + ' m²' : '—'}</span>
+                  <small>calculado</small>
+                </div>
+              </div>
+              <div></div>
+            </div>
           </div>
 
           <div class="grupo-label" style="margin-top:8px">Endereço</div>
@@ -416,7 +483,11 @@ function renderLocalizacao() {
       </div>
     </div>`;
 
-  setTimeout(() => inicializarSecao('localizacao', localizacaoAberta), 10);
+  setTimeout(() => {
+    inicializarSecao('localizacao', localizacaoAberta);
+    atualizarVisibilidadeAreas();
+    tooltipInit();
+  }, 10);
 }
 
 function mascaraCEP(input) {
@@ -485,6 +556,67 @@ async function buscarCEP(cep) {
 }
 
 function salvarLoc(campo, valor) { dadosLocalizacao[campo] = valor; }
+
+/* ════════════════════════════════════════════════════════
+   ÁREAS DO IMÓVEL
+   ════════════════════════════════════════════════════════ */
+function atualizarVisibilidadeAreas() {
+  const tipo  = dadosLocalizacao.tipo_imovel || '';
+  const bloco = document.getElementById('bloco-areas');
+  if (!bloco) return;
+  if (!tipo) { bloco.style.display = 'none'; return; }
+
+  bloco.style.display = '';
+
+  const comCondominio = TIPOS_COM_CONDOMINIO.includes(tipo);
+  const semTerreno    = TIPOS_SEM_TERRENO.includes(tipo);
+  const semEdificacao = TIPOS_SEM_EDIFICACAO.includes(tipo);
+
+  document.getElementById('row-area-terreno').style.display        = semTerreno    ? 'none' : '';
+  document.getElementById('row-area-privativa-util').style.display  = semEdificacao ? 'none' : '';
+  document.getElementById('row-area-comum').style.display           = comCondominio ? ''     : 'none';
+
+  calcularAreaTotal();
+}
+
+function calcularAreaTotal() {
+  const tipo      = dadosLocalizacao.tipo_imovel || '';
+  const privativa = parseFloat(dadosLocalizacao.area_privativa) || 0;
+  const comum     = parseFloat(dadosLocalizacao.area_comum)     || 0;
+  const terreno   = parseFloat(dadosLocalizacao.area_terreno)   || 0;
+
+  let total = null;
+  if (TIPOS_SEM_EDIFICACAO.includes(tipo)) {
+    if (terreno) total = terreno;
+  } else if (privativa) {
+    total = privativa + comum;
+  }
+
+  const str = total !== null ? total.toFixed(2) : '';
+  salvarLoc('area_total', str);
+  const el = document.getElementById('val-area-total');
+  if (el) el.textContent = total !== null ? total.toFixed(2) + ' m²' : '—';
+}
+
+function tooltipInit() {
+  document.querySelectorAll('.campo-tip').forEach(tip => {
+    tip.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isAtivo = tip.classList.contains('ativo');
+      document.querySelectorAll('.campo-tip.ativo').forEach(t => t.classList.remove('ativo'));
+      if (!isAtivo) tip.classList.add('ativo');
+    });
+  });
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.campo-tip.ativo').forEach(t => t.classList.remove('ativo'));
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape')
+    document.querySelectorAll('.campo-tip.ativo').forEach(t => t.classList.remove('ativo'));
+});
 
 /* ════════════════════════════════════════════════════════
    SEÇÃO AMBIENTES
@@ -969,6 +1101,12 @@ function exportarExcel() {
 
   const camposLoc = [
     ['tipo_imovel','Tipo de Imóvel'],
+    ['area_terreno','Área do terreno (m²)'],
+    ['area_privativa','Área privativa (m²)'],
+    ['area_util','Área útil (m²)'],
+    ['area_comum','Área comum — fração ideal (m²)'],
+    ['fracao_ideal','Fração ideal (%)'],
+    ['area_total','Área total (m²)'],
     ['pais','País'],['cep','CEP'],['rua','Rua'],['bairro','Bairro'],
     ['numero','Número'],['complemento','Complemento'],
     ['cidade','Cidade'],['estado','Estado'],

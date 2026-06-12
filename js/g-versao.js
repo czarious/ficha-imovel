@@ -6,7 +6,7 @@
 
 /* ── VERSÕES ─────────────────────────────────────────────── */
 const VERSAO_PORTAL = '0.7.1';
-const VERSAO_ATUAL  = '0.7.1'; /* ficha */
+const VERSAO_ATUAL  = '0.7.4'; /* ficha */
 
 /* ── CHANGELOG UNIFICADO (≥ 0.7.1) ───────────────────────────
    A partir da unificação, cada versão tem UMA entrada aqui (sem
@@ -14,6 +14,64 @@ const VERSAO_ATUAL  = '0.7.1'; /* ficha */
    CHANGELOG (ficha) e CHANGELOG_PORTAL, exibidas divididas no
    g-changelog.html. */
 const CHANGELOG_GERAL = [
+  {
+    versao: '0.7.4',
+    data:   '12/Jun/2026',
+    titulo: 'Campos de áreas do imóvel na ficha',
+    grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          '6 novos campos na seção Localização da ficha: Área do terreno, Área privativa, Área útil (opcional), Área comum — fração ideal, Fração ideal e Área total.',
+          'Visibilidade condicional por tipo de imóvel — Apartamento não exibe área de terreno; Terreno/Lote oculta privativa, útil e áreas de condomínio; apenas Apartamento e Casa em Condomínio exibem área comum e fração ideal.',
+          'Área total calculada automaticamente em tempo real (Privativa + Comum; ou Terreno para lotes).',
+          'Tooltip ⓘ com definição técnica em cada campo de área — baseado em ABNT NBR 12.721 e Lei nº 4.591/64.',
+        ]
+      },
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          '6 novos campos exportados no Excel na seção Imóvel > Localização, antes do endereço.',
+          'Novos conjuntos TIPOS_COM_CONDOMINIO, TIPOS_SEM_TERRENO e TIPOS_SEM_EDIFICACAO centralizam a lógica condicional.',
+        ]
+      }
+    ]
+  },
+  {
+    versao: '0.7.3',
+    data:   '12/Jun/2026',
+    titulo: 'Saneamento e limpeza da ficha',
+    grupos: [
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'Comentários históricos CORR-1 a CORR-7 removidos após conclusão das correções.',
+          'Variáveis mortas eliminadas; função limparComodo() simplificada.',
+          'lang="pt-br" corrigido para "pt-BR"; preconnect de fontes adicionado.',
+        ]
+      }
+    ]
+  },
+  {
+    versao: '0.7.2',
+    data:   '12/Jun/2026',
+    titulo: 'Ambientes unificados na ficha',
+    grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          'Banheiro, Cozinha e Área de Serviço passam a ser ambientes independentes — mesma hierarquia dos demais cômodos.',
+          'Campo "Outro..." permite criar qualquer tipo de ambiente de forma livre.',
+        ]
+      },
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'f-dominios.json v0.7.2: tipos_ambiente listados explicitamente (Sala, Quarto, Banheiro, Cozinha, Área de Serviço, Garagem, Varanda, Edícula, Outro).',
+        ]
+      }
+    ]
+  },
   {
     versao: '0.7.1',
     data:   '08/Jun/2026',

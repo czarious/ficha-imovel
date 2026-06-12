@@ -1,6 +1,6 @@
 # DEPS.md — Mapa de dependências do Zillow BR
 > Atualizar sempre que adicionar, remover ou renomear arquivo, link ou dependência.  
-> Auditado em: 10/Jun/2026 · versão portal 0.7.1 / ficha 0.7.3
+> Auditado em: 12/Jun/2026 · versão portal 0.7.1 / ficha 0.7.4
 
 ---
 
@@ -57,7 +57,7 @@
 | `p-cards.js` | `renderizarCards()` `criarCard()` `navegarParaImovel()` | `p-ui.js` → `formatarData()` `formatarEndereco()` · lê `_todosImoveis` de `p-filtros.js` |
 | `p-render.js` | `renderizarFicha()` | `p-ui.js` → `formatarData()` `formatarEndereco()` |
 | `g-versao.js` | `VERSAO_PORTAL` `VERSAO_ATUAL` `CHANGELOG_PORTAL` `CHANGELOG` `CHANGELOG_GERAL` `abrirChangelogPortal()` `abrirChangelog()` | — |
-| `g-menu.js` | injeta `<aside id="sidebar">` via IIFE | lê `VERSAO_PORTAL` e `MENU_BASE` (globals da página) |
+| `g-menu.js` | injeta `<aside id="sidebar">` via IIFE | lê `VERSAO_PORTAL` / `VERSAO_ATUAL` (detecta ficha por pathname) e `MENU_BASE` (globals da página) |
 | `g-geo.js` | `geocodificarEndereco(endereco)` → `{lat,lng}` ou `null` | — · usado por `f-ficha.html` (cadastro) e `p-imovel.html` (fallback) |
 | `p-mapa.js` | `renderizarMapa(...)` + `montarMapa(imovel)` (orquestra: lê coord salva → fallback geocode → desenha) | Leaflet (CDN) · `g-geo.js` · `formatarEndereco()` de `p-ui.js` · usado por `p-imovel.html` |
 | `p-import.js` | `acionarImportacao()` + `processarArquivo(evento)` (parse → valida → duplicata → salva) | `p-parser.js` · `p-storage.js` · `p-ui.js` · chama hook `aoImportarComSucesso()` da página · usado por `index.html` e `cadastro.html` |
@@ -70,7 +70,7 @@
 | Global | Definido em | Usado em |
 |--------|-------------|----------|
 | `VERSAO_PORTAL` | `g-versao.js` | `g-menu.js` (badge) · `g-changelog.html` (badge + versão atual) |
-| `VERSAO_ATUAL` | `g-versao.js` | alinhado a `VERSAO_PORTAL` (ambos 0.7.1) |
+| `VERSAO_ATUAL` | `g-versao.js` | `g-menu.js` — badge de versão quando em `f-ficha.html` (0.7.4) |
 | `CHANGELOG_PORTAL` | `g-versao.js` | `g-changelog.html` (entradas Portal ≤ 0.7.0) |
 | `CHANGELOG` | `g-versao.js` | `g-changelog.html` (entradas Ficha ≤ 0.7.0) |
 | `CHANGELOG_GERAL` | `g-versao.js` | `g-changelog.html` (entradas unificadas ≥ 0.7.1) |

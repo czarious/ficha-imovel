@@ -1,4 +1,4 @@
-/* arquivo: g-menu.js | versao: 0.7.1 */
+/* arquivo: g-menu.js | versao: 0.7.2 */
 
 /* Injeta a sidebar em qualquer página.
    A página deve declarar MENU_BASE antes de carregar este script:
@@ -7,9 +7,13 @@
 */
 (function () {
   const base   = (typeof MENU_BASE    !== 'undefined') ? MENU_BASE    : './';
-  const versao = (typeof VERSAO_PORTAL !== 'undefined') ? VERSAO_PORTAL : '—';
   const nome   = (typeof APP_NOME      !== 'undefined') ? APP_NOME      : 'Zillow BR';
-  const path = window.location.pathname;
+  const path   = window.location.pathname;
+  /* Ficha tem versão própria; demais páginas usam VERSAO_PORTAL */
+  const isFicha = path.endsWith('f-ficha.html');
+  const versao  = isFicha
+    ? ((typeof VERSAO_ATUAL   !== 'undefined') ? VERSAO_ATUAL   : '—')
+    : ((typeof VERSAO_PORTAL  !== 'undefined') ? VERSAO_PORTAL  : '—');
   const ativo = (page) => path.endsWith(page) ? 'ativo' : '';
 
   document.body.insertAdjacentHTML('afterbegin', `
