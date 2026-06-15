@@ -1,4 +1,4 @@
-<!-- arquivo: index.html | versao: 0.7.1 -->
+<!-- arquivo: index.html | versao: 0.7.2 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,12 +6,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Imobiliário</title>
   <meta name="description" content="Portal de fichas técnicas profissionais para imóveis brasileiros">
+
+  <!-- MODO DE TESTE — editar dados/config-teste.js para ligar/desligar -->
+  <script src="dados/config-teste.js"></script>
+
   <link rel="stylesheet" href="css/p-style.css">
   <link rel="stylesheet" href="css/g-global.css">
   <!-- SheetJS — leitura de arquivos .xlsx/.xlsm -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- Google Identity Services — OAuth 2.0 -->
-  <script src="https://accounts.google.com/gsi/client" onload="inicializarOAuth()" async defer></script>
+  <!-- Google Identity Services — carrega só se não estiver em modo de teste -->
+  <script>
+    if (!DADOS_TESTE) {
+      const _gsi = document.createElement('script');
+      _gsi.src   = 'https://accounts.google.com/gsi/client';
+      _gsi.onload = () => inicializarOAuth();
+      _gsi.async  = true;
+      _gsi.defer  = true;
+      document.head.appendChild(_gsi);
+    }
+  </script>
 </head>
 <body>
 
@@ -244,12 +257,13 @@
        Inicialização da página
        ============================================================ */
     document.addEventListener('DOMContentLoaded', async () => {
-      /* Carrega imóveis do Drive */
       const estadoCarregando = document.getElementById('estado-carregando');
       if (estadoCarregando) estadoCarregando.style.display = 'flex';
 
       try {
-        const imoveis = await getImoveis();
+        const imoveis = DADOS_TESTE
+          ? await fetch('dados/imoveis-teste.json').then(r => r.json())
+          : await getImoveis();
         inicializarFiltros(imoveis);
       } catch (e) {
         mostrarToast('Erro ao carregar imóveis. Verifique sua conexão.', 'erro', '❌');

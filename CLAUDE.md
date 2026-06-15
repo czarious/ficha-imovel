@@ -1,6 +1,8 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+> **Finalidade:** briefing de sessão para o Claude Code — contexto do projeto, decisões de arquitetura e regras de trabalho.  
+> Contém o **porquê** e o **o quê**. Lido automaticamente ao iniciar cada sessão.  
+> Detalhes técnicos de lookup (versões, dependências, ordem de carga, API dos módulos) ficam em **DEPS.md** — não duplicar aqui.
 
 ## O Projeto
 
@@ -37,6 +39,21 @@ Nível técnico:
 - Respostas diretas e sem enrolação
 - Nunca atualize o Obsidian sem mostrar o conteúdo antes e aguardar aprovação
 
+## Fluxo de Teste e Deploy
+
+1. Edições feitas localmente em `G:\Meu Drive\GitHub\ficha-imovel`
+2. César abre os arquivos editados pelo **Live Server do VS Code** (botão direito → Open with Live Server) para confirmar visualmente que os fixes/features funcionam
+3. Só após confirmação do César → commit + push (GitHub Desktop ou autorização ao Claude)
+4. GitHub Pages atualiza automaticamente após o push — esse é o "live" para usuários finais
+
+**Antes de cada commit/push:** apresentar lista do que foi feito e perguntar se sobe versão.
+- **Sem bump de versão:** correção de algo recém-implementado que nem foi testado pelo César
+- **Com bump de versão:** qualquer fix que o César já tinha visto funcionando antes, nova feature, ou melhoria perceptível pelo usuário final (ex: mapa carregando certo, campo oculto)
+
+**Regra:** nunca fazer commit/push sem resumo e autorização explícita do César.
+
+**Google Drive API:** cada carregamento do portal (`index.html`, `p-imovel.html`) consome quota da Drive API. Evitar recarregamentos desnecessários durante testes — preferir Live Server local para portal também.
+
 ## Fluxo de Dados
 
 ```
@@ -72,10 +89,10 @@ Todas as páginas estão na raiz do repo, então todas usam:
 | Arquivo | Responsabilidade |
 |---------|-----------------|
 | `p-storage.js` | Todas as chamadas à Drive API (list, download, upload, delete) + OAuth |
-| `p-parser.js` | Validação e parse do Excel em objeto JS estruturado |
+| `p-parser.js` | Validação e parse do Excel; roteia por coluna Grupo → `imovel.grupos` dinâmico |
 | `p-filtros.js` | Filtragem em memória; dropdowns cascata estado→cidade |
 | `p-cards.js` | Geração de HTML dos cards e empty states |
-| `p-render.js` | Página de detalhe (badges, tabela resumo, acordeões) |
+| `p-render.js` | Página de detalhe (badges, tabela resumo, acordeões); `renderGruposImovel()` com pré-ordem |
 | `p-ui.js` | Toasts (auto-dismiss 3s) e modais |
 | `p-mapa.js` | Renderiza mapa + PIN na ficha do imóvel via Leaflet/OSM (adapter trocável) |
 | `p-import.js` | Pipeline de importação do Excel (parse→valida→duplicata→salva); usado por index e cadastro |
@@ -87,7 +104,27 @@ O Excel é o contrato de dados entre Ficha e Portal. O parser (`p-parser.js`) ex
 - Nome do arquivo: `FT_*.xlsx` ou `FT_*.xlsm`
 - 4 colunas: `Cômodo | Grupo | Característica | Valor`
 - Linhas obrigatórias: `Anunciante`, `Imóvel`, CEP não vazio, ao menos um cômodo
-- Linhas opcionais: `Imóvel | Localização | Latitude` e `Longitude` — gravadas pela Ficha via geocodificação (Nominatim) para alimentar o mapa
+
+**Roteamento pelo parser — coluna B (Grupo) é o roteador:**
+
+| Cômodo (col A) | Grupo (col B) | Destino no objeto |
+|----------------|---------------|-------------------|
+| `Anunciante` | qualquer | `imovel.anunciante[Característica]` |
+| `Imóvel` | `Localização` | `imovel.grupos['Localização']` **+ atalho** `imovel.localizacao` |
+| `Imóvel` | `Informações Técnicas` | `imovel.grupos['Informações Técnicas']` |
+| `Imóvel` | qualquer outro | `imovel.grupos[Grupo]` — **dinâmico, sem alterar código** |
+| qualquer outro | qualquer | `imovel.comodos[]` (agrupados por cômodo e grupo) |
+
+**`imovel.localizacao`** é mantido como atalho interno para `grupos['Localização']` — usado por geocodificação, cards e detecção de duplicata. Não exibir diretamente na UI; usar sempre `imovel.grupos`.
+
+**Pré-ordem de exibição** (definida em `p-render.js` → `ORDEM_GRUPOS_IMOVEL`):
+```javascript
+['Localização', 'Informações Técnicas', 'Custos']
+// grupos não listados aqui aparecem ao final, automaticamente
+```
+Para registrar um grupo novo na ordem: adicionar o nome nesse array e no objeto `ICONES_GRUPO` (mesmo arquivo).
+
+**Arquivos antigos** (sem `imovel.grupos`): `p-render.js` tem fallback automático para `localizacao + dadosTecnicos`.
 
 Detecção de duplicata usa CEP + Numero + Complemento como chave composta.
 
@@ -100,7 +137,7 @@ Detecção de duplicata usa CEP + Numero + Complemento como chave composta.
   - JS/CSS: `/* arquivo: nome.js | versao: X.X.X */`
   - HTML: `<!-- arquivo: nome.html | versao: X.X.X -->`
   - JSON: campo `"_arquivo": "nome | versao: X.X.X"`
-- Versão atual: portal `0.7.1` / ficha `0.7.4`
+- Versão atual: ver **DEPS.md Section 0** (fonte única — evita dessincronia)
 - Patch = Z (bug fix), Minor = Y (feature nova), Major = X (mudança radical)
 - Categorias do changelog: **Interface & Funcionalidades** e **Sistema & Código**
 - Datas no formato `DD/Mmm/AAAA`
@@ -183,23 +220,6 @@ Decisões importantes documentadas lá (ainda não implementadas):
 | Fase 4 | ✓ Concluída | `g-versao.js` unificado substituindo `f-versao.js` + `p-versao.js` |
 | Fase 5 | ✓ Concluída | `g-config.js` substituiu `p-config.js`; expandido com `APP_NOME` e constantes globais |
 
-## Dependências Externas (CDN)
-
-- **SheetJS** `0.18.5` — leitura/escrita de Excel
-- **Google Identity Services** — OAuth 2.0
-- **Google Drive API** v3
-- **ViaCEP** — lookup de CEP (ficha only)
-- **Leaflet** `1.9.4` — mapa (`p-imovel.html` only)
-- **Nominatim / OpenStreetMap** — geocodificação (`g-geo.js`) + tiles do mapa
-- **Google Fonts** — DM Sans + DM Serif Display
-
 ## Design Tokens
 
-```css
---verde-escuro: #2B5F3E   /* primary accent */
---areia:        #F5F3EE   /* background */
---texto:        #1a1a1a
---cinza-claro:  #e0ddd8
-```
-
-Breakpoint responsivo: `600px`.
+Ver **DEPS.md Section 7** — tokens CSS e breakpoints.

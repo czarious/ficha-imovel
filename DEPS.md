@@ -1,6 +1,43 @@
-# DEPS.md — Mapa de dependências do Zillow BR
+# DEPS.md — Mapa técnico de dependências do Zillow BR
+
+> **Finalidade:** referência técnica de lookup — versões, dependências, ordem de carga, API dos módulos e variáveis globais.  
+> Contém o **como** e o **onde**. Consultado durante o trabalho quando precisar de detalhes precisos.  
+> Contexto do projeto, decisões de arquitetura e regras de trabalho ficam em **CLAUDE.md** — não duplicar aqui.
+
 > Atualizar sempre que adicionar, remover ou renomear arquivo, link ou dependência.  
-> Auditado em: 12/Jun/2026 · versão portal 0.7.1 / ficha 0.7.4
+> Auditado em: 15/Jun/2026 · versão portal 0.7.3 / ficha 0.7.5
+
+---
+
+## 0. Versões por arquivo
+
+> Leia esta seção no início de cada sessão para saber o estado real de cada arquivo.  
+> A versão do arquivo reflete **quando ele foi tocado pela última vez** — não a versão do produto.  
+> Sempre que um arquivo for editado: bumpar seu cabeçalho + atualizar esta tabela + atualizar `CHANGELOG_GERAL` em `g-versao.js`.
+
+| Arquivo | Versão atual | Última mudança relevante |
+|---------|-------------|--------------------------|
+| `f-ficha.html` | 0.7.5 | Grupo "Informações Técnicas" no export; fix calcularAreaTotal |
+| `js/g-versao.js` | 0.7.3 | `VERSAO_PORTAL=0.7.3` / `VERSAO_ATUAL=0.7.5`; changelog v0.7.6 |
+| `js/g-menu.js` | 0.7.2 | Badge de versão detecta ficha vs portal pelo pathname |
+| `js/g-config.js` | 0.7.1 | Constantes globais do app (APP_NOME, TOAST_KEY, Drive IDs) |
+| `js/g-geo.js` | 0.7.1 | Geocodificação via Nominatim |
+| `js/p-render.js` | 0.7.3 | renderGruposImovel() dinâmico com pré-ordem; backward compat para arquivos antigos |
+| `js/p-mapa.js` | 0.7.2 | invalidateSize() — mapa renderiza completo ao abrir |
+| `js/p-storage.js` | 0.7.1 | CRUD no Google Drive (list, upload, download, delete) |
+| `js/p-parser.js` | 0.7.3 | imovel.grupos dinâmico por coluna Grupo; localizacao mantida como atalho interno |
+| `js/p-ui.js` | 0.7.1 | Toasts, modais, helpers compartilhados |
+| `js/p-filtros.js` | 0.7.1 | Filtragem em memória; dropdowns cascata |
+| `js/p-cards.js` | 0.7.1 | Grid de cards e avatar com iniciais |
+| `js/p-import.js` | 0.7.1 | Pipeline completo de importação (parse→valida→duplicata→salva) |
+| `js/p-acoes.js` | 0.7.1 | Copiar link, WhatsApp, excluir imóvel |
+| `css/g-global.css` | 0.7.1 | Sidebar CSS + tokens globais |
+| `css/p-style.css` | 0.7.2 | Estilos accordion do Resumo |
+| `index.html` | 0.7.2 | Flag DADOS_TESTE (modo de teste local) |
+| `p-imovel.html` | 0.7.2 | Flag DADOS_TESTE (modo de teste local) |
+| `cadastro.html` | 0.7.1 | Tutorial + importação |
+| `g-changelog.html` | 0.7.1 | Changelog unificado (accordion) |
+| `dominios/f-dominios.json` | 0.7.2 | tipos_ambiente com Banheiro, Cozinha, Área de Serviço |
 
 ---
 
@@ -105,3 +142,160 @@
 
 ---
 
+## 6. Modo de teste local (DADOS_TESTE)
+
+> **Por que existe:** a Drive API tem quota diária. Cada carregamento do portal consome chamadas.
+> Durante desenvolvimento, `DADOS_TESTE = true` desvia tudo para um JSON local — sem Drive, sem OAuth, sem quota.
+> Criado em: 15/Jun/2026. Arquivos alterados: `index.html`, `p-imovel.html` (2 trechos cada).
+> Arquivos criados: `dados/config-teste.js`, `dados/imoveis-teste.json`.
+
+---
+
+### Pasta e arquivos criados
+
+```
+dados/                     ← pasta criada exclusivamente para o modo de teste
+  config-teste.js          ← ÚNICO ponto de controle do modo (true/false)
+  imoveis-teste.json       ← dados fictícios: 1 apartamento completo, Ribeirão Preto/SP
+```
+
+**`dados/config-teste.js` — conteúdo completo atual:**
+```javascript
+/* arquivo: dados/config-teste.js
+   MODO DE TESTE — troque true/false para ligar/desligar
+   true  → carrega dados/imoveis-teste.json (sem Drive API, sem OAuth)
+   false → carrega do Google Drive normalmente
+   Alterar APENAS aqui — index.html e p-imovel.html leem esta variável. */
+const DADOS_TESTE = true;
+```
+
+> ⚠️ Mudar `DADOS_TESTE` aqui afeta os dois HTMLs ao mesmo tempo. Nunca editar o flag diretamente nos HTMLs.
+
+---
+
+### `index.html` — o que foi alterado
+
+#### Alteração 1 — 2 linhas inseridas no `<head>`, logo após `<meta name="description">`
+
+**Inserido (apagar para reverter):**
+```html
+
+  <!-- MODO DE TESTE — editar dados/config-teste.js para ligar/desligar -->
+  <script src="dados/config-teste.js"></script>
+```
+
+---
+
+#### Alteração 2 — bloco Google Identity Services substituído no `<head>`, após SheetJS
+
+**Estado atual (teste) — apagar e substituir:**
+```html
+  <!-- Google Identity Services — carrega só se não estiver em modo de teste -->
+  <script>
+    if (!DADOS_TESTE) {
+      const _gsi = document.createElement('script');
+      _gsi.src   = 'https://accounts.google.com/gsi/client';
+      _gsi.onload = () => inicializarOAuth();
+      _gsi.async  = true;
+      _gsi.defer  = true;
+      document.head.appendChild(_gsi);
+    }
+  </script>
+```
+
+**Repor o original:**
+```html
+  <!-- Google Identity Services — OAuth 2.0 -->
+  <script src="https://accounts.google.com/gsi/client" onload="inicializarOAuth()" async defer></script>
+```
+
+---
+
+#### Alteração 3 — carregamento de imóveis no `DOMContentLoaded` (inline script, final do `<body>`)
+
+**Estado atual (teste) — apagar e substituir:**
+```javascript
+        const imoveis = DADOS_TESTE
+          ? await fetch('dados/imoveis-teste.json').then(r => r.json())
+          : await getImoveis();
+```
+
+**Repor o original:**
+```javascript
+        const imoveis = await getImoveis();
+```
+
+---
+
+### `p-imovel.html` — o que foi alterado
+
+#### Alteração 1 — 2 linhas inseridas no `<head>`, logo após `<meta name="description">`
+
+**Inserido (apagar para reverter):**
+```html
+  <!-- MODO DE TESTE — editar dados/config-teste.js para ligar/desligar -->
+  <script src="dados/config-teste.js"></script>
+```
+
+---
+
+#### Alteração 2 — bloco Google Identity Services substituído no `<head>`, após SheetJS
+
+Idêntico à Alteração 2 do `index.html`.
+
+**Repor o original:**
+```html
+  <!-- Google Identity Services — OAuth 2.0 -->
+  <script src="https://accounts.google.com/gsi/client" onload="inicializarOAuth()" async defer></script>
+```
+
+---
+
+#### Alteração 3 — busca do imóvel no `DOMContentLoaded` (inline script, final do `<body>`)
+
+**Estado atual (teste) — apagar e substituir:**
+```javascript
+        let imovel;
+        if (DADOS_TESTE) {
+          const lista = await fetch('dados/imoveis-teste.json').then(r => r.json());
+          imovel = lista.find(i => i.id === _idImovel) || null;
+        } else {
+          imovel = await getImovelById(_idImovel);
+        }
+```
+
+**Repor o original:**
+```javascript
+        const imovel = await getImovelById(_idImovel);
+```
+
+---
+
+### Checklist de reversão completo
+
+Execute cada item. Ao final, o código deve estar idêntico ao estado anterior ao modo de teste.
+
+- [ ] Deletar o arquivo `dados/config-teste.js`
+- [ ] Deletar o arquivo `dados/imoveis-teste.json`
+- [ ] Deletar a pasta `dados/` (só se estiver vazia — verificar antes)
+- [ ] `index.html` — Alteração 1: remover as 2 linhas do config-teste (comentário + script src)
+- [ ] `index.html` — Alteração 2: substituir o bloco GSI condicional pelo script estático original
+- [ ] `index.html` — Alteração 3: substituir o fetch condicional por `const imoveis = await getImoveis();`
+- [ ] `p-imovel.html` — Alteração 1: remover as 2 linhas do config-teste (comentário + script src)
+- [ ] `p-imovel.html` — Alteração 2: substituir o bloco GSI condicional pelo script estático original
+- [ ] `p-imovel.html` — Alteração 3: substituir o bloco if/else por `const imovel = await getImovelById(_idImovel);`
+
+---
+
+## 7. Design Tokens e breakpoints
+
+```css
+--verde-escuro: #2B5F3E   /* primary accent */
+--areia:        #F5F3EE   /* background */
+--texto:        #1a1a1a
+--cinza-claro:  #e0ddd8
+```
+
+Breakpoint responsivo: `600px` (mobile — sidebar e layout colapsam).
+
+---

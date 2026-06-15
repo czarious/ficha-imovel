@@ -1,5 +1,5 @@
 <!-- DESTINO: f-ficha.html -->
-<!-- arquivo: f-ficha.html | versao: 0.7.4 -->
+<!-- arquivo: f-ficha.html | versao: 0.7.5 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -589,7 +589,7 @@ function calcularAreaTotal() {
   if (TIPOS_SEM_EDIFICACAO.includes(tipo)) {
     if (terreno) total = terreno;
   } else if (privativa) {
-    total = privativa + comum;
+    total = TIPOS_COM_CONDOMINIO.includes(tipo) ? privativa + comum : privativa;
   }
 
   const str = total !== null ? total.toFixed(2) : '';
@@ -1099,20 +1099,27 @@ function exportarExcel() {
     if (v) linhas.push(['Anunciante', c.grupo, c.label, v]);
   });
 
-  const camposLoc = [
+  const camposTecnicos = [
     ['tipo_imovel','Tipo de Imóvel'],
     ['area_terreno','Área do terreno (m²)'],
     ['area_privativa','Área privativa (m²)'],
     ['area_util','Área útil (m²)'],
     ['area_comum','Área comum — fração ideal (m²)'],
     ['fracao_ideal','Fração ideal (%)'],
-    ['area_total','Área total (m²)'],
+    ['area_total','Área total (m²)']
+  ];
+  camposTecnicos.forEach(([id, label]) => {
+    const v = dadosLocalizacao[id];
+    if (v) linhas.push(['Imóvel', 'Informações Técnicas', label, v]);
+  });
+
+  const camposEndereco = [
     ['pais','País'],['cep','CEP'],['rua','Rua'],['bairro','Bairro'],
     ['numero','Número'],['complemento','Complemento'],
     ['cidade','Cidade'],['estado','Estado'],
     ['lat','Latitude'],['lng','Longitude']
   ];
-  camposLoc.forEach(([id, label]) => {
+  camposEndereco.forEach(([id, label]) => {
     const v = dadosLocalizacao[id];
     if (v) linhas.push(['Imóvel', 'Localização', label, v]);
   });

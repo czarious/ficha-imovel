@@ -1,4 +1,4 @@
-/* arquivo: p-parser.js | versao: 0.7.1 */
+/* arquivo: p-parser.js | versao: 0.7.3 */
 /* ============================================================
    p-parser.js — Leitura e validação do arquivo .xlsx gerado pela Ficha Técnica
    Depende de: SheetJS (XLSX) carregado antes deste arquivo
@@ -107,7 +107,7 @@ function parsearExcel(arquivo) {
  * Converte o array de linhas da planilha no objeto imóvel canônico.
  *
  * Linhas com célula A = "Anunciante" → imovel.anunciante
- * Linhas com célula A = "Imóvel"     → imovel.localizacao
+ * Linhas com célula A = "Imóvel"     → imovel.grupos[Grupo] (+ atalho em imovel.localizacao para o grupo Localização)
  * Demais linhas                      → imovel.comodos (agrupados por nome)
  *
  * @param {Array<Array<string>>} linhas
@@ -117,7 +117,8 @@ function montarObjetoImovel(linhas) {
   const imovel = {
     id:          null,
     anunciante:  {},
-    localizacao: {},
+    grupos:      {},   // dados do Imóvel agrupados dinamicamente pela coluna Grupo
+    localizacao: {},   // atalho para grupos['Localização'] — uso interno (cards, geocod., dedup.)
     comodos:     [],
     importadoEm: new Date().toISOString()
   };
@@ -143,9 +144,13 @@ function montarObjetoImovel(linhas) {
       continue;
     }
 
-    /* ---- 2. Localização (cômodo "Imóvel") ---- */
+    /* ---- 2. Imóvel — roteia dinamicamente pelo Grupo ---- */
     if (colA === 'Imóvel' || colA === 'Imovel') {
-      imovel.localizacao[colC] = valor;
+      if (!imovel.grupos[colB]) imovel.grupos[colB] = {};
+      imovel.grupos[colB][colC] = valor;
+      if (colB === 'Localização' || colB === 'Localizacao') {
+        imovel.localizacao[colC] = valor;
+      }
       continue;
     }
 

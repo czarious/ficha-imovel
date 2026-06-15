@@ -1,4 +1,4 @@
-/* arquivo: p-render.js | versao: 0.7.1 */
+/* arquivo: p-render.js | versao: 0.7.3 */
 /* ============================================================
    p-render.js — Renderização da ficha técnica completa (p-imovel.html)
    Depende de: p-ui.js (formatarData, formatarEndereco)
@@ -47,13 +47,8 @@ function renderizarFicha(imovel) {
     html += renderTabelaResumo(imovel.comodos);
   }
 
-  /* Localização — aberta por padrão */
-  if (Object.keys(loc).length > 0) {
-    html += renderSecaoAccordion('localizacao', '📍 Localização',
-      `<div class="ficha-grid-atributos">
-        ${Object.entries(loc).map(([k, v]) => renderAtributo(k, v)).join('')}
-      </div>`, true);
-  }
+  /* Grupos do Imóvel (Localização, Informações Técnicas…) — dinâmicos com pré-ordem */
+  html += renderGruposImovel(imovel);
 
   /* Anunciante — fechada por padrão */
   if (Object.keys(cad).length > 0) {
@@ -133,12 +128,27 @@ function renderTabelaResumo(comodos) {
 
   return `
     <section class="ficha-resumo-wrap">
-      <h2 class="ficha-resumo-titulo">Resumo</h2>
+      <h2 class="ficha-resumo-titulo ficha-resumo-toggle" onclick="toggleResumoFicha()">
+        <span>Resumo</span>
+        <span class="ficha-secao-arrow" id="arrow-resumo">▾</span>
+      </h2>
       <table class="ficha-resumo-tabela">
-        <thead><tr><th>Cômodo</th><th>Metragem</th></tr></thead>
-        <tbody>${linhas}${totalHTML}</tbody>
+        <thead id="resumo-thead" style="display:none"><tr><th>Cômodo</th><th>Metragem</th></tr></thead>
+        <tbody id="resumo-corpo" style="display:none">${linhas}</tbody>
+        <tbody>${totalHTML}</tbody>
       </table>
     </section>`;
+}
+
+function toggleResumoFicha() {
+  const corpo = document.getElementById('resumo-corpo');
+  const thead = document.getElementById('resumo-thead');
+  const arrow = document.getElementById('arrow-resumo');
+  if (!corpo) return;
+  const aberto = corpo.style.display !== 'none';
+  corpo.style.display = aberto ? 'none' : '';
+  thead.style.display = aberto ? 'none' : '';
+  arrow?.classList.toggle('aberto', !aberto);
 }
 
 function extrairArea(comodo) {
@@ -150,6 +160,68 @@ function extrairArea(comodo) {
     }
   }
   return null;
+}
+
+/* ================================================================
+   GRUPOS DO IMÓVEL — pré-ordem + dinâmico
+   Novos grupos adicionados na ficha aparecem automaticamente aqui,
+   após os grupos registrados em ORDEM_GRUPOS_IMOVEL.
+   Para controlar a ordem de exibição de um grupo novo, registre-o
+   neste array antes de criar os campos na ficha.
+   ================================================================ */
+const ORDEM_GRUPOS_IMOVEL = [
+  'Localização',
+  'Informações Técnicas',
+  'Custos',
+  // grupos novos: adicionar aqui para controlar a ordem de exibição
+];
+
+const ICONES_GRUPO = {
+  'Localização':          '📍',
+  'Informações Técnicas': '🏠',
+  'Custos':               '💰',
+};
+
+const EXCLUIR_CAMPOS_GRUPO = new Set(['Latitude', 'Longitude']);
+
+function renderGruposImovel(imovel) {
+  /* Backward compat: arquivos antigos têm localizacao + dadosTecnicos, sem grupos */
+  let grupos = imovel.grupos;
+  if (!grupos || Object.keys(grupos).length === 0) {
+    grupos = {};
+    const locAntigo = imovel.localizacao || {};
+    const dtAntigo  = imovel.dadosTecnicos || {};
+    if (Object.keys(locAntigo).length > 0) grupos['Localização']          = locAntigo;
+    if (Object.keys(dtAntigo).length  > 0) grupos['Informações Técnicas'] = dtAntigo;
+  }
+
+  /* Ordena: grupos da pré-ordem primeiro; desconhecidos append no final */
+  const chaves = Object.keys(grupos);
+  chaves.sort((a, b) => {
+    const ia = ORDEM_GRUPOS_IMOVEL.indexOf(a);
+    const ib = ORDEM_GRUPOS_IMOVEL.indexOf(b);
+    if (ia === -1 && ib === -1) return 0;
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+
+  let html = '';
+  for (const grupo of chaves) {
+    const entradas = Object.entries(grupos[grupo])
+      .filter(([k]) => !EXCLUIR_CAMPOS_GRUPO.has(k));
+    if (entradas.length === 0) continue;
+
+    const icone = ICONES_GRUPO[grupo] || '📋';
+    const idSec = 'grupo-' + grupo.toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '-');
+
+    html += renderSecaoAccordion(idSec, `${icone} ${grupo}`,
+      `<div class="ficha-grid-atributos">
+        ${entradas.map(([k, v]) => renderAtributo(k, v)).join('')}
+      </div>`, true);
+  }
+  return html;
 }
 
 /* ================================================================

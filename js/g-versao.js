@@ -1,12 +1,12 @@
-/* arquivo: g-versao.js | versao: 0.7.1 */
+/* arquivo: g-versao.js | versao: 0.7.3 */
 /* ============================================================
    g-versao.js — Controle de versão unificado do Zillow BR
    Carregado em: todas as páginas do portal e da ficha.
    ============================================================ */
 
 /* ── VERSÕES ─────────────────────────────────────────────── */
-const VERSAO_PORTAL = '0.7.1';
-const VERSAO_ATUAL  = '0.7.4'; /* ficha */
+const VERSAO_PORTAL = '0.7.3';
+const VERSAO_ATUAL  = '0.7.5'; /* ficha */
 
 /* ── CHANGELOG UNIFICADO (≥ 0.7.1) ───────────────────────────
    A partir da unificação, cada versão tem UMA entrada aqui (sem
@@ -14,6 +14,47 @@ const VERSAO_ATUAL  = '0.7.4'; /* ficha */
    CHANGELOG (ficha) e CHANGELOG_PORTAL, exibidas divididas no
    g-changelog.html. */
 const CHANGELOG_GERAL = [
+  {
+    versao: '0.7.6',
+    data:   '15/Jun/2026',
+    titulo: 'Portal: grupos dinâmicos na ficha do imóvel',
+    grupos: [
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'Parser: bloco "Imóvel" do Excel agora popula imovel.grupos dinamicamente por Grupo — qualquer grupo novo criado na ficha aparece automaticamente no portal sem alterar código.',
+          'Render: grupos exibidos com pré-ordem configurável (Localização → Informações Técnicas → Custos); grupos desconhecidos aparecem ao final.',
+          'Backward compat: arquivos antigos (sem imovel.grupos) continuam funcionando via fallback automático para localizacao + dadosTecnicos.',
+          '"Custos" pré-registrado na pré-ordem — pronto para quando o grupo for implementado na ficha (Condomínio + IPTU).',
+        ]
+      }
+    ]
+  },
+  {
+    versao: '0.7.5',
+    data:   '15/Jun/2026',
+    titulo: 'Ficha: grupo Informações Técnicas no Excel',
+    grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          'Portal: seção "Dados do Imóvel" separada de "Localização" na ficha do imóvel — tipo, áreas e fração ideal ficam em bloco próprio.',
+          'Portal: accordion no Resumo de cômodos — recolhido por padrão, exibe apenas a área total.',
+          'Portal: Latitude e Longitude não aparecem mais na seção Localização da ficha do imóvel.',
+          'Portal: mapa renderiza completo ao abrir a página (correção do canto cinza).',
+        ]
+      },
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'Ficha: export passa a usar Grupo = "Informações Técnicas" para tipo e campos de área; endereço permanece em "Localização".',
+          'Ficha: calcularAreaTotal() corrigido — não somava área_comum em tipos sem condomínio ao trocar tipo de imóvel.',
+          'Parser: campos do grupo "Informações Técnicas" agora roteados para imovel.dadosTecnicos; demais campos do Imóvel vão para imovel.localizacao. Arquivos antigos sem esse grupo continuam funcionando.',
+          'Infraestrutura de teste: dados/config-teste.js + dados/imoveis-teste.json permitem testar o portal sem consumir quota da Drive API (DADOS_TESTE = true/false em um único arquivo).',
+        ]
+      }
+    ]
+  },
   {
     versao: '0.7.4',
     data:   '12/Jun/2026',

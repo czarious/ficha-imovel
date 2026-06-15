@@ -1,4 +1,4 @@
-/* arquivo: p-style.css | versao: 0.7.1 */
+/* arquivo: p-style.css | versao: 0.7.2 */
 /* ============================================================
    Zillow BR — Estilos Globais
    Paleta: fundo #F5F3EE | verde #2B5F3E | DM Sans + DM Serif Display
@@ -915,6 +915,13 @@ body  {
   color: var(--verde);
   padding: 14px 20px 10px;
   border-bottom: 1px solid var(--borda);
+}
+.ficha-resumo-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
 }
 
 .ficha-resumo-tabela {

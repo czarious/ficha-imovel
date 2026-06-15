@@ -1,4 +1,4 @@
-<!-- arquivo: p-imovel.html | versao: 0.7.1 -->
+<!-- arquivo: p-imovel.html | versao: 0.7.2 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ficha Técnica</title>
   <meta name="description" content="Ficha técnica detalhada do imóvel">
+  <!-- MODO DE TESTE — editar dados/config-teste.js para ligar/desligar -->
+  <script src="dados/config-teste.js"></script>
+
   <link rel="stylesheet" href="css/p-style.css">
   <link rel="stylesheet" href="css/g-global.css">
   <!-- Leaflet — mapa (OpenStreetMap, sem chave) -->
@@ -13,8 +16,17 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <!-- SheetJS — necessário para p-parser.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- Google Identity Services — OAuth 2.0 -->
-  <script src="https://accounts.google.com/gsi/client" onload="inicializarOAuth()" async defer></script>
+  <!-- Google Identity Services — carrega só se não estiver em modo de teste -->
+  <script>
+    if (!DADOS_TESTE) {
+      const _gsi = document.createElement('script');
+      _gsi.src   = 'https://accounts.google.com/gsi/client';
+      _gsi.onload = () => inicializarOAuth();
+      _gsi.async  = true;
+      _gsi.defer  = true;
+      document.head.appendChild(_gsi);
+    }
+  </script>
 
   <style>
     /* ============================================================
@@ -154,9 +166,14 @@
     document.addEventListener('DOMContentLoaded', async () => {
       if (!_idImovel) { renderizarFicha(null); return; }
 
-      /* Busca imóvel no Drive */
       try {
-        const imovel = await getImovelById(_idImovel);
+        let imovel;
+        if (DADOS_TESTE) {
+          const lista = await fetch('dados/imoveis-teste.json').then(r => r.json());
+          imovel = lista.find(i => i.id === _idImovel) || null;
+        } else {
+          imovel = await getImovelById(_idImovel);
+        }
         renderizarFicha(imovel);
         configurarBotaoExcluir(imovel);
         renderizarBotaoWhatsApp(imovel);

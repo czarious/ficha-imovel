@@ -1,0 +1,184 @@
+[
+  {
+    "id": "teste-14015070-235-apartamento-42",
+    "anunciante": {
+      "Tipo de anunciante": "Corretor",
+      "Nome completo": "TESTE",
+      "CRECI": "12345-F",
+      "Telefone": "16991234567",
+      "E-mail": "teste@teste.com",
+      "Responsável pela venda": "TESTE",
+      "WhatsApp do responsável": "16991234567"
+    },
+    "grupos": {
+      "Localização": {
+        "País": "Brasil",
+        "CEP": "14015-070",
+        "Rua": "Rua General Osório",
+        "Bairro": "Centro",
+        "Número": "235",
+        "Complemento": "Apartamento 42",
+        "Cidade": "Ribeirão Preto",
+        "Estado": "SP",
+        "Latitude": "-21.1764",
+        "Longitude": "-47.8101"
+      },
+      "Informações Técnicas": {
+        "Tipo de Imóvel": "Apartamento",
+        "Área privativa (m²)": "68.00",
+        "Área útil (m²)": "61.00",
+        "Área comum — fração ideal (m²)": "8.20",
+        "Fração ideal (%)": "1.64",
+        "Área total (m²)": "76.20"
+      }
+    },
+    "localizacao": {
+      "País": "Brasil",
+      "CEP": "14015-070",
+      "Rua": "Rua General Osório",
+      "Bairro": "Centro",
+      "Número": "235",
+      "Complemento": "Apartamento 42",
+      "Cidade": "Ribeirão Preto",
+      "Estado": "SP",
+      "Latitude": "-21.1764",
+      "Longitude": "-47.8101"
+    },
+    "comodos": [
+      {
+        "nome": "Sala 1",
+        "grupos": [
+          { "nome": "Dimensões", "itens": [
+            { "caracteristica": "Formato",         "valor": "Retangular" },
+            { "caracteristica": "Largura (m)",      "valor": "4.2" },
+            { "caracteristica": "Comprimento (m)",  "valor": "5.0" },
+            { "caracteristica": "Área total (m²)",  "valor": "21.00" }
+          ]},
+          { "nome": "Piso",   "itens": [
+            { "caracteristica": "Material",    "valor": "Porcelanato Polido" },
+            { "caracteristica": "Estado",      "valor": "Ótimo" }
+          ]},
+          { "nome": "Parede", "itens": [
+            { "caracteristica": "Acabamento",  "valor": "Pintura Lisa" },
+            { "caracteristica": "Estado",      "valor": "Ótimo" }
+          ]},
+          { "nome": "Teto", "itens": [
+            { "caracteristica": "Acabamento",  "valor": "Liso" },
+            { "caracteristica": "Rebaixado",   "valor": "Sim" }
+          ]},
+          { "nome": "Elétrica", "itens": [
+            { "caracteristica": "Tomadas",     "valor": "4" },
+            { "caracteristica": "Padrão",      "valor": "NBR 14136" }
+          ]}
+        ]
+      },
+      {
+        "nome": "Cozinha 1",
+        "grupos": [
+          { "nome": "Dimensões", "itens": [
+            { "caracteristica": "Formato",         "valor": "Retangular" },
+            { "caracteristica": "Largura (m)",      "valor": "2.8" },
+            { "caracteristica": "Comprimento (m)",  "valor": "3.5" },
+            { "caracteristica": "Área total (m²)",  "valor": "9.80" }
+          ]},
+          { "nome": "Piso",   "itens": [
+            { "caracteristica": "Material",    "valor": "Cerâmico" },
+            { "caracteristica": "Estado",      "valor": "Bom" }
+          ]},
+          { "nome": "Parede", "itens": [
+            { "caracteristica": "Acabamento",  "valor": "Azulejo" },
+            { "caracteristica": "Estado",      "valor": "Bom" }
+          ]},
+          { "nome": "Bancada", "itens": [
+            { "caracteristica": "Material",    "valor": "Granito" },
+            { "caracteristica": "Armários",    "valor": "Sim" }
+          ]}
+        ]
+      },
+      {
+        "nome": "Quarto 1",
+        "grupos": [
+          { "nome": "Dimensões", "itens": [
+            { "caracteristica": "Formato",         "valor": "Retangular" },
+            { "caracteristica": "Largura (m)",      "valor": "3.8" },
+            { "caracteristica": "Comprimento (m)",  "valor": "4.0" },
+            { "caracteristica": "Área total (m²)",  "valor": "15.20" }
+          ]},
+          { "nome": "Piso",   "itens": [
+            { "caracteristica": "Material",    "valor": "Porcelanato Polido" },
+            { "caracteristica": "Estado",      "valor": "Ótimo" }
+          ]},
+          { "nome": "Climatização", "itens": [
+            { "caracteristica": "Ar-condicionado",  "valor": "Sim" },
+            { "caracteristica": "Potência (BTU)",   "valor": "12000" }
+          ]},
+          { "nome": "Elétrica", "itens": [
+            { "caracteristica": "Tomadas",     "valor": "4" },
+            { "caracteristica": "Padrão",      "valor": "NBR 14136" }
+          ]}
+        ]
+      },
+      {
+        "nome": "Quarto 2",
+        "grupos": [
+          { "nome": "Dimensões", "itens": [
+            { "caracteristica": "Formato",         "valor": "Retangular" },
+            { "caracteristica": "Largura (m)",      "valor": "3.0" },
+            { "caracteristica": "Comprimento (m)",  "valor": "3.2" },
+            { "caracteristica": "Área total (m²)",  "valor": "9.60" }
+          ]},
+          { "nome": "Piso",   "itens": [
+            { "caracteristica": "Material",    "valor": "Porcelanato Polido" },
+            { "caracteristica": "Estado",      "valor": "Bom" }
+          ]},
+          { "nome": "Climatização", "itens": [
+            { "caracteristica": "Ar-condicionado",  "valor": "Não" }
+          ]}
+        ]
+      },
+      {
+        "nome": "Banheiro 1",
+        "grupos": [
+          { "nome": "Dimensões", "itens": [
+            { "caracteristica": "Formato",         "valor": "Retangular" },
+            { "caracteristica": "Largura (m)",      "valor": "1.8" },
+            { "caracteristica": "Comprimento (m)",  "valor": "2.5" },
+            { "caracteristica": "Área total (m²)",  "valor": "4.50" }
+          ]},
+          { "nome": "Piso",   "itens": [
+            { "caracteristica": "Material",    "valor": "Cerâmico" },
+            { "caracteristica": "Estado",      "valor": "Bom" }
+          ]},
+          { "nome": "Parede", "itens": [
+            { "caracteristica": "Acabamento",  "valor": "Azulejo" }
+          ]},
+          { "nome": "Louças e metais", "itens": [
+            { "caracteristica": "Vaso",        "valor": "Sim" },
+            { "caracteristica": "Pia",         "valor": "Sim" },
+            { "caracteristica": "Box",         "valor": "Sim" },
+            { "caracteristica": "Aquecedor",   "valor": "Elétrico" }
+          ]}
+        ]
+      },
+      {
+        "nome": "Área de Serviço 1",
+        "grupos": [
+          { "nome": "Dimensões", "itens": [
+            { "caracteristica": "Formato",         "valor": "Retangular" },
+            { "caracteristica": "Largura (m)",      "valor": "1.5" },
+            { "caracteristica": "Comprimento (m)",  "valor": "2.0" },
+            { "caracteristica": "Área total (m²)",  "valor": "3.00" }
+          ]},
+          { "nome": "Piso",   "itens": [
+            { "caracteristica": "Material",    "valor": "Cerâmico" }
+          ]},
+          { "nome": "Instalações", "itens": [
+            { "caracteristica": "Ponto de máquina de lavar",  "valor": "Sim" },
+            { "caracteristica": "Tanque",                     "valor": "Sim" }
+          ]}
+        ]
+      }
+    ],
+    "importadoEm": "2026-06-10T09:00:00.000Z"
+  }
+]
