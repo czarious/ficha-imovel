@@ -35,16 +35,24 @@ Nível técnico:
 - Um arquivo por vez — aguarde confirmação antes do próximo
 - Textos para copiar sempre em bloco de código (` ``` `)
 - Verifique referências cruzadas antes de entregar qualquer arquivo
+- **Revisão de feature/correção = a varredura de sempre + `BUGS.md`:** mantém o que já era feito (bugs de interface/lógica, referências cruzadas entre arquivos, dead code/dados órfãos) e **acrescenta** o `BUGS.md` nas duas pontas — no **início**, rodar o "Como verificar" de cada entrada contra o código tocado (pegar regressão); no **fim**, registrar bug novo (mesmo se já corrigido). O `BUGS.md` é incremento, não substitui a revisão. Edição pontual (sem revisão) não precisa.
+- **Verificação "feito na mão" (parte da verificação, após implementar cada parte):** pegar um exemplo concreto, calcular/prever o resultado **na mão** e conferir se é exatamente isso que sai no site — valor certo, no **local certo**, com a **variável certa**. Não parar no caso feliz: cobrir **todas as possibilidades** do que foi mexido — cada tipo de imóvel, cada modalidade, cada campo novo, um a um (ex.: campo de área → conferir Apartamento, Lote, Chácara, Galpão… e bater cada um com o cálculo manual). Campo novo: confirmar que aparece no lugar certo e lê a variável certa.
 - Indique o destino no topo de cada arquivo: `<!-- DESTINO: pasta/arquivo.html -->`
 - Respostas diretas e sem enrolação
 - Nunca atualize o Obsidian sem mostrar o conteúdo antes e aguardar aprovação
 
 ## Fluxo de Teste e Deploy
 
-1. Edições feitas localmente em `G:\Meu Drive\GitHub\ficha-imovel`
-2. César abre os arquivos editados pelo **Live Server do VS Code** (botão direito → Open with Live Server) para confirmar visualmente que os fixes/features funcionam
-3. Só após confirmação do César → commit + push (GitHub Desktop ou autorização ao Claude)
-4. GitHub Pages atualiza automaticamente após o push — esse é o "live" para usuários finais
+> **Regra de ouro — verificar no início de cada sessão antes de qualquer edição:**
+> - `dados/config-teste.js` deve estar `DADOS_TESTE = true` para fazer qualquer alteração no código
+> - `dados/config-teste.js` deve estar `DADOS_TESTE = false` no momento do commit/push
+> - Nunca editar código com modo teste desligado; nunca commitar com modo teste ligado
+
+1. **Verificar** que `DADOS_TESTE = true` antes de começar qualquer edição
+2. Edições feitas localmente em `G:\Meu Drive\GitHub\ficha-imovel`
+3. César abre os arquivos editados pelo **Live Server do VS Code** (botão direito → Open with Live Server) para confirmar visualmente que os fixes/features funcionam
+4. Só após confirmação do César → setar `DADOS_TESTE = false` → commit + push → setar `DADOS_TESTE = true` novamente
+5. GitHub Pages atualiza automaticamente após o push — esse é o "live" para usuários finais
 
 **Antes de cada commit/push:** apresentar lista do que foi feito e perguntar se sobe versão.
 - **Sem bump de versão:** correção de algo recém-implementado que nem foi testado pelo César

@@ -1,4 +1,4 @@
-/* arquivo: p-render.js | versao: 0.7.3 */
+/* arquivo: p-render.js | versao: 0.7.7 */
 /* ============================================================
    p-render.js — Renderização da ficha técnica completa (p-imovel.html)
    Depende de: p-ui.js (formatarData, formatarEndereco)
@@ -58,8 +58,10 @@ function renderizarFicha(imovel) {
       </div>`, false);
   }
 
-  /* Cômodos colapsáveis */
-  if (imovel.comodos && imovel.comodos.length > 0) {
+  /* Cômodos ou Edificações */
+  if (imovel.edificacoes && imovel.edificacoes.length > 0) {
+    html += renderEdificacoes(imovel.edificacoes);
+  } else if (imovel.comodos && imovel.comodos.length > 0) {
     const comodosHTML = imovel.comodos.map((c, idx) => renderComodoAccordion(c, idx)).join('');
     html += `
       <section class="ficha-secao">
@@ -69,6 +71,29 @@ function renderizarFicha(imovel) {
   }
 
   container.innerHTML = html;
+}
+
+/* ================================================================
+   EDIFICAÇÕES
+   ================================================================ */
+function renderEdificacoes(edificacoes) {
+  let html = '';
+  edificacoes.forEach((ed, i) => {
+    const titulo = ed.nome || `Edificação ${i + 1}`;
+    const areaConstr = ed['Área construída (m²)'];
+    const areaInfo = areaConstr ? `<span class="ed-area-tag">🏗 ${areaConstr} m²</span>` : '';
+    const tituloCompleto = `🏚 ${titulo} ${areaInfo}`;
+    let comodosHTML = '';
+    if (ed.comodos && ed.comodos.length > 0) {
+      comodosHTML = `<div class="comodos-lista">${ed.comodos.map((c, idx) => renderComodoAccordion(c, idx)).join('')}</div>`;
+    }
+    html += renderSecaoAccordion(`ed-${i}`, tituloCompleto, comodosHTML, i === 0);
+  });
+  return `
+    <section class="ficha-secao">
+      <h2 class="ficha-secao-titulo">🏗 Edificações</h2>
+      ${html}
+    </section>`;
 }
 
 /* ================================================================
@@ -296,9 +321,17 @@ function renderAtributo(chave, valor) {
   let valorFormatado = valor;
   if (valor === 'Sim') valorFormatado = '<span style="color:var(--verde);font-weight:700;">✓ Sim</span>';
   else if (valor === 'Não' || valor === 'Nao') valorFormatado = '<span style="color:var(--texto-fraco);">✗ Não</span>';
+  else if (chave.includes('(R$') && valor && !isNaN(parseFloat(valor)))
+    valorFormatado = parseFloat(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  const def = typeof getDefPorLabel === 'function' ? getDefPorLabel(chave) : null;
+  const chaveHTML = def
+    ? `<span class="campo-tip atributo-chave" tabindex="0">${escaparHTML(chave)}<span class="tooltip-pop">${escaparHTML(def.texto)}</span></span>`
+    : `<span class="atributo-chave">${escaparHTML(chave)}</span>`;
+
   return `
     <div class="atributo">
-      <span class="atributo-chave">${escaparHTML(chave)}</span>
+      ${chaveHTML}
       <span class="atributo-valor">${valorFormatado}</span>
     </div>`;
 }

@@ -5,7 +5,7 @@
 > Contexto do projeto, decisões de arquitetura e regras de trabalho ficam em **CLAUDE.md** — não duplicar aqui.
 
 > Atualizar sempre que adicionar, remover ou renomear arquivo, link ou dependência.  
-> Auditado em: 15/Jun/2026 · versão portal 0.7.3 / ficha 0.7.5
+> Auditado em: 18/Jun/2026 · versão portal 0.7.7 / ficha 0.7.7
 
 ---
 
@@ -17,24 +17,25 @@
 
 | Arquivo | Versão atual | Última mudança relevante |
 |---------|-------------|--------------------------|
-| `f-ficha.html` | 0.7.5 | Grupo "Informações Técnicas" no export; fix calcularAreaTotal |
-| `js/g-versao.js` | 0.7.3 | `VERSAO_PORTAL=0.7.3` / `VERSAO_ATUAL=0.7.5`; changelog v0.7.6 |
+| `f-ficha.html` | 0.7.7 | Seção Edificações (Chácara/Sítio/Fazenda/Galpão/Prédio Comercial) + tooltips em 13 campos |
+| `js/g-versao.js` | 0.7.7 | `VERSAO_PORTAL=0.7.7` / `VERSAO_ATUAL=0.7.7`; changelog v0.7.7 (Edificações + tooltips) |
+| `js/g-definicoes.js` | 0.7.7 | Fonte única de 13 definições de termos imobiliários; expõe `DEFINICOES` e `getDefPorLabel()` |
 | `js/g-menu.js` | 0.7.2 | Badge de versão detecta ficha vs portal pelo pathname |
 | `js/g-config.js` | 0.7.1 | Constantes globais do app (APP_NOME, TOAST_KEY, Drive IDs) |
 | `js/g-geo.js` | 0.7.1 | Geocodificação via Nominatim |
-| `js/p-render.js` | 0.7.3 | renderGruposImovel() dinâmico com pré-ordem; backward compat para arquivos antigos |
+| `js/p-render.js` | 0.7.7 | renderEdificacoes() + tooltips via getDefPorLabel() + renderAtributo() formata R$ |
 | `js/p-mapa.js` | 0.7.2 | invalidateSize() — mapa renderiza completo ao abrir |
 | `js/p-storage.js` | 0.7.1 | CRUD no Google Drive (list, upload, download, delete) |
-| `js/p-parser.js` | 0.7.3 | imovel.grupos dinâmico por coluna Grupo; localizacao mantida como atalho interno |
+| `js/p-parser.js` | 0.7.7 | Suporte a marcador `[Edificação]`; popula `imovel.edificacoes[]`; fallback para `imovel.comodos` |
 | `js/p-ui.js` | 0.7.1 | Toasts, modais, helpers compartilhados |
-| `js/p-filtros.js` | 0.7.1 | Filtragem em memória; dropdowns cascata |
-| `js/p-cards.js` | 0.7.1 | Grid de cards e avatar com iniciais |
+| `js/p-filtros.js` | 0.7.6 | Filtro de Modalidade; tipoImovel lê de grupos['Informações Técnicas'] |
+| `js/p-cards.js` | 0.7.6 | Preço + badge Venda/Locação nos cards; tipoImovel com fallback correto |
 | `js/p-import.js` | 0.7.1 | Pipeline completo de importação (parse→valida→duplicata→salva) |
 | `js/p-acoes.js` | 0.7.1 | Copiar link, WhatsApp, excluir imóvel |
 | `css/g-global.css` | 0.7.1 | Sidebar CSS + tokens globais |
-| `css/p-style.css` | 0.7.2 | Estilos accordion do Resumo |
-| `index.html` | 0.7.2 | Flag DADOS_TESTE (modo de teste local) |
-| `p-imovel.html` | 0.7.2 | Flag DADOS_TESTE (modo de teste local) |
+| `css/p-style.css` | 0.7.7 | Estilos edificações no portal + `.campo-tip` tooltips |
+| `index.html` | 0.7.7 | Select filtro-modalidade (Venda / Locação) |
+| `p-imovel.html` | 0.7.7 | Carrega `js/g-definicoes.js`; flag DADOS_TESTE (modo de teste local) |
 | `cadastro.html` | 0.7.1 | Tutorial + importação |
 | `g-changelog.html` | 0.7.1 | Changelog unificado (accordion) |
 | `dominios/f-dominios.json` | 0.7.2 | tipos_ambiente com Banheiro, Cozinha, Área de Serviço |
@@ -48,7 +49,7 @@
 | Página | CSS | Scripts (em ordem de carga) |
 |--------|-----|-----------------------------|
 | `index.html` | `css/p-style.css` `css/g-global.css` | `js/g-config.js` → `js/p-storage.js` → `js/p-parser.js` → `js/p-ui.js` → `js/p-cards.js` → `js/p-filtros.js` → `js/p-import.js` → `js/g-versao.js` → `js/g-menu.js` |
-| `p-imovel.html` | `css/p-style.css` `css/g-global.css` + Leaflet CSS (CDN) | `js/g-config.js` → `js/p-storage.js` → `js/p-parser.js` → `js/p-ui.js` → `js/p-render.js` → `js/g-geo.js` → `js/p-mapa.js` → `js/p-acoes.js` → `js/g-versao.js` → `js/g-menu.js` |
+| `p-imovel.html` | `css/p-style.css` `css/g-global.css` + Leaflet CSS (CDN) | `js/g-config.js` → `js/g-definicoes.js` → `js/p-storage.js` → `js/p-parser.js` → `js/p-ui.js` → `js/p-render.js` → `js/g-geo.js` → `js/p-mapa.js` → `js/p-acoes.js` → `js/g-versao.js` → `js/g-menu.js` |
 | `cadastro.html` | `css/p-style.css` `css/g-global.css` | `js/g-config.js` → `js/p-storage.js` → `js/p-parser.js` → `js/p-ui.js` → `js/p-import.js` → `js/g-versao.js` → `js/g-menu.js` |
 | `g-changelog.html` | CSS inline | `js/g-config.js` → `js/g-versao.js` — **sem g-menu.js** (header próprio); changelog unificado em accordion; nome via `APP_NOME` |
 
@@ -56,7 +57,7 @@
 
 | Página | CSS | Scripts (em ordem de carga) |
 |--------|-----|-----------------------------|
-| `f-ficha.html` | `css/g-global.css` + CSS inline | `js/g-config.js` → `js/g-versao.js` → SheetJS CDN → `js/g-geo.js` → lógica inline → `js/g-menu.js` |
+| `f-ficha.html` | `css/g-global.css` + CSS inline | `js/g-config.js` → `js/g-definicoes.js` → `js/g-versao.js` → SheetJS CDN → `js/g-geo.js` → lógica inline → `js/g-menu.js` |
 
 > `g-changelog.html` é compartilhado (Ficha + Portal) — listado na seção Portal acima.
 
@@ -87,6 +88,7 @@
 | Módulo | Expõe | Depende de |
 |--------|-------|------------|
 | `g-config.js` | `APP_NOME` `TOAST_KEY` `DRIVE_PASTA_ID` `DRIVE_API_KEY` `OAUTH_CLIENT_ID` `OAUTH_ESCOPOS` `EXCEL_PREFIXO` `EXCEL_EXTENSOES` `APP_MENSAGEM_ERRO_IMPORT` | — |
+| `g-definicoes.js` | `DEFINICOES` (objeto com 13 termos imobiliários) · `getDefPorLabel(label)` → entrada ou null | — · usado por `f-ficha.html` (tooltipInit via data-def) e `p-render.js` (renderAtributo via getDefPorLabel) |
 | `p-storage.js` | `inicializarOAuth()` `solicitarToken()` `getImoveis()` `getImovelById()` `saveImovel()` `deleteImovel()` `checkDuplicata()` `normalizarId()` | `g-config.js` |
 | `p-parser.js` | `parsearExcel()` `montarObjetoImovel()` `validarArquivo()` | `g-config.js` |
 | `p-ui.js` | `mostrarToast()` `mostrarToastPendente()` `abrirModalDuplicata()` `fecharModal()` `formatarData()` `formatarEndereco()` `obterParam()` `renderizarBotaoLogin()` `atualizarEstadoLogin()` | — |
@@ -106,6 +108,8 @@
 
 | Global | Definido em | Usado em |
 |--------|-------------|----------|
+| `DEFINICOES` | `g-definicoes.js` | `f-ficha.html` (tooltipInit — lê via data-def) · `p-render.js` (renderAtributo — via getDefPorLabel) |
+| `getDefPorLabel` | `g-definicoes.js` | `p-render.js` (renderAtributo) |
 | `VERSAO_PORTAL` | `g-versao.js` | `g-menu.js` (badge) · `g-changelog.html` (badge + versão atual) |
 | `VERSAO_ATUAL` | `g-versao.js` | `g-menu.js` — badge de versão quando em `f-ficha.html` (0.7.4) |
 | `CHANGELOG_PORTAL` | `g-versao.js` | `g-changelog.html` (entradas Portal ≤ 0.7.0) |

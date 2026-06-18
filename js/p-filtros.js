@@ -1,4 +1,4 @@
-/* arquivo: p-filtros.js | versao: 0.7.1 */
+/* arquivo: p-filtros.js | versao: 0.7.6 */
 /* ============================================================
    p-filtros.js — Filtragem, busca e ordenação de imóveis
    Depende de: p-cards.js (renderizarCards), p-ui.js (formatarEndereco)
@@ -30,7 +30,8 @@ function popularDropdowns(imoveis) {
   const cidades     = extrairUnicos(imoveis, i => i.localizacao?.['Cidade']);
   const anunciantes = extrairUnicos(imoveis, i => i.anunciante?.['Tipo de anunciante']);
   const tiposImovel = extrairUnicos(imoveis, i =>
-    i.localizacao?.['Tipo de Imóvel'] || i.localizacao?.['Tipo de Imovel']
+    i.grupos?.['Informações Técnicas']?.['Tipo de Imóvel']
+    || i.localizacao?.['Tipo de Imóvel'] || i.localizacao?.['Tipo de Imovel']
   );
 
   preencherSelect('filtro-estado',      estados,      'Todos os estados');
@@ -98,7 +99,7 @@ function registrarEventos() {
     aplicarFiltros();
   });
 
-  ['filtro-cidade', 'filtro-comodos', 'filtro-anunciante', 'filtro-tipo-imovel', 'filtro-ordenar'].forEach(id => {
+  ['filtro-cidade', 'filtro-comodos', 'filtro-anunciante', 'filtro-tipo-imovel', 'filtro-modalidade', 'filtro-ordenar'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('change', aplicarFiltros);
   });
@@ -118,8 +119,9 @@ function aplicarFiltros() {
   const cidade     = document.getElementById('filtro-cidade')?.value      || '';
   const comodos    = parseInt(document.getElementById('filtro-comodos')?.value || '0');
   const anunciante = document.getElementById('filtro-anunciante')?.value  || '';
-  const tipoImovel = document.getElementById('filtro-tipo-imovel')?.value  || '';
-  const ordenar    = document.getElementById('filtro-ordenar')?.value      || 'recente';
+  const tipoImovel  = document.getElementById('filtro-tipo-imovel')?.value  || '';
+  const modalidade  = document.getElementById('filtro-modalidade')?.value   || '';
+  const ordenar     = document.getElementById('filtro-ordenar')?.value      || 'recente';
 
   if (busca) {
     resultado = resultado.filter(i => {
@@ -137,7 +139,11 @@ function aplicarFiltros() {
   if (comodos > 0) resultado = resultado.filter(i => (i.comodos?.length || 0) >= comodos);
   if (anunciante)  resultado = resultado.filter(i => i.anunciante?.['Tipo de anunciante'] === anunciante);
   if (tipoImovel)  resultado = resultado.filter(i =>
-    (i.localizacao?.['Tipo de Imóvel'] || i.localizacao?.['Tipo de Imovel']) === tipoImovel
+    (i.grupos?.['Informações Técnicas']?.['Tipo de Imóvel']
+     || i.localizacao?.['Tipo de Imóvel'] || i.localizacao?.['Tipo de Imovel']) === tipoImovel
+  );
+  if (modalidade)  resultado = resultado.filter(i =>
+    (i.grupos?.['Custos']?.['Modalidade'] || '').includes(modalidade)
   );
 
   resultado.sort((a, b) => {
@@ -174,7 +180,7 @@ function togglePainelFiltros() {
 }
 
 function limparTodosFiltros() {
-  ['filtro-busca', 'filtro-estado', 'filtro-cidade', 'filtro-anunciante', 'filtro-tipo-imovel'].forEach(id => {
+  ['filtro-busca', 'filtro-estado', 'filtro-cidade', 'filtro-anunciante', 'filtro-tipo-imovel', 'filtro-modalidade'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -206,6 +212,7 @@ function atualizarBadgeFiltros() {
   if ((parseInt(document.getElementById('filtro-comodos')?.value) || 0) > 0) count++;
   if (document.getElementById('filtro-anunciante')?.value)         count++;
   if (document.getElementById('filtro-tipo-imovel')?.value)        count++;
+  if (document.getElementById('filtro-modalidade')?.value)         count++;
   badge.textContent = count;
   badge.style.display = count > 0 ? 'inline-flex' : 'none';
   const btn = document.getElementById('btn-toggle-filtros');

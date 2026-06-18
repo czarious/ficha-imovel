@@ -1,4 +1,4 @@
-/* arquivo: p-style.css | versao: 0.7.2 */
+/* arquivo: p-style.css | versao: 0.7.7 */
 /* ============================================================
    Zillow BR — Estilos Globais
    Paleta: fundo #F5F3EE | verde #2B5F3E | DM Sans + DM Serif Display
@@ -58,9 +58,6 @@ body  {
 }
 .btn-primario  { background: white;                   color: var(--verde); }
 .btn-primario:hover  { background: var(--verde-sutil); }
-
-.btn-secundario { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.25); }
-.btn-secundario:hover { background: rgba(255,255,255,0.28); }
 
 .btn-verde   { background: var(--verde);    color: white; }
 .btn-verde:hover { background: var(--verde-hover); }
@@ -245,8 +242,40 @@ body  {
 .card-cidade {
   font-size: 0.82rem;
   color: var(--texto-fraco);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
+
+.card-preco {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.card-preco-valor {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--texto);
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+.card-preco-sufixo {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--texto-fraco);
+}
+.badge-modalidade {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+.badge-venda   { background: #e8f4ec; color: #2B5F3E; }
+.badge-aluguel { background: #e8eef8; color: #1a3a5c; }
+.badge-ambos   { background: #f3eef8; color: #3a1a5c; }
 
 .card-meta { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
 .meta-tag {
@@ -466,6 +495,12 @@ body  {
   align-items: center;
   gap: 8px;
 }
+
+/* Tooltip (hover no label) — compartilhado com f-ficha via g-definicoes.js */
+.campo-tip { position: relative; cursor: help; text-decoration: underline dotted 1px currentColor; text-underline-offset: 3px; }
+.campo-tip .tooltip-pop { display: none; position: absolute; bottom: calc(100% + 8px); left: 0; width: 260px; max-width: 80vw; background: #1a1a1a; color: #f5f5f5; font-size: 12px; line-height: 1.55; padding: 10px 13px; border-radius: 8px; z-index: 999; text-transform: none; font-weight: 400; letter-spacing: 0; box-shadow: 0 4px 16px rgba(0,0,0,0.25); pointer-events: none; white-space: normal; }
+.campo-tip:hover .tooltip-pop,
+.campo-tip.ativo .tooltip-pop { display: block; }
 
 /* Grid de atributos (chave/valor) */
 .ficha-grid-atributos {
@@ -849,8 +884,15 @@ body  {
 .ficha-secao-toggle:hover { color: var(--verde-hover); }
 
 .ficha-secao-arrow {
-  font-size: 14px;
-  color: var(--texto-fraco);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--verde);
+  color: #fff;
+  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.25s;
   flex-shrink: 0;
 }
@@ -892,8 +934,15 @@ body  {
 }
 
 .comodo-arrow-ficha {
-  font-size: 14px;
-  color: rgba(255,255,255,0.7);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  font-size: 17px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.25s;
   flex-shrink: 0;
 }
@@ -1001,5 +1050,19 @@ body  {
   font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
+}
+
+/* ================================================================
+   EDIFICAÇÕES (portal — p-imovel.html)
+   ================================================================ */
+.ed-area-tag {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--verde);
+  background: var(--verde-sutil);
+  border: 1px solid var(--borda);
+  border-radius: 20px;
+  padding: 3px 10px;
 }
 

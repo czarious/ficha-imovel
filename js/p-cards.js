@@ -1,4 +1,4 @@
-/* arquivo: p-cards.js | versao: 0.7.1 */
+/* arquivo: p-cards.js | versao: 0.7.6 */
 /* ============================================================
    p-cards.js — Renderização dos cards de imóveis (index.html)
    Depende de: p-ui.js (formatarData, formatarEndereco)
@@ -53,7 +53,24 @@ function criarCard(imovel) {
   const cep        = loc['CEP'] || '';
   const qtdComodos = imovel.comodos ? imovel.comodos.length : 0;
   const tipoCad    = cad['Tipo de anunciante'] || 'Anunciante';
-  const tipoImovel = loc['Tipo de Imóvel'] || loc['Tipo de Imovel'] || '';
+  const tipoImovel = (imovel.grupos?.['Informações Técnicas']?.['Tipo de Imóvel'])
+    || loc['Tipo de Imóvel'] || loc['Tipo de Imovel'] || '';
+
+  const custos      = imovel.grupos?.['Custos'] || {};
+  const modal       = custos['Modalidade'] || '';
+  const valorVenda  = custos['Valor de venda (R$)'] || '';
+  const valorAlug   = custos['Valor de aluguel (R$/mês)'] || '';
+  const precoNum    = valorVenda || valorAlug;
+  const precoStr    = precoNum
+    ? parseFloat(precoNum).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    : '';
+  const sufixoPreco = !valorVenda && valorAlug ? '/mês' : '';
+  const badgeClass  = modal === 'Venda' ? 'badge-venda' : modal === 'Locação' ? 'badge-aluguel' : 'badge-ambos';
+  const precoHTML   = (modal || precoStr) ? `
+      <div class="card-preco">
+        ${modal ? `<span class="badge-modalidade ${badgeClass}">${modal}</span>` : ''}
+        ${precoStr ? `<span class="card-preco-valor">${precoStr}${sufixoPreco ? `<span class="card-preco-sufixo">${sufixoPreco}</span>` : ''}</span>` : ''}
+      </div>` : '';
 
   const card = document.createElement('article');
   card.className = 'card-imovel';
@@ -93,6 +110,7 @@ function criarCard(imovel) {
     <div class="card-corpo">
       <div class="card-endereco" title="${endereco}">${endereco || 'Endereço não informado'}</div>
       <div class="card-cidade">${cidade || '—'}</div>
+      ${precoHTML}
       <div class="card-meta">${metaTags}</div>
       <div class="card-footer">
         <span class="card-data">Importado ${formatarData(imovel.importadoEm)}</span>

@@ -1,4 +1,4 @@
-/* arquivo: p-parser.js | versao: 0.7.3 */
+/* arquivo: p-parser.js | versao: 0.7.7 */
 /* ============================================================
    p-parser.js — Leitura e validação do arquivo .xlsx gerado pela Ficha Técnica
    Depende de: SheetJS (XLSX) carregado antes deste arquivo
@@ -55,6 +55,7 @@ function validarArquivo(arquivo, linhas) {
     const colA = String(l[0]).trim();
     return colA !== '' && colA !== 'Anunciante' &&
            colA !== 'Imóvel' && colA !== 'Imovel' &&
+           colA !== '[Edificação]' &&
            colA.toLowerCase() !== 'comodo' && colA.toLowerCase() !== 'cômodo';
   });
   if (!temComodo) erro();
@@ -126,6 +127,8 @@ function montarObjetoImovel(linhas) {
   const mapaComodos  = {};
   const ordemComodos = [];
   const ordemGrupos  = {};
+  let edAtual = null;
+  const edMaps = {};
 
   for (const linha of linhas) {
     const [colA, colB, colC, colD] = linha.map(c => String(c).trim());
@@ -133,6 +136,20 @@ function montarObjetoImovel(linhas) {
     if (!colA) continue;
     const colALower = colA.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     if (colALower === 'comodo') continue; // cabeçalho
+
+    /* ---- 3. Edificação — marcador (antes do guard !colC) ---- */
+    if (colA === '[Edificação]') {
+      if (colB === 'Áreas' && colC) {
+        if (edAtual) edAtual[colC] = colD;
+      } else if (colB) {
+        if (!imovel.edificacoes) imovel.edificacoes = [];
+        const ed = { nome: colB, comodos: [] };
+        imovel.edificacoes.push(ed);
+        edAtual = ed;
+        edMaps[imovel.edificacoes.length - 1] = { mapaComodos: {}, ordemComodos: [], ordemGrupos: {} };
+      }
+      continue;
+    }
 
     if (!colB || !colC) continue;
 
@@ -154,22 +171,24 @@ function montarObjetoImovel(linhas) {
       continue;
     }
 
-    /* ---- 3. Cômodos ---- */
+    /* ---- 4. Cômodos — atribui à edificação ativa ou ao array raiz ---- */
     const nomeComodo = colA;
     const nomeGrupo  = colB;
+    const edIdx = edAtual ? imovel.edificacoes.indexOf(edAtual) : -1;
+    const mapa  = edIdx >= 0 ? edMaps[edIdx] : { mapaComodos, ordemComodos, ordemGrupos };
 
-    if (!mapaComodos[nomeComodo]) {
-      mapaComodos[nomeComodo] = {};
-      ordemComodos.push(nomeComodo);
-      ordemGrupos[nomeComodo] = [];
+    if (!mapa.mapaComodos[nomeComodo]) {
+      mapa.mapaComodos[nomeComodo] = {};
+      mapa.ordemComodos.push(nomeComodo);
+      mapa.ordemGrupos[nomeComodo] = [];
     }
 
-    if (!mapaComodos[nomeComodo][nomeGrupo]) {
-      mapaComodos[nomeComodo][nomeGrupo] = {};
-      ordemGrupos[nomeComodo].push(nomeGrupo);
+    if (!mapa.mapaComodos[nomeComodo][nomeGrupo]) {
+      mapa.mapaComodos[nomeComodo][nomeGrupo] = {};
+      mapa.ordemGrupos[nomeComodo].push(nomeGrupo);
     }
 
-    mapaComodos[nomeComodo][nomeGrupo][colC] = valor;
+    mapa.mapaComodos[nomeComodo][nomeGrupo][colC] = valor;
   }
 
   /* ---- Converte o mapa para o array de cômodos ---- */
@@ -190,6 +209,25 @@ function montarObjetoImovel(linhas) {
     if (grupos.length > 0) {
       imovel.comodos.push({ nome: nomeComodo, grupos });
     }
+  }
+
+  /* ---- Converte cômodos de cada edificação ---- */
+  if (imovel.edificacoes) {
+    imovel.edificacoes.forEach((ed, idx) => {
+      const m = edMaps[idx];
+      if (!m) return;
+      for (const nomeComodo of m.ordemComodos) {
+        const grupos = [];
+        for (const nomeGrupo of m.ordemGrupos[nomeComodo]) {
+          const atributos = m.mapaComodos[nomeComodo][nomeGrupo];
+          const itens = Object.entries(atributos)
+            .map(([caracteristica, valor]) => ({ caracteristica, valor }))
+            .filter(item => item.valor !== '');
+          if (itens.length > 0) grupos.push({ nome: nomeGrupo, itens });
+        }
+        if (grupos.length > 0) ed.comodos.push({ nome: nomeComodo, grupos });
+      }
+    });
   }
 
   /* ---- Gera ID canônico para deduplicação ---- */

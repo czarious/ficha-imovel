@@ -1,12 +1,12 @@
-/* arquivo: g-versao.js | versao: 0.7.3 */
+/* arquivo: g-versao.js | versao: 0.7.7 */
 /* ============================================================
    g-versao.js — Controle de versão unificado do Zillow BR
    Carregado em: todas as páginas do portal e da ficha.
    ============================================================ */
 
 /* ── VERSÕES ─────────────────────────────────────────────── */
-const VERSAO_PORTAL = '0.7.3';
-const VERSAO_ATUAL  = '0.7.5'; /* ficha */
+const VERSAO_PORTAL = '0.7.7';
+const VERSAO_ATUAL  = '0.7.7'; /* ficha */
 
 /* ── CHANGELOG UNIFICADO (≥ 0.7.1) ───────────────────────────
    A partir da unificação, cada versão tem UMA entrada aqui (sem
@@ -15,17 +15,59 @@ const VERSAO_ATUAL  = '0.7.5'; /* ficha */
    g-changelog.html. */
 const CHANGELOG_GERAL = [
   {
-    versao: '0.7.6',
-    data:   '15/Jun/2026',
-    titulo: 'Portal: grupos dinâmicos na ficha do imóvel',
+    versao: '0.7.7',
+    data:   '18/Jun/2026',
+    titulo: 'Edificações e tooltips contextuais',
     grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          'Ficha: nova seção Edificações para imóveis rurais e industriais (Chácara, Sítio, Fazenda, Galpão, Prédio Comercial) — múltiplas construções independentes, cada uma com tipo, nome livre e área construída próprios.',
+          'Ficha: cada edificação tem sua própria lista de cômodos — mesma interface do cômodo padrão, isolada por edificação.',
+          'Ficha: tooltips contextuais em 13 campos de área e custo — ao passar o mouse sobre o nome do campo aparece a definição técnica e o comprovante de cálculo com os valores reais preenchidos.',
+          'Portal: tooltips nos campos de área e custo da ficha do imóvel — mesma definição da ficha, sem duplicação.',
+          'Ficha: checkboxes Venda e Locação agora exibem marcação visual corretamente (regressão de CSS corrigida).',
+        ]
+      },
       {
         categoria: 'Sistema & Código',
         itens: [
-          'Parser: bloco "Imóvel" do Excel agora popula imovel.grupos dinamicamente por Grupo — qualquer grupo novo criado na ficha aparece automaticamente no portal sem alterar código.',
-          'Render: grupos exibidos com pré-ordem configurável (Localização → Informações Técnicas → Custos); grupos desconhecidos aparecem ao final.',
-          'Backward compat: arquivos antigos (sem imovel.grupos) continuam funcionando via fallback automático para localizacao + dadosTecnicos.',
-          '"Custos" pré-registrado na pré-ordem — pronto para quando o grupo for implementado na ficha (Condomínio + IPTU).',
+          'js/g-definicoes.js criado: fonte única de 13 definições de termos imobiliários (ABNT NBR 12.721, NBR 14.653, Lei nº 4.591/64); ficha consome via data-def + tooltipInit(), portal via getDefPorLabel().',
+          'p-parser.js: suporte ao marcador [Edificação] na coluna A do Excel — agrupa cômodos em imovel.edificacoes[]; arquivos sem marcador continuam funcionando via imovel.comodos.',
+          'p-render.js: renderEdificacoes() exibe cada edificação com título, área construída e cômodos colapsáveis; fallback automático para imovel.comodos em arquivos antigos.',
+          'Ficha: TIPOS_COM_EDIFICACOES controla visibilidade da seção Edificações e oculta campos de área privativa/comum nos tipos rurais/industriais.',
+          'Ficha: atualizarTooltipsProva() recalcula o comprovante de cálculo em tempo real ao passar o mouse — lê os valores dos campos e monta a fórmula com números reais.',
+          'BUG-015 corrigido: tooltipInit() agora chamado no fim de adicionarEdificacao() — labels dinâmicos recebem texto e listeners corretamente.',
+          'BUG-016 corrigido: guard typeof DEFINICOES e flag defInjetado em tooltipInit() evitam crash e dupla-injeção.',
+        ]
+      }
+    ]
+  },
+  {
+    versao: '0.7.6',
+    data:   '17/Jun/2026',
+    titulo: 'Grupo Custos — preço, modalidade e filtro',
+    grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          'Ficha: novo bloco "Custos" na seção Localização com Modalidade (checkboxes Venda/Locação), Valor de venda, Valor de aluguel, Condomínio, IPTU e R$/m² calculado automaticamente.',
+          'Ficha: R$/m² calculado em tempo real — área privativa para imóveis edificados, área do terreno para lotes (padrão FipeZAP).',
+          'Ficha: bloco Custos aparece somente após selecionar Tipo de imóvel; campos de venda/aluguel aparecem conforme Modalidade selecionada.',
+          'Portal: preço e badge de modalidade (Venda / Locação / Venda e Locação) exibidos nos cards.',
+          'Portal: filtro de Modalidade — busca por "Venda" retorna também imóveis "Venda e Locação".',
+          'Portal: valores monetários formatados automaticamente como R$ 280.000,00 na ficha do imóvel.',
+        ]
+      },
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'Ficha: calcularRporM2() calcula e salva custo_r_m2_venda e custo_r_m2_aluguel em dadosLocalizacao.',
+          'Ficha: atualizarVisibilidadeCustos() controla visibilidade do bloco e dos campos condicionais; chamada ao final de atualizarVisibilidadeAreas().',
+          'Ficha: 7 campos do grupo Custos exportados no Excel (Imóvel | Custos | Característica | Valor).',
+          'Portal: renderAtributo() em p-render.js detecta campo com "(R$" no nome e formata valor como moeda pt-BR.',
+          'Portal: p-cards.js lê imovel.grupos.Custos para exibir preço e badge de modalidade no card.',
+          'Portal: p-filtros.js usa .includes() no filtro de Modalidade — "Venda e Locação" aparece nos dois filtros.',
         ]
       }
     ]

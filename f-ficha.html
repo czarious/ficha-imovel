@@ -1,5 +1,5 @@
 <!-- DESTINO: f-ficha.html -->
-<!-- arquivo: f-ficha.html | versao: 0.7.5 -->
+<!-- arquivo: f-ficha.html | versao: 0.7.7 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -58,7 +58,7 @@
   /* ── CAMPOS ── */
   .campo { margin-bottom: 16px; }
   .campo label { display: block; font-size: 11px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
-  .campo input, .campo select { width: 100%; padding: 10px 13px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--surface); transition: border-color 0.15s, box-shadow 0.15s; appearance: none; -webkit-appearance: none; }
+  .campo input:not([type="checkbox"]), .campo select { width: 100%; padding: 10px 13px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--surface); transition: border-color 0.15s, box-shadow 0.15s; appearance: none; -webkit-appearance: none; }
   .campo input:focus, .campo select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(43,95,62,0.1); }
   .campo input[readonly] { background: var(--surface2); color: var(--text2); cursor: default; }
   .campo-vazio { border-color: #c0392b !important; background-color: #fff5f5 !important; }
@@ -74,11 +74,13 @@
   .area-display { background: var(--accent-light); border: 1px solid var(--accent-border); border-radius: 8px; padding: 10px 13px; font-size: 15px; color: var(--accent); font-weight: 500; display: flex; align-items: center; gap: 5px; min-height: 41px; }
   .area-display small { font-size: 11px; font-weight: 400; color: #5A9470; }
 
-  /* ── TOOLTIP ⓘ ── */
-  .campo-tip { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; border-radius: 50%; background: var(--accent-light); color: var(--accent); font-size: 10px; font-weight: 700; cursor: pointer; position: relative; vertical-align: middle; margin-left: 5px; flex-shrink: 0; user-select: none; }
+  /* ── TOOLTIP (hover no label) ── */
+  .campo-tip { position: relative; cursor: help; text-decoration: underline dotted 1px currentColor; text-underline-offset: 3px; }
   .campo-tip .tooltip-pop { display: none; position: absolute; bottom: calc(100% + 8px); left: 0; width: 260px; max-width: 80vw; background: #1a1a1a; color: #f5f5f5; font-size: 12px; line-height: 1.55; padding: 10px 13px; border-radius: 8px; z-index: 999; text-transform: none; font-weight: 400; letter-spacing: 0; box-shadow: 0 4px 16px rgba(0,0,0,0.25); pointer-events: none; white-space: normal; }
   .campo-tip:hover .tooltip-pop,
   .campo-tip.ativo .tooltip-pop { display: block; }
+  .tooltip-prova { display: block; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.12); font-size: 11px; color: #b0c4b8; font-family: monospace; letter-spacing: 0; }
+  .tooltip-prova:empty { display: none; }
 
   /* ── APELIDO ── */
   .apelido-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
@@ -138,6 +140,16 @@
   .btn-exportar:hover { background: #1e4a2e; transform: translateY(-2px); }
   .btn-exportar:disabled { background: var(--border-strong); box-shadow: none; transform: none; cursor: not-allowed; }
 
+  /* ── EDIFICAÇÕES ── */
+  .ed-card { border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
+  .ed-header { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; background: var(--bg-alt); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .ed-header-left { display: flex; align-items: center; gap: 12px; flex: 1; flex-wrap: wrap; }
+  .ed-nome-input { flex: 1; min-width: 160px; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: 'DM Sans', sans-serif; }
+  .ed-body { padding: 16px; }
+  .lista-ambientes-ed { margin-bottom: 8px; }
+  .btn-adicionar-comodo { width: 100%; padding: 10px; border: 2px dashed var(--border); border-radius: var(--radius); background: none; color: var(--text2); font-size: 13px; cursor: pointer; transition: all 0.15s; }
+  .btn-adicionar-comodo:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
   /* ── LOADING / ERRO ── */
   .loading { text-align: center; padding: 60px; color: var(--text3); font-size: 14px; }
   .loading::after { content: ''; display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-left: 8px; vertical-align: middle; }
@@ -161,6 +173,7 @@
 </button>
 
 <script src="js/g-config.js"></script>
+<script src="js/g-definicoes.js"></script>
 <script src="js/g-versao.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="js/g-geo.js"></script>
@@ -175,8 +188,10 @@ let dom              = null;
 let dadosAnunciante  = {};
 let dadosLocalizacao = {};
 
-let ambientes         = [];
-let contadorAmbientes = 0;
+let ambientes           = [];
+let contadorAmbientes   = 0;
+let edificacoes         = [];
+let contadorEdificacoes = 0;
 
 let anuncianteAberto  = true;
 let localizacaoAberta = true;
@@ -190,7 +205,11 @@ const TIPOS_IMOVEL = {
 /* Grupos para visibilidade condicional dos campos de área */
 const TIPOS_COM_CONDOMINIO = ['Apartamento','Casa em Condomínio','Cobertura','Flat / Apart-hotel'];
 const TIPOS_SEM_TERRENO    = ['Apartamento','Cobertura','Flat / Apart-hotel','Kitnet / Quitinete','Loft','Studio','Sala Comercial'];
-const TIPOS_SEM_EDIFICACAO = ['Lote / Terreno'];
+const TIPOS_SEM_EDIFICACAO  = ['Lote / Terreno'];
+const TIPOS_COM_EDIFICACOES = ['Chácara', 'Sítio', 'Fazenda', 'Galpão', 'Prédio Comercial'];
+// dentre TIPOS_COM_EDIFICACOES: área total e R$/m² sobre a SOMA das áreas construídas
+// (Galpão/Prédio Comercial). Os rurais (Chácara/Sítio/Fazenda) usam o terreno.
+const TIPOS_ED_AREA_CONSTRUIDA = ['Galpão', 'Prédio Comercial'];
 
 /* ════════════════════════════════════════════════════════
    CARREGAMENTO DO JSON
@@ -218,9 +237,11 @@ function renderApp() {
   document.getElementById('app').innerHTML = `
     <div id="sec-anunciante"></div>
     <div id="sec-localizacao"></div>
+    <div id="sec-edificacoes"></div>
     <div id="sec-comodos"></div>`;
   renderAnunciante();
   renderLocalizacao();
+  renderSecaoEdificacoes();
   renderComodos();
 }
 
@@ -351,7 +372,7 @@ function renderLocalizacao() {
 
             <div class="grid-2" id="row-area-terreno">
               <div class="campo">
-                <label>Área do terreno (m²) <span class="campo-tip" tabindex="0">ⓘ<span class="tooltip-pop">Superfície total do lote ou gleba onde o imóvel está implantado, incluindo área construída e descoberta. Dado que consta na matrícula no Cartório de Registro de Imóveis.</span></span></label>
+                <label class="campo-tip" tabindex="0" data-def="area_terreno">Área do terreno (m²)<span class="tooltip-pop"><span id="tip-prova-terreno" class="tooltip-prova"></span></span></label>
                 <input type="number" id="campo-area-terreno" min="0" step="0.01" placeholder="Ex: 300.00"
                   value="${dadosLocalizacao.area_terreno||''}"
                   oninput="salvarLoc('area_terreno',this.value); calcularAreaTotal()">
@@ -361,13 +382,13 @@ function renderLocalizacao() {
 
             <div class="grid-2" id="row-area-privativa-util">
               <div class="campo">
-                <label>Área privativa (m²) <span class="campo-tip" tabindex="0">ⓘ<span class="tooltip-pop">Área de uso exclusivo do proprietário conforme matrícula. Inclui o espaço interno e o espaço ocupado pelas paredes. Base para o cálculo do custo por m². Ref: ABNT NBR 12.721.</span></span></label>
+                <label class="campo-tip" tabindex="0" data-def="area_privativa">Área privativa (m²)<span class="tooltip-pop"><span id="tip-prova-privativa" class="tooltip-prova"></span></span></label>
                 <input type="number" id="campo-area-privativa" min="0" step="0.01" placeholder="Ex: 72.00"
                   value="${dadosLocalizacao.area_privativa||''}"
                   oninput="salvarLoc('area_privativa',this.value); calcularAreaTotal()">
               </div>
               <div class="campo">
-                <label>Área útil (m²) <span class="campo-tip" tabindex="0">ⓘ<span class="tooltip-pop">Soma das áreas dos cômodos sem contar paredes e pilares. "Área de vassoura". Em média 10–15% menor que a área privativa. Opcional — não é derivada da soma dos ambientes cadastrados.</span></span></label>
+                <label class="campo-tip" tabindex="0" data-def="area_util">Área útil (m²)<span class="tooltip-pop"><span id="tip-prova-util" class="tooltip-prova"></span></span></label>
                 <input type="number" id="campo-area-util" min="0" step="0.01" placeholder="Opcional"
                   value="${dadosLocalizacao.area_util||''}"
                   oninput="salvarLoc('area_util',this.value)">
@@ -376,13 +397,13 @@ function renderLocalizacao() {
 
             <div class="grid-2" id="row-area-comum" style="display:none">
               <div class="campo">
-                <label>Área comum — fração ideal (m²) <span class="campo-tip" tabindex="0">ⓘ<span class="tooltip-pop">Parcela das áreas coletivas do condomínio (hall, escadas, salão, piscina) atribuída proporcionalmente a esta unidade. Consta na matrícula. Ref: Lei nº 4.591/64.</span></span></label>
+                <label class="campo-tip" tabindex="0" data-def="area_comum">Área comum — fração ideal (m²)<span class="tooltip-pop"><span id="tip-prova-comum" class="tooltip-prova"></span></span></label>
                 <input type="number" id="campo-area-comum" min="0" step="0.01" placeholder="Ex: 9.50"
                   value="${dadosLocalizacao.area_comum||''}"
                   oninput="salvarLoc('area_comum',this.value); calcularAreaTotal()">
               </div>
               <div class="campo">
-                <label>Fração ideal (%) <span class="campo-tip" tabindex="0">ⓘ<span class="tooltip-pop">Percentual do terreno e das coisas comuns do condomínio que pertence a esta unidade. Base para rateio de condomínio e IPTU. Ref: ABNT NBR 12.721 e Lei nº 4.591/64, art. 3º.</span></span></label>
+                <label class="campo-tip" tabindex="0" data-def="fracao_ideal">Fração ideal (%)<span class="tooltip-pop"><span id="tip-prova-fracao" class="tooltip-prova"></span></span></label>
                 <input type="number" id="campo-fracao-ideal" min="0" step="0.01" max="100" placeholder="Ex: 1.85"
                   value="${dadosLocalizacao.fracao_ideal||''}"
                   oninput="salvarLoc('fracao_ideal',this.value)">
@@ -391,13 +412,89 @@ function renderLocalizacao() {
 
             <div class="grid-2" id="row-area-total">
               <div class="campo">
-                <label>Área total (m²) <span class="campo-tip" tabindex="0">ⓘ<span class="tooltip-pop">Soma da área privativa com a área comum (fração ideal). Para imóveis sem condomínio: Área Total = Área Privativa. Para terrenos: Área Total = Área do Terreno. Ref: ABNT NBR 12.721.</span></span></label>
+                <label class="campo-tip" tabindex="0" data-def="area_total">Área total (m²)<span class="tooltip-pop"><span id="tip-prova-area-total" class="tooltip-prova"></span></span></label>
                 <div class="area-display" id="display-area-total">
                   <span id="val-area-total">${dadosLocalizacao.area_total ? dadosLocalizacao.area_total + ' m²' : '—'}</span>
                   <small>calculado</small>
                 </div>
               </div>
               <div></div>
+            </div>
+          </div>
+
+          <!-- ── BLOCO DE CUSTOS ── -->
+          <div id="bloco-custos" style="display:none">
+            <div class="grupo-label" style="margin-top:8px">Custos</div>
+
+            <div class="grid-2" id="row-custo-modalidade">
+              <div class="campo">
+                <label>Modalidade</label>
+                <div style="display:flex; gap:20px; padding:10px 0;">
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.9rem;">
+                    <input type="checkbox" id="chk-custo-venda" onchange="atualizarModalidade()"
+                      ${['Venda','Venda e Locação'].includes(dadosLocalizacao.custo_modalidade||'')?'checked':''}>
+                    Venda
+                  </label>
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.9rem;">
+                    <input type="checkbox" id="chk-custo-locacao" onchange="atualizarModalidade()"
+                      ${['Locação','Venda e Locação'].includes(dadosLocalizacao.custo_modalidade||'')?'checked':''}>
+                    Locação
+                  </label>
+                </div>
+              </div>
+              <div></div>
+            </div>
+
+            <div class="grid-2" id="row-custo-venda" style="display:none">
+              <div class="campo">
+                <label class="campo-tip" tabindex="0" data-def="custo_venda">Valor de venda (R$)<span class="tooltip-pop"></span></label>
+                <input type="number" id="campo-custo-venda" min="0" step="0.01" placeholder="Ex: 350000.00"
+                  value="${dadosLocalizacao.custo_venda||''}"
+                  oninput="salvarLoc('custo_venda',this.value); calcularRporM2()">
+              </div>
+              <div></div>
+            </div>
+
+            <div class="grid-2" id="row-custo-aluguel" style="display:none">
+              <div class="campo">
+                <label class="campo-tip" tabindex="0" data-def="custo_aluguel">Valor de aluguel (R$/mês)<span class="tooltip-pop"></span></label>
+                <input type="number" id="campo-custo-aluguel" min="0" step="0.01" placeholder="Ex: 2500.00"
+                  value="${dadosLocalizacao.custo_aluguel||''}"
+                  oninput="salvarLoc('custo_aluguel',this.value); calcularRporM2()">
+              </div>
+              <div></div>
+            </div>
+
+            <div class="grid-2" id="row-custo-despesas">
+              <div class="campo" id="campo-wrap-condominio" style="display:none">
+                <label class="campo-tip" tabindex="0" data-def="custo_condominio">Condomínio (R$/mês)<span class="tooltip-pop"></span></label>
+                <input type="number" id="campo-custo-condominio" min="0" step="0.01" placeholder="Ex: 500.00"
+                  value="${dadosLocalizacao.custo_condominio||''}"
+                  oninput="salvarLoc('custo_condominio',this.value)">
+              </div>
+              <div class="campo">
+                <label class="campo-tip" tabindex="0" data-def="custo_iptu">IPTU (R$/ano)<span class="tooltip-pop"></span></label>
+                <input type="number" id="campo-custo-iptu" min="0" step="0.01" placeholder="Ex: 1200.00"
+                  value="${dadosLocalizacao.custo_iptu||''}"
+                  oninput="salvarLoc('custo_iptu',this.value)">
+              </div>
+            </div>
+
+            <div class="grid-2" id="row-custo-r-m2">
+              <div class="campo" id="campo-wrap-r-m2-venda" style="display:none">
+                <label class="campo-tip" tabindex="0" data-def="custo_r_m2_venda">R$/m² — venda<span class="tooltip-pop"><span id="tip-prova-rm2-venda" class="tooltip-prova"></span></span></label>
+                <div class="area-display">
+                  <span id="val-r-m2-venda">—</span>
+                  <small>calculado</small>
+                </div>
+              </div>
+              <div class="campo" id="campo-wrap-r-m2-aluguel" style="display:none">
+                <label class="campo-tip" tabindex="0" data-def="custo_r_m2_aluguel">R$/m² — aluguel<span class="tooltip-pop"><span id="tip-prova-rm2-aluguel" class="tooltip-prova"></span></span></label>
+                <div class="area-display">
+                  <span id="val-r-m2-aluguel">—</span>
+                  <small>calculado</small>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -573,10 +670,34 @@ function atualizarVisibilidadeAreas() {
   const semEdificacao = TIPOS_SEM_EDIFICACAO.includes(tipo);
 
   document.getElementById('row-area-terreno').style.display        = semTerreno    ? 'none' : '';
-  document.getElementById('row-area-privativa-util').style.display  = semEdificacao ? 'none' : '';
-  document.getElementById('row-area-comum').style.display           = comCondominio ? ''     : 'none';
+  const multiEdificacao = TIPOS_COM_EDIFICACOES.includes(tipo);
+  document.getElementById('row-area-privativa-util').style.display  = (semEdificacao || multiEdificacao) ? 'none' : '';
+  document.getElementById('row-area-comum').style.display           = (comCondominio && !multiEdificacao) ? '' : 'none';
 
   calcularAreaTotal();
+
+  // max-height foi travado no scrollHeight anterior; aguarda reflow antes de recalcular
+  requestAnimationFrame(() => {
+    const wrap = document.getElementById('wrap-localizacao');
+    if (wrap && wrap.style.maxHeight !== '0' && wrap.style.maxHeight !== '0px') {
+      wrap.style.maxHeight = wrap.scrollHeight + 'px';
+    }
+  });
+
+  atualizarVisibilidadeCustos();
+  calcularRporM2();
+  atualizarVisibilidadeEdificacoes();
+}
+
+/* Soma as áreas construídas de todas as edificações (Galpão/Prédio Comercial). */
+function somaAreaConstruida() {
+  return edificacoes.reduce((s, ed) => s + (parseFloat(ed.areaConstr) || 0), 0);
+}
+
+/* Recalcula área total + R$/m² do imóvel — chamado quando uma edificação muda. */
+function recalcularAreasImovel() {
+  calcularAreaTotal();
+  calcularRporM2();
 }
 
 function calcularAreaTotal() {
@@ -586,10 +707,13 @@ function calcularAreaTotal() {
   const terreno   = parseFloat(dadosLocalizacao.area_terreno)   || 0;
 
   let total = null;
-  if (TIPOS_SEM_EDIFICACAO.includes(tipo)) {
-    if (terreno) total = terreno;
+  if (TIPOS_ED_AREA_CONSTRUIDA.includes(tipo)) {
+    const constr = somaAreaConstruida();      // Galpão/Prédio Comercial → soma das edificações
+    if (constr) total = constr;
+  } else if (TIPOS_SEM_EDIFICACAO.includes(tipo) || TIPOS_COM_EDIFICACOES.includes(tipo)) {
+    if (terreno) total = terreno;             // Lote + rurais (Chácara/Sítio/Fazenda) → terreno
   } else if (privativa) {
-    total = TIPOS_COM_CONDOMINIO.includes(tipo) ? privativa + comum : privativa;
+    total = TIPOS_COM_CONDOMINIO.includes(tipo) ? privativa + comum : privativa;  // edificados
   }
 
   const str = total !== null ? total.toFixed(2) : '';
@@ -598,10 +722,155 @@ function calcularAreaTotal() {
   if (el) el.textContent = total !== null ? total.toFixed(2) + ' m²' : '—';
 }
 
+function atualizarModalidade() {
+  const venda   = document.getElementById('chk-custo-venda')?.checked;
+  const locacao = document.getElementById('chk-custo-locacao')?.checked;
+  const modal   = venda && locacao ? 'Venda e Locação' : venda ? 'Venda' : locacao ? 'Locação' : '';
+  salvarLoc('custo_modalidade', modal);
+  atualizarVisibilidadeCustos();
+  calcularRporM2();
+}
+
+function atualizarVisibilidadeCustos() {
+  const tipo  = dadosLocalizacao.tipo_imovel || '';
+  const bloco = document.getElementById('bloco-custos');
+  if (!bloco) return;
+
+  bloco.style.display = tipo ? '' : 'none';
+  if (!tipo) return;
+
+  const modal      = dadosLocalizacao.custo_modalidade || '';
+  const temVenda   = modal === 'Venda' || modal === 'Venda e Locação';
+  const temAluguel = modal === 'Locação' || modal === 'Venda e Locação';
+
+  document.getElementById('row-custo-venda').style.display       = temVenda   ? '' : 'none';
+  document.getElementById('row-custo-aluguel').style.display     = temAluguel ? '' : 'none';
+  document.getElementById('campo-wrap-condominio').style.display = TIPOS_COM_CONDOMINIO.includes(tipo) ? '' : 'none';
+
+  requestAnimationFrame(() => {
+    const wrap = document.getElementById('wrap-localizacao');
+    if (wrap && wrap.style.maxHeight !== '0' && wrap.style.maxHeight !== '0px')
+      wrap.style.maxHeight = wrap.scrollHeight + 'px';
+  });
+}
+
+function calcularRporM2() {
+  const tipo = dadosLocalizacao.tipo_imovel || '';
+  let area;
+  if (TIPOS_ED_AREA_CONSTRUIDA.includes(tipo)) {
+    area = somaAreaConstruida();                              // Galpão/Prédio Comercial
+  } else if (TIPOS_SEM_EDIFICACAO.includes(tipo) || TIPOS_COM_EDIFICACOES.includes(tipo)) {
+    area = parseFloat(dadosLocalizacao.area_terreno) || 0;    // Lote + rurais
+  } else {
+    area = parseFloat(dadosLocalizacao.area_privativa) || 0;  // edificados (privativa, sem comum)
+  }
+
+  const venda   = parseFloat(dadosLocalizacao.custo_venda)   || 0;
+  const aluguel = parseFloat(dadosLocalizacao.custo_aluguel) || 0;
+
+  const rmV = (area && venda)   ? (venda / area).toFixed(2)   : '';
+  const rmA = (area && aluguel) ? (aluguel / area).toFixed(2) : '';
+
+  salvarLoc('custo_r_m2_venda',   rmV);
+  salvarLoc('custo_r_m2_aluguel', rmA);
+
+  const elV = document.getElementById('val-r-m2-venda');
+  const elA = document.getElementById('val-r-m2-aluguel');
+  if (elV) elV.textContent = rmV ? 'R$ ' + rmV + '/m²' : '—';
+  if (elA) elA.textContent = rmA ? 'R$ ' + rmA + '/m²' : '—';
+
+  const wV = document.getElementById('campo-wrap-r-m2-venda');
+  const wA = document.getElementById('campo-wrap-r-m2-aluguel');
+  if (wV) wV.style.display = rmV ? '' : 'none';
+  if (wA) wA.style.display = rmA ? '' : 'none';
+}
+
+function atualizarTipProva(id, txt) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = txt;
+}
+
+function atualizarTooltipsProva() {
+  const tipo = dadosLocalizacao.tipo_imovel || '';
+  const v = {
+    terreno:   parseFloat(dadosLocalizacao.area_terreno)   || 0,
+    privativa: parseFloat(dadosLocalizacao.area_privativa) || 0,
+    util:      parseFloat(dadosLocalizacao.area_util)      || 0,
+    comum:     parseFloat(dadosLocalizacao.area_comum)     || 0,
+    fracao:    parseFloat(dadosLocalizacao.fracao_ideal)   || 0,
+  };
+
+  atualizarTipProva('tip-prova-terreno',   v.terreno   ? `Valor informado: ${v.terreno.toFixed(2)} m²`   : '');
+  atualizarTipProva('tip-prova-privativa', v.privativa ? `Valor informado: ${v.privativa.toFixed(2)} m²` : '');
+  atualizarTipProva('tip-prova-util',      v.util      ? `Valor informado: ${v.util.toFixed(2)} m²`      : '');
+  atualizarTipProva('tip-prova-comum',     v.comum     ? `Valor informado: ${v.comum.toFixed(2)} m²`     : '');
+  atualizarTipProva('tip-prova-fracao',    v.fracao    ? `Valor informado: ${v.fracao.toFixed(2)}%`      : '');
+
+  /* Área total */
+  const total = parseFloat(dadosLocalizacao.area_total) || 0;
+  let provaTotal = '';
+  if (total) {
+    if (TIPOS_ED_AREA_CONSTRUIDA.includes(tipo)) {
+      const eds = edificacoes.filter(e => e.areaConstr);
+      provaTotal = eds.length > 1
+        ? eds.map(e => parseFloat(e.areaConstr).toFixed(2)).join(' + ') + ` = ${total.toFixed(2)} m²`
+        : `Área construída: ${total.toFixed(2)} m²`;
+    } else if (TIPOS_SEM_EDIFICACAO.includes(tipo) || TIPOS_COM_EDIFICACOES.includes(tipo)) {
+      provaTotal = `Área do terreno: ${v.terreno.toFixed(2)} m²`;
+    } else if (TIPOS_COM_CONDOMINIO.includes(tipo) && v.comum) {
+      provaTotal = `${v.privativa.toFixed(2)} + ${v.comum.toFixed(2)} = ${total.toFixed(2)} m²`;
+    } else {
+      provaTotal = `Área privativa: ${v.privativa.toFixed(2)} m²`;
+    }
+  }
+  atualizarTipProva('tip-prova-area-total', provaTotal);
+
+  /* R$/m² */
+  const areaRm2 = TIPOS_ED_AREA_CONSTRUIDA.includes(tipo) ? somaAreaConstruida()
+    : (TIPOS_SEM_EDIFICACAO.includes(tipo) || TIPOS_COM_EDIFICACOES.includes(tipo)) ? v.terreno
+    : v.privativa;
+
+  let areaLabel = '';
+  if (areaRm2) {
+    if (TIPOS_ED_AREA_CONSTRUIDA.includes(tipo)) {
+      const eds = edificacoes.filter(e => e.areaConstr);
+      areaLabel = `Constr. (${eds.map(e => parseFloat(e.areaConstr).toFixed(2)).join(' + ')})`;
+    } else if (TIPOS_SEM_EDIFICACAO.includes(tipo) || TIPOS_COM_EDIFICACOES.includes(tipo)) {
+      areaLabel = `Terreno (${v.terreno.toFixed(2)})`;
+    } else {
+      areaLabel = `Privativa (${v.privativa.toFixed(2)})`;
+    }
+  }
+
+  const venda   = parseFloat(dadosLocalizacao.custo_venda)   || 0;
+  const aluguel = parseFloat(dadosLocalizacao.custo_aluguel) || 0;
+  const rmV = areaRm2 && venda   ? (venda   / areaRm2).toFixed(2) : '';
+  const rmA = areaRm2 && aluguel ? (aluguel / areaRm2).toFixed(2) : '';
+
+  atualizarTipProva('tip-prova-rm2-venda',
+    rmV ? `Venda (${venda.toFixed(2)}) ÷ ${areaLabel} = R$ ${rmV}/m²` : '');
+  atualizarTipProva('tip-prova-rm2-aluguel',
+    rmA ? `Aluguel (${aluguel.toFixed(2)}) ÷ ${areaLabel} = R$ ${rmA}/m²` : '');
+}
+
 function tooltipInit() {
+  if (typeof DEFINICOES === 'undefined') return;
+  /* Popula o texto das tooltips a partir de DEFINICOES (g-definicoes.js) */
+  document.querySelectorAll('.campo-tip[data-def]').forEach(tip => {
+    const def = DEFINICOES[tip.dataset.def];
+    if (!def) return;
+    const pop = tip.querySelector('.tooltip-pop');
+    if (pop && !pop.dataset.defInjetado) {
+      pop.insertAdjacentText('afterbegin', def.texto);
+      pop.dataset.defInjetado = '1';
+    }
+  });
+
   document.querySelectorAll('.campo-tip').forEach(tip => {
+    tip.addEventListener('mouseenter', atualizarTooltipsProva);
     tip.addEventListener('click', (e) => {
       e.stopPropagation();
+      atualizarTooltipsProva();
       const isAtivo = tip.classList.contains('ativo');
       document.querySelectorAll('.campo-tip.ativo').forEach(t => t.classList.remove('ativo'));
       if (!isAtivo) tip.classList.add('ativo');
@@ -621,11 +890,36 @@ document.addEventListener('keydown', (e) => {
 /* ════════════════════════════════════════════════════════
    SEÇÃO AMBIENTES
    ════════════════════════════════════════════════════════ */
-function renderComodos() {
-  const opcoesHtml = dom.tipos_ambiente
-    .map(t => `<option value="${t}">${t}</option>`).join('') +
-    '<option value="__outro__">Outro...</option>';
+/* Opções de tipo de ambiente — fonte única (dom.tipos_ambiente) reusada
+   no imóvel comum e em cada edificação; tipo novo aparece nos dois. */
+function opcoesTipoAmb() {
+  return dom.tipos_ambiente.map(t => `<option value="${t}">${t}</option>`).join('')
+    + '<option value="__outro__">Outro...</option>';
+}
 
+/* Seletor de tipo de ambiente reusável — ctx='' para o imóvel, ctx=edId para edificação.
+   IDs sufixados pelo contexto para coexistirem na mesma página. */
+function htmlSeletorAmb(ctx, rotuloBtn, btnClasse) {
+  const suf = ctx ? '-' + ctx : '';
+  const cls = btnClasse || 'btn-adicionar';
+  return `
+    <div class="seletor-ambiente" id="seletor-ambiente${suf}" style="display:none">
+      <div class="seletor-row">
+        <div class="select-wrap" style="flex:1;min-width:160px">
+          <select id="select-tipo-amb${suf}" onchange="onChangeTipoAmb('${ctx}',this.value)">
+            <option value="">— tipo de ambiente —</option>
+            ${opcoesTipoAmb()}
+          </select>
+        </div>
+        <input id="input-tipo-custom${suf}" type="text" placeholder="Ex: Sala de Jogos" style="display:none">
+        <button class="btn-confirmar-amb" onclick="confirmarAmbiente('${ctx}')">Adicionar</button>
+        <button class="btn-cancelar-amb"  onclick="cancelarSeletor('${ctx}')">Cancelar</button>
+      </div>
+    </div>
+    <button class="${cls}" id="btn-add-ambiente${suf}" onclick="abrirSeletor('${ctx}')">${rotuloBtn}</button>`;
+}
+
+function renderComodos() {
   document.getElementById('sec-comodos').innerHTML = `
     <div class="secao">
       <div class="secao-header">
@@ -637,44 +931,33 @@ function renderComodos() {
       </div>
       <div class="secao-body">
         <div id="lista-ambientes"></div>
-        <div class="seletor-ambiente" id="seletor-ambiente" style="display:none">
-          <div class="seletor-row">
-            <div class="select-wrap" style="flex:1;min-width:160px">
-              <select id="select-tipo-amb" onchange="onChangeTipoAmb(this.value)">
-                <option value="">— tipo de ambiente —</option>
-                ${opcoesHtml}
-              </select>
-            </div>
-            <input id="input-tipo-custom" type="text" placeholder="Ex: Sala de Jogos"
-              style="display:none">
-            <button class="btn-confirmar-amb" onclick="confirmarAmbiente()">Adicionar</button>
-            <button class="btn-cancelar-amb"  onclick="cancelarSeletor()">Cancelar</button>
-          </div>
-        </div>
-        <button class="btn-adicionar" id="btn-add-ambiente" onclick="abrirSeletor()">+ Adicionar Ambiente</button>
+        ${htmlSeletorAmb('', '+ Adicionar Ambiente')}
       </div>
     </div>`;
 
   ambientes.filter(a => !a.removido).forEach(a => renderBlocoAmbiente(a.id));
 }
 
-/* ── SELETOR DE TIPO ── */
-function abrirSeletor() {
-  document.getElementById('seletor-ambiente').style.display = '';
-  document.getElementById('btn-add-ambiente').style.display = 'none';
-  document.getElementById('select-tipo-amb').value = '';
-  const inp = document.getElementById('input-tipo-custom');
+/* ── SELETOR DE TIPO (ctx='' imóvel | ctx=edId edificação) ── */
+function abrirSeletor(ctx) {
+  const suf = ctx ? '-' + ctx : '';
+  document.getElementById('seletor-ambiente' + suf).style.display = '';
+  document.getElementById('btn-add-ambiente' + suf).style.display = 'none';
+  document.getElementById('select-tipo-amb' + suf).value = '';
+  const inp = document.getElementById('input-tipo-custom' + suf);
   inp.style.display = 'none';
   inp.value = '';
 }
 
-function cancelarSeletor() {
-  document.getElementById('seletor-ambiente').style.display = 'none';
-  document.getElementById('btn-add-ambiente').style.display = '';
+function cancelarSeletor(ctx) {
+  const suf = ctx ? '-' + ctx : '';
+  document.getElementById('seletor-ambiente' + suf).style.display = 'none';
+  document.getElementById('btn-add-ambiente' + suf).style.display = '';
 }
 
-function onChangeTipoAmb(val) {
-  const inp = document.getElementById('input-tipo-custom');
+function onChangeTipoAmb(ctx, val) {
+  const suf = ctx ? '-' + ctx : '';
+  const inp = document.getElementById('input-tipo-custom' + suf);
   inp.style.display = val === '__outro__' ? '' : 'none';
   if (val !== '__outro__') inp.value = '';
 }
@@ -686,18 +969,20 @@ function normalizarTipo(str) {
     .replace(/\b\w/g, l => l.toUpperCase());
 }
 
-function confirmarAmbiente() {
-  const sel = document.getElementById('select-tipo-amb').value;
-  const inp = document.getElementById('input-tipo-custom').value.trim();
+function confirmarAmbiente(ctx) {
+  const suf = ctx ? '-' + ctx : '';
+  const sel = document.getElementById('select-tipo-amb' + suf).value;
+  const inp = document.getElementById('input-tipo-custom' + suf).value.trim();
   let tipo = '';
   if (sel === '__outro__') {
-    if (!inp) { document.getElementById('input-tipo-custom').focus(); return; }
+    if (!inp) { document.getElementById('input-tipo-custom' + suf).focus(); return; }
     tipo = normalizarTipo(inp);
   } else if (sel) {
     tipo = sel;
   } else { return; }
-  cancelarSeletor();
-  adicionarAmbiente(tipo);
+  cancelarSeletor(ctx);
+  if (ctx) adicionarAmbienteEd(ctx, tipo);
+  else     adicionarAmbiente(tipo);
 }
 
 /* ── AMBIENTES ── */
@@ -719,7 +1004,8 @@ function adicionarAmbiente(tipo) {
 
 function removerAmbiente(id, e) {
   e.stopPropagation();
-  const a = ambientes.find(a => a.id === id);
+  const ctx = _ambContext(id);
+  const a = ctx.arr.find(a => a.id === id);
   if (a) a.removido = true;
   document.getElementById('bloco-' + id)?.remove();
   renumerarAmbientes();
@@ -727,9 +1013,10 @@ function removerAmbiente(id, e) {
 }
 
 function renderBlocoAmbiente(id) {
-  const a = ambientes.find(a => a.id === id);
+  const ctx = _ambContext(id);
+  const a = ctx.arr.find(a => a.id === id);
   if (!a) return;
-  const visiveis = ambientes.filter(x => !x.removido && x.tipo === a.tipo);
+  const visiveis = ctx.arr.filter(x => !x.removido && x.tipo === a.tipo);
   const idx  = visiveis.findIndex(x => x.id === id);
   const num  = idx + 1;
   const nome = (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim')
@@ -742,14 +1029,15 @@ function renderBlocoAmbiente(id) {
   const div = document.createElement('div');
   div.id = 'bloco-' + id;
   div.innerHTML = cartaoComodo(id, nome, num, a.dados, a.tipo, true);
-  document.getElementById('lista-ambientes').appendChild(div);
+  const listaId = ctx.edId ? 'lista-ambientes-' + ctx.edId : 'lista-ambientes';
+  document.getElementById(listaId).appendChild(div);
   if (a.tipo === 'Quarto') atualizarBanheiroSuite(id);
 }
 
-function renumerarAmbientes() {
-  const visiveis  = ambientes.filter(a => !a.removido);
+/* Renumera uma lista de ambientes (Sala 1, Sala 2…) por tipo, no escopo dado. */
+function renumerarLista(arr) {
   const idxPorTipo = {};
-  visiveis.forEach(a => {
+  arr.filter(a => !a.removido).forEach(a => {
     idxPorTipo[a.tipo] = (idxPorTipo[a.tipo] || 0) + 1;
     const num  = idxPorTipo[a.tipo];
     const nome = (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim')
@@ -760,6 +1048,11 @@ function renumerarAmbientes() {
     if (elNome) elNome.textContent = nome;
     if (elNum)  elNum.style.display = 'flex';
   });
+}
+
+function renumerarAmbientes() {
+  renumerarLista(ambientes);
+  edificacoes.forEach(ed => renumerarLista(ed.ambientes));
 }
 
 /* ════════════════════════════════════════════════════════
@@ -968,9 +1261,17 @@ function salvarDado(scopeId, campo, valor) {
   atualizarBotao();
 }
 
+function _ambContext(id) {
+  if (ambientes.find(a => a.id === id)) return { arr: ambientes, edId: null };
+  for (const ed of edificacoes) {
+    if (ed.ambientes.find(a => a.id === id)) return { arr: ed.ambientes, edId: ed.id };
+  }
+  return { arr: ambientes, edId: null };
+}
+
 function getDados(id) {
-  const amb = ambientes.find(a => a.id === id);
-  return amb ? amb.dados : {};
+  const ctx = _ambContext(id);
+  return ctx.arr.find(a => a.id === id)?.dados || {};
 }
 
 /* ════════════════════════════════════════════════════════
@@ -997,9 +1298,10 @@ function atualizarBanheiroSuite(id) {
 }
 
 function atualizarNomeAmbiente(id) {
-  const amb = ambientes.find(a => a.id === id);
+  const ctx = _ambContext(id);
+  const amb = ctx.arr.find(a => a.id === id);
   if (!amb) return;
-  const visiveis = ambientes.filter(a => !a.removido && a.tipo === amb.tipo);
+  const visiveis = ctx.arr.filter(a => !a.removido && a.tipo === amb.tipo);
   const idx = visiveis.findIndex(a => a.id === id);
   if (idx < 0) return;
   const num    = idx + 1;
@@ -1045,7 +1347,8 @@ function contarPreenchidos(tipo, dados) {
 }
 
 function atualizarProgresso(id) {
-  const amb   = ambientes.find(a => a.id === id);
+  const ctx   = _ambContext(id);
+  const amb   = ctx.arr.find(a => a.id === id);
   const tipo  = amb ? amb.tipo : '';
   const dados = getDados(id);
   const pre   = contarPreenchidos(tipo, dados);
@@ -1069,7 +1372,8 @@ function atualizarProgresso(id) {
 function atualizarBotao() {
   const btn             = document.getElementById('btnExportar');
   const temLoc          = dadosLocalizacao.cep && dadosLocalizacao.numero;
-  const temComodo       = ambientes.filter(a => !a.removido).length > 0;
+  const temComodo       = ambientes.filter(a => !a.removido).length > 0
+    || edificacoes.some(ed => ed.ambientes.filter(a => !a.removido).length > 0);
   btn.disabled = !(temLoc && temComodo);
 
   if (temComodo) {
@@ -1086,6 +1390,105 @@ function montarComplemento() {
   const num   = document.getElementById('comp-numero').value.trim();
   const valor = tipo && num ? `${tipo} ${num}` : (tipo || num);
   salvarLoc('complemento', valor);
+}
+
+/* ════════════════════════════════════════════════════════
+   EDIFICAÇÕES
+   ════════════════════════════════════════════════════════ */
+function atualizarVisibilidadeEdificacoes() {
+  const tipo = dadosLocalizacao.tipo_imovel || '';
+  const comEd = TIPOS_COM_EDIFICACOES.includes(tipo);
+  document.getElementById('sec-edificacoes').style.display = comEd ? '' : 'none';
+  document.getElementById('sec-comodos').style.display     = comEd ? 'none' : '';
+}
+
+function renderSecaoEdificacoes() {
+  document.getElementById('sec-edificacoes').innerHTML = `
+    <div class="secao">
+      <div class="secao-header">
+        <div class="secao-icone">🏗️</div>
+        <div>
+          <div class="secao-titulo">Edificações</div>
+          <div class="secao-subtitulo">Cadastre cada construção e seus cômodos</div>
+        </div>
+      </div>
+      <div class="secao-body">
+        <div id="lista-edificacoes"></div>
+        <button class="btn-adicionar" onclick="adicionarEdificacao()">+ Adicionar Edificação</button>
+      </div>
+    </div>`;
+}
+
+function adicionarEdificacao() {
+  contadorEdificacoes++;
+  const edId = 'ed' + contadorEdificacoes;
+  const tiposEd = ['Sede','Casa de Funcionários','Galpão / Depósito','Área de Lazer Coberta','Piscina','Outro'];
+  const opts = tiposEd.map(t => `<option value="${t}">${t}</option>`).join('');
+
+  edificacoes.push({ id: edId, tipo: tiposEd[0], nome: '', areaConstr: '', ambientes: [], contador: 0 });
+
+  const div = document.createElement('div');
+  div.id = 'bloco-ed-' + edId;
+  div.className = 'ed-card';
+  div.innerHTML = `
+    <div class="ed-header">
+      <div class="ed-header-left">
+        <div class="select-wrap" style="min-width:180px">
+          <select onchange="salvarEdificacao('${edId}','tipo',this.value)">
+            ${opts}
+          </select>
+        </div>
+        <input type="text" class="ed-nome-input" placeholder="Nome livre (opcional)"
+          oninput="salvarEdificacao('${edId}','nome',this.value)">
+        <div class="campo" style="flex:0 0 140px">
+          <label class="campo-tip" tabindex="0" data-def="area_construida">Área construída (m²)<span class="tooltip-pop"></span></label>
+          <input type="number" min="0" step="0.01" placeholder="0.00"
+            oninput="salvarEdificacao('${edId}','areaConstr',this.value); recalcularAreasImovel()">
+        </div>
+      </div>
+      <button class="btn-remover" onclick="removerEdificacao('${edId}',event)">✕ Remover edificação</button>
+    </div>
+    <div class="ed-body">
+      <div id="lista-ambientes-${edId}" class="lista-ambientes-ed"></div>
+      ${htmlSeletorAmb(edId, '+ Adicionar cômodo', 'btn-adicionar-comodo')}
+    </div>`;
+  document.getElementById('lista-edificacoes').appendChild(div);
+  tooltipInit();
+  atualizarBotao();
+}
+
+function salvarEdificacao(edId, campo, valor) {
+  const ed = edificacoes.find(e => e.id === edId);
+  if (ed) ed[campo] = valor;
+}
+
+function removerEdificacao(edId, e) {
+  e.stopPropagation();
+  const idx = edificacoes.findIndex(e => e.id === edId);
+  if (idx >= 0) edificacoes.splice(idx, 1);
+  document.getElementById('bloco-ed-' + edId)?.remove();
+  recalcularAreasImovel();
+  atualizarBotao();
+}
+
+/* Mesmo fluxo de adicionarAmbiente(), mas no array da edificação:
+   reaproveita ambiente removido do mesmo tipo e renumera. */
+function adicionarAmbienteEd(edId, tipo) {
+  const ed = edificacoes.find(e => e.id === edId);
+  if (!ed) return;
+  const removido = ed.ambientes.find(a => a.removido && a.tipo === tipo);
+  if (removido) {
+    removido.removido = false;
+    document.getElementById('lista-ambientes-' + edId).innerHTML = '';
+    ed.ambientes.filter(a => !a.removido).forEach(a => renderBlocoAmbiente(a.id));
+  } else {
+    ed.contador++;
+    const id = edId + '_a' + ed.contador;
+    ed.ambientes.push({ id, tipo, dados: {}, removido: false });
+    renderBlocoAmbiente(id);
+  }
+  renumerarAmbientes();
+  atualizarBotao();
 }
 
 /* ════════════════════════════════════════════════════════
@@ -1111,6 +1514,20 @@ function exportarExcel() {
   camposTecnicos.forEach(([id, label]) => {
     const v = dadosLocalizacao[id];
     if (v) linhas.push(['Imóvel', 'Informações Técnicas', label, v]);
+  });
+
+  const camposCustos = [
+    ['custo_modalidade',   'Modalidade'],
+    ['custo_venda',        'Valor de venda (R$)'],
+    ['custo_aluguel',      'Valor de aluguel (R$/mês)'],
+    ['custo_condominio',   'Condomínio (R$/mês)'],
+    ['custo_iptu',         'IPTU (R$/ano)'],
+    ['custo_r_m2_venda',   'Valor por m² — venda (R$/m²)'],
+    ['custo_r_m2_aluguel', 'Valor por m² — aluguel (R$/m²)'],
+  ];
+  camposCustos.forEach(([id, label]) => {
+    const v = dadosLocalizacao[id];
+    if (v) linhas.push(['Imóvel', 'Custos', label, v]);
   });
 
   const camposEndereco = [
@@ -1147,15 +1564,31 @@ function exportarExcel() {
     }
   };
 
-  const contAtualPorTipo = {};
-  ambientes.filter(a => !a.removido).forEach(a => {
-    contAtualPorTipo[a.tipo] = (contAtualPorTipo[a.tipo] || 0) + 1;
-    const num    = contAtualPorTipo[a.tipo];
-    const nomeAmb = (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim')
-      ? `Suíte ${num}`
-      : `${a.tipo} ${num}`;
-    exportarComodo(nomeAmb, a.tipo, a.dados);
-  });
+  if (TIPOS_COM_EDIFICACOES.includes(dadosLocalizacao.tipo_imovel)) {
+    edificacoes.forEach(ed => {
+      const edLabel = ed.tipo + (ed.nome ? ` — ${ed.nome}` : '');
+      linhas.push(['[Edificação]', edLabel, '', '']);
+      if (ed.areaConstr) linhas.push(['[Edificação]', 'Áreas', 'Área construída (m²)', ed.areaConstr]);
+      const contEd = {};
+      ed.ambientes.filter(a => !a.removido).forEach(a => {
+        contEd[a.tipo] = (contEd[a.tipo] || 0) + 1;
+        const num = contEd[a.tipo];
+        const nomeAmb = (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim')
+          ? `Suíte ${num}` : `${a.tipo} ${num}`;
+        exportarComodo(nomeAmb, a.tipo, a.dados);
+      });
+    });
+  } else {
+    const contAtualPorTipo = {};
+    ambientes.filter(a => !a.removido).forEach(a => {
+      contAtualPorTipo[a.tipo] = (contAtualPorTipo[a.tipo] || 0) + 1;
+      const num    = contAtualPorTipo[a.tipo];
+      const nomeAmb = (a.tipo === 'Quarto' && a.dados.e_suite === 'Sim')
+        ? `Suíte ${num}`
+        : `${a.tipo} ${num}`;
+      exportarComodo(nomeAmb, a.tipo, a.dados);
+    });
+  }
 
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(linhas);
@@ -1167,7 +1600,15 @@ function exportarExcel() {
     .normalize('NFD').replace(/[̀-ͯ]/g,'')
     .replace(/[^a-zA-Z0-9]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'');
 
-  const compAbrev = limpar(dadosLocalizacao.complemento).slice(0,20);
+  const COMP_SIGLA = {
+    'Apartamento': 'AP', 'Casa': 'CS', 'Lote': 'LT',
+    'Sala': 'SL', 'Bloco': 'BL', 'Andar': 'AN', 'Conjunto': 'CJ',
+  };
+  const _compTipo = document.getElementById('comp-tipo')?.value || '';
+  const _compNum  = limpar(document.getElementById('comp-numero')?.value || '');
+  const compAbrev = _compTipo
+    ? (COMP_SIGLA[_compTipo] || limpar(_compTipo).slice(0,2).toUpperCase()) + (_compNum ? '_' + _compNum : '')
+    : limpar(dadosLocalizacao.complemento).slice(0,20);
   const cep  = (dadosLocalizacao.cep||'').replace(/\D/g,'') || 'SEMCEP';
   const num  = limpar(dadosLocalizacao.numero) || 'SN';
   const comp = compAbrev || '';
