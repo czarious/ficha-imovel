@@ -168,28 +168,28 @@
 - **Histórico:** 18/Jun/2026 — corrigido com `if (typeof DEFINICOES === 'undefined') return;` no topo de `tooltipInit()`.
 
 ### BUG-017 — CSS compartilhado duplicado em dois arquivos em vez de estar no CSS global
-- **Categoria:** Dead code / manutenção · **Primeira vez:** 18/Jun/2026 · **Status:** aberto
+- **Categoria:** Dead code / manutenção · **Primeira vez:** 18/Jun/2026 · **Status:** corrigido
 - **Sintoma:** qualquer ajuste visual no tooltip (sombra, border-radius, z-index) precisa ser feito em dois lugares; `.tooltip-prova` já só existe em `f-ficha.html`, provando que os dois já divergiram.
 - **Causa raiz:** o bloco `.campo-tip` foi adicionado tanto em `f-ficha.html` (inline `<style>`) quanto em `css/p-style.css`. A intenção era compartilhar, mas a implementação parou no meio — o lugar certo seria `css/g-global.css` (stylesheet já carregado por todas as páginas).
 - **Onde:** `f-ficha.html` linhas 77-84; `css/p-style.css` bloco `.campo-tip`.
 - **Como verificar:** grep por `.campo-tip` em `f-ficha.html`, `css/p-style.css` e `css/g-global.css`. Deve existir em **apenas um lugar** (g-global.css). Conferir que `.tooltip-prova` também migrou.
-- **Histórico:** 18/Jun/2026 — detectado na revisão; não corrigido ainda (baixo risco imediato).
+- **Histórico:** 18/Jun/2026 — detectado na revisão; não corrigido ainda (baixo risco imediato). 18/Jun/2026 — corrigido: bloco movido para `css/g-global.css`; removido de `f-ficha.html` e `css/p-style.css`; adicionada regra `.atributo-chave.campo-tip .tooltip-pop { left: auto; right: 0 }` para evitar overflow no portal.
 
 ### BUG-018 — Lógica de routing de tipo de imóvel (TIPOS_*) duplicada em 3 funções
-- **Categoria:** Arquitetura (DRY) · **Primeira vez:** 18/Jun/2026 · **Status:** aberto
+- **Categoria:** Arquitetura (DRY) · **Primeira vez:** 18/Jun/2026 · **Status:** corrigido
 - **Sintoma:** ao adicionar um novo tipo de imóvel, há 3 lugares que precisam ser atualizados em sincronia: `calcularAreaTotal()`, `calcularRporM2()` e `atualizarTooltipsProva()`. Esquecendo um, o cálculo fica certo mas a tooltip mostra a fórmula errada — falha silenciosa.
 - **Causa raiz:** `atualizarTooltipsProva()` precisava do mesmo branching `TIPOS_ED_AREA_CONSTRUIDA / TIPOS_SEM_EDIFICACAO / TIPOS_COM_EDIFICACOES / TIPOS_COM_CONDOMINIO` das funções de cálculo, e foi implementado como 3ª cópia em vez de extrair `resolverAreaBase(tipo)` como helper compartilhado.
 - **Onde:** `f-ficha.html` — `calcularAreaTotal()`, `calcularRporM2()`, `atualizarTooltipsProva()`.
 - **Como verificar:** grep por `TIPOS_ED_AREA_CONSTRUIDA` em `f-ficha.html`; o número de ocorrências deve ser 1 (na declaração) mais o helper centralizado. Mais de 1 ocorrência de uso = duplicação.
-- **Histórico:** 18/Jun/2026 — detectado na revisão; não refatorado (impacto baixo agora, alto ao escalar tipos).
+- **Histórico:** 18/Jun/2026 — detectado na revisão; não refatorado (impacto baixo agora, alto ao escalar tipos). 18/Jun/2026 — corrigido: `resolverAreaBase(tipo)` extraído como helper; retorna `'construida' | 'terreno' | 'privativa'`; as 3 funções agora delegam para ele.
 
 ### BUG-019 — escaparHTML() aplicado a conteúdo de autor confiável — double-encoding silencioso
-- **Categoria:** Arquitetura / renderização · **Primeira vez:** 18/Jun/2026 · **Status:** aberto
+- **Categoria:** Arquitetura / renderização · **Primeira vez:** 18/Jun/2026 · **Status:** fechado (não era bug)
 - **Sintoma:** qualquer HTML entity escrita em `g-definicoes.js` (ex.: `&mdash;`, `&nbsp;`) seria exibida literalmente como `&amp;mdash;` no tooltip do portal — sem erro visível, só texto errado.
 - **Causa raiz:** `p-render.js` usa `escaparHTML(def.texto)` para injetar o texto da definição no HTML do tooltip, mas `g-definicoes.js` é conteúdo de autor (source controlado, não user input). `escaparHTML` converte `&` em `&amp;`, o que double-encoda qualquer entity. O padrão correto para conteúdo confiável é usar o texto diretamente (como `insertAdjacentText` faz na ficha).
 - **Onde:** `js/p-render.js` linha 329; `js/g-definicoes.js` (regra de autoria).
 - **Como verificar:** grep por `escaparHTML(def.` em `p-render.js`. Se existir, avaliar se o conteúdo é de autor (confiável → remover `escaparHTML`) ou user input (não confiável → manter). Garantir que `g-definicoes.js` documenta que os textos devem usar Unicode puro, nunca HTML entities.
-- **Histórico:** 18/Jun/2026 — detectado na revisão; não corrigido (textos atuais são ASCII/Unicode puro, sem risco imediato).
+- **Histórico:** 18/Jun/2026 — detectado na revisão; não corrigido (textos atuais são ASCII/Unicode puro, sem risco imediato). 18/Jun/2026 — tentativa de correção revertida: remoção do `escaparHTML` cria XSS potencial (conteúdo autor é confiável, mas escaping é defesa em profundidade sem custo). `escaparHTML(def.texto)` mantido; regra de autoria em `g-definicoes.js` (só Unicode puro, sem HTML entities) resolve o double-encoding teórico. **Status: não é bug — comportamento correto.**
 
 ---
 

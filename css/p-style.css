@@ -496,11 +496,7 @@ body  {
   gap: 8px;
 }
 
-/* Tooltip (hover no label) — compartilhado com f-ficha via g-definicoes.js */
-.campo-tip { position: relative; cursor: help; text-decoration: underline dotted 1px currentColor; text-underline-offset: 3px; }
-.campo-tip .tooltip-pop { display: none; position: absolute; bottom: calc(100% + 8px); left: 0; width: 260px; max-width: 80vw; background: #1a1a1a; color: #f5f5f5; font-size: 12px; line-height: 1.55; padding: 10px 13px; border-radius: 8px; z-index: 999; text-transform: none; font-weight: 400; letter-spacing: 0; box-shadow: 0 4px 16px rgba(0,0,0,0.25); pointer-events: none; white-space: normal; }
-.campo-tip:hover .tooltip-pop,
-.campo-tip.ativo .tooltip-pop { display: block; }
+/* .campo-tip — definido em css/g-global.css */
 
 /* Grid de atributos (chave/valor) */
 .ficha-grid-atributos {

@@ -74,13 +74,7 @@
   .area-display { background: var(--accent-light); border: 1px solid var(--accent-border); border-radius: 8px; padding: 10px 13px; font-size: 15px; color: var(--accent); font-weight: 500; display: flex; align-items: center; gap: 5px; min-height: 41px; }
   .area-display small { font-size: 11px; font-weight: 400; color: #5A9470; }
 
-  /* ── TOOLTIP (hover no label) ── */
-  .campo-tip { position: relative; cursor: help; text-decoration: underline dotted 1px currentColor; text-underline-offset: 3px; }
-  .campo-tip .tooltip-pop { display: none; position: absolute; bottom: calc(100% + 8px); left: 0; width: 260px; max-width: 80vw; background: #1a1a1a; color: #f5f5f5; font-size: 12px; line-height: 1.55; padding: 10px 13px; border-radius: 8px; z-index: 999; text-transform: none; font-weight: 400; letter-spacing: 0; box-shadow: 0 4px 16px rgba(0,0,0,0.25); pointer-events: none; white-space: normal; }
-  .campo-tip:hover .tooltip-pop,
-  .campo-tip.ativo .tooltip-pop { display: block; }
-  .tooltip-prova { display: block; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.12); font-size: 11px; color: #b0c4b8; font-family: monospace; letter-spacing: 0; }
-  .tooltip-prova:empty { display: none; }
+  /* .campo-tip e .tooltip-prova — definidos em css/g-global.css */
 
   /* ── APELIDO ── */
   .apelido-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
@@ -700,20 +694,29 @@ function recalcularAreasImovel() {
   calcularRporM2();
 }
 
+/* Retorna qual referência de área usar para cálculos de custo e total por tipo de imóvel.
+   'construida' = soma das edificações | 'terreno' = área do terreno | 'privativa' = área privativa */
+function resolverAreaBase(tipo) {
+  if (TIPOS_ED_AREA_CONSTRUIDA.includes(tipo)) return 'construida';
+  if (TIPOS_SEM_EDIFICACAO.includes(tipo) || TIPOS_COM_EDIFICACOES.includes(tipo)) return 'terreno';
+  return 'privativa';
+}
+
 function calcularAreaTotal() {
   const tipo      = dadosLocalizacao.tipo_imovel || '';
   const privativa = parseFloat(dadosLocalizacao.area_privativa) || 0;
   const comum     = parseFloat(dadosLocalizacao.area_comum)     || 0;
   const terreno   = parseFloat(dadosLocalizacao.area_terreno)   || 0;
+  const base      = resolverAreaBase(tipo);
 
   let total = null;
-  if (TIPOS_ED_AREA_CONSTRUIDA.includes(tipo)) {
-    const constr = somaAreaConstruida();      // Galpão/Prédio Comercial → soma das edificações
+  if (base === 'construida') {
+    const constr = somaAreaConstruida();
     if (constr) total = constr;
-  } else if (TIPOS_SEM_EDIFICACAO.includes(tipo) || TIPOS_COM_EDIFICACOES.includes(tipo)) {
-    if (terreno) total = terreno;             // Lote + rurais (Chácara/Sítio/Fazenda) → terreno
+  } else if (base === 'terreno') {
+    if (terreno) total = terreno;
   } else if (privativa) {
-    total = TIPOS_COM_CONDOMINIO.includes(tipo) ? privativa + comum : privativa;  // edificados
+    total = TIPOS_COM_CONDOMINIO.includes(tipo) ? privativa + comum : privativa;
   }
 
   const str = total !== null ? total.toFixed(2) : '';
@@ -756,14 +759,10 @@ function atualizarVisibilidadeCustos() {
 
 function calcularRporM2() {
   const tipo = dadosLocalizacao.tipo_imovel || '';
-  let area;
-  if (TIPOS_ED_AREA_CONSTRUIDA.includes(tipo)) {
-    area = somaAreaConstruida();                              // Galpão/Prédio Comercial
-  } else if (TIPOS_SEM_EDIFICACAO.includes(tipo) || TIPOS_COM_EDIFICACOES.includes(tipo)) {
-    area = parseFloat(dadosLocalizacao.area_terreno) || 0;    // Lote + rurais
-  } else {
-    area = parseFloat(dadosLocalizacao.area_privativa) || 0;  // edificados (privativa, sem comum)
-  }
+  const base = resolverAreaBase(tipo);
+  const area = base === 'construida' ? somaAreaConstruida()
+             : base === 'terreno'    ? parseFloat(dadosLocalizacao.area_terreno)   || 0
+             :                        parseFloat(dadosLocalizacao.area_privativa)  || 0;
 
   const venda   = parseFloat(dadosLocalizacao.custo_venda)   || 0;
   const aluguel = parseFloat(dadosLocalizacao.custo_aluguel) || 0;
@@ -807,15 +806,16 @@ function atualizarTooltipsProva() {
   atualizarTipProva('tip-prova-fracao',    v.fracao    ? `Valor informado: ${v.fracao.toFixed(2)}%`      : '');
 
   /* Área total */
+  const base  = resolverAreaBase(tipo);
   const total = parseFloat(dadosLocalizacao.area_total) || 0;
   let provaTotal = '';
   if (total) {
-    if (TIPOS_ED_AREA_CONSTRUIDA.includes(tipo)) {
+    if (base === 'construida') {
       const eds = edificacoes.filter(e => e.areaConstr);
       provaTotal = eds.length > 1
         ? eds.map(e => parseFloat(e.areaConstr).toFixed(2)).join(' + ') + ` = ${total.toFixed(2)} m²`
         : `Área construída: ${total.toFixed(2)} m²`;
-    } else if (TIPOS_SEM_EDIFICACAO.includes(tipo) || TIPOS_COM_EDIFICACOES.includes(tipo)) {
+    } else if (base === 'terreno') {
       provaTotal = `Área do terreno: ${v.terreno.toFixed(2)} m²`;
     } else if (TIPOS_COM_CONDOMINIO.includes(tipo) && v.comum) {
       provaTotal = `${v.privativa.toFixed(2)} + ${v.comum.toFixed(2)} = ${total.toFixed(2)} m²`;
@@ -826,16 +826,16 @@ function atualizarTooltipsProva() {
   atualizarTipProva('tip-prova-area-total', provaTotal);
 
   /* R$/m² */
-  const areaRm2 = TIPOS_ED_AREA_CONSTRUIDA.includes(tipo) ? somaAreaConstruida()
-    : (TIPOS_SEM_EDIFICACAO.includes(tipo) || TIPOS_COM_EDIFICACOES.includes(tipo)) ? v.terreno
-    : v.privativa;
+  const areaRm2 = base === 'construida' ? somaAreaConstruida()
+                : base === 'terreno'    ? v.terreno
+                :                        v.privativa;
 
   let areaLabel = '';
   if (areaRm2) {
-    if (TIPOS_ED_AREA_CONSTRUIDA.includes(tipo)) {
+    if (base === 'construida') {
       const eds = edificacoes.filter(e => e.areaConstr);
       areaLabel = `Constr. (${eds.map(e => parseFloat(e.areaConstr).toFixed(2)).join(' + ')})`;
-    } else if (TIPOS_SEM_EDIFICACAO.includes(tipo) || TIPOS_COM_EDIFICACOES.includes(tipo)) {
+    } else if (base === 'terreno') {
       areaLabel = `Terreno (${v.terreno.toFixed(2)})`;
     } else {
       areaLabel = `Privativa (${v.privativa.toFixed(2)})`;
