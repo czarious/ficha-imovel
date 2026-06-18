@@ -29,7 +29,10 @@
         "Área útil (m²)": "61.00",
         "Área comum — fração ideal (m²)": "8.20",
         "Fração ideal (%)": "1.64",
-        "Área total (m²)": "76.20"
+        "Área total (m²)": "76.20",
+        "Piscina": "Não",
+        "Energia solar": "Sim",
+        "Energia solar — potência (kWp)": "5.50"
       },
       "Custos": {
         "Modalidade": "Venda e Locação",
@@ -215,7 +218,10 @@
       },
       "Informações Técnicas": {
         "Tipo de Imóvel": "Chácara",
-        "Área do terreno (m²)": "50000.00"
+        "Área do terreno (m²)": "50000.00",
+        "Piscina": "Sim",
+        "Energia solar": "Sim",
+        "Energia solar — potência (kWp)": "22.00"
       },
       "Custos": {
         "Modalidade": "Venda",

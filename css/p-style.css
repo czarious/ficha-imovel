@@ -1,4 +1,4 @@
-/* arquivo: p-style.css | versao: 0.7.7 */
+/* arquivo: p-style.css | versao: 0.7.8 */
 /* ============================================================
    Zillow BR — Estilos Globais
    Paleta: fundo #F5F3EE | verde #2B5F3E | DM Sans + DM Serif Display
@@ -498,7 +498,7 @@ body  {
 
 /* .campo-tip — definido em css/g-global.css */
 
-/* Grid de atributos (chave/valor) */
+/* Grid de atributos — usado nos grupos internos dos cômodos */
 .ficha-grid-atributos {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -522,6 +522,34 @@ body  {
 }
 .atributo-valor {
   font-size: 0.9rem;
+  color: var(--texto);
+  font-weight: 500;
+}
+
+/* Tabela de atributos (chave/valor) */
+.ficha-tabela-grupo { margin-bottom: 20px; }
+.ficha-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border: 1px solid var(--borda);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  font-size: 0.88rem;
+}
+.ficha-tabela tr { border-bottom: 1px solid var(--borda); }
+.ficha-tabela tr:last-child { border-bottom: none; }
+.ficha-tabela tr:hover { background: var(--bg-hover, #f9fafb); }
+.ficha-tabela td { padding: 9px 14px; vertical-align: middle; }
+.ficha-tabela td:first-child {
+  color: var(--texto-fraco);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  width: 52%;
+}
+.ficha-tabela td:last-child {
   color: var(--texto);
   font-weight: 500;
 }
@@ -1061,4 +1089,39 @@ body  {
   border-radius: 20px;
   padding: 3px 10px;
 }
+.ed-container {
+  background: var(--bg);
+  border: 2px solid var(--verde);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: var(--sombra);
+}
+.ed-container-header {
+  background: var(--verde-sutil);
+  border-bottom: 1px solid var(--verde);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.ed-container-header:hover { filter: brightness(0.97); }
+.ed-container-nome {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--verde);
+  flex: 1;
+}
+.ed-container-arrow {
+  color: var(--verde);
+  font-size: 1rem;
+  transition: transform 0.2s;
+}
+.ed-container-arrow.aberto { transform: rotate(180deg); }
+.ed-container-body { padding: 16px 16px 4px 16px; }
+.ed-comodos-lista { display: flex; flex-direction: column; gap: 16px; }
+.ed-comodos-lista .comodo-card { border: 2px solid var(--verde); }
 

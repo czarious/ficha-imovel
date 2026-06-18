@@ -41,18 +41,32 @@ Nível técnico:
 - Respostas diretas e sem enrolação
 - Nunca atualize o Obsidian sem mostrar o conteúdo antes e aguardar aprovação
 
+## Agentes — Papéis e Contratos
+
+| Papel | Quem | Responsabilidade |
+|---|---|---|
+| **Executor** | Claude (conversa principal) | Implementa features e correções, um arquivo por vez, aguardando confirmação do César |
+| **censor-subagent** | `.claude/agents/censor-subagent.md` | Revisão sistemática antes do commit — 8 fases (regressão BUGS.md, /code-review, referências cruzadas, lógica manual, tamanho, nomenclatura, BUGS.md novo, impacto DEPS.md); entrega relatório CONFIRMAR/OBSERVAR/LIMPO |
+| **terminus-subagent** | `.claude/agents/terminus-subagent.md` | Bumpa cabeçalhos, atualiza `DEPS.md`, escreve changelog, commita e faz push |
+
+**Fluxo:** executor implementa → appenda ao `RASCUNHO` em `g-versao.js` → censor revisa → César autoriza → terminus fecha.
+
+**O `RASCUNHO`** vive no final de `js/g-versao.js` entre os marcadores `>> RASCUNHO_INICIO` e `RASCUNHO_FIM <<`. É o único handoff entre os agentes — executor acumula durante a sessão, terminus consome ao fechar.
+
+**Arquivos protegidos — nenhum SA toca sem instrução explícita:**
+`CLAUDE.md` · `js/g-config.js` · `dominios/f-dominios.json` · `dados/config-teste.js` · `.claude/*`
+
+**Regra de ouro:** commit e push nunca são automáticos. Terminus age apenas após autorização explícita do César na conversa principal.
+
 ## Fluxo de Teste e Deploy
 
-> **Regra de ouro — verificar no início de cada sessão antes de qualquer edição:**
-> - `dados/config-teste.js` deve estar `DADOS_TESTE = true` para fazer qualquer alteração no código
-> - `dados/config-teste.js` deve estar `DADOS_TESTE = false` no momento do commit/push
-> - Nunca editar código com modo teste desligado; nunca commitar com modo teste ligado
+> `DADOS_TESTE = true` é o estado permanente — sócios usam o portal com dados de teste.
+> Nunca alterar `dados/config-teste.js` antes de commitar.
 
-1. **Verificar** que `DADOS_TESTE = true` antes de começar qualquer edição
-2. Edições feitas localmente em `G:\Meu Drive\GitHub\ficha-imovel`
-3. César abre os arquivos editados pelo **Live Server do VS Code** (botão direito → Open with Live Server) para confirmar visualmente que os fixes/features funcionam
-4. Só após confirmação do César → setar `DADOS_TESTE = false` → commit + push → setar `DADOS_TESTE = true` novamente
-5. GitHub Pages atualiza automaticamente após o push — esse é o "live" para usuários finais
+1. Edições feitas localmente em `G:\Meu Drive\GitHub\ficha-imovel`
+2. César abre os arquivos editados pelo **Live Server do VS Code** (botão direito → Open with Live Server) para confirmar visualmente que os fixes/features funcionam
+3. Após confirmação do César → commit + push
+4. GitHub Pages atualiza automaticamente após o push — esse é o "live" para usuários finais
 
 **Antes de cada commit/push:** apresentar lista do que foi feito e perguntar se sobe versão.
 - **Sem bump de versão:** correção de algo recém-implementado que nem foi testado pelo César

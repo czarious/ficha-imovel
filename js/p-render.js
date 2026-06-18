@@ -1,4 +1,4 @@
-/* arquivo: p-render.js | versao: 0.7.7 */
+/* arquivo: p-render.js | versao: 0.7.8 */
 /* ============================================================
    p-render.js — Renderização da ficha técnica completa (p-imovel.html)
    Depende de: p-ui.js (formatarData, formatarEndereco)
@@ -77,22 +77,30 @@ function renderizarFicha(imovel) {
    EDIFICAÇÕES
    ================================================================ */
 function renderEdificacoes(edificacoes) {
-  let html = '';
-  edificacoes.forEach((ed, i) => {
-    const titulo = ed.nome || `Edificação ${i + 1}`;
+  const containers = edificacoes.map((ed, i) => {
+    const titulo    = ed.nome || `Edificação ${i + 1}`;
     const areaConstr = ed['Área construída (m²)'];
-    const areaInfo = areaConstr ? `<span class="ed-area-tag">🏗 ${areaConstr} m²</span>` : '';
-    const tituloCompleto = `🏚 ${titulo} ${areaInfo}`;
-    let comodosHTML = '';
-    if (ed.comodos && ed.comodos.length > 0) {
-      comodosHTML = `<div class="comodos-lista">${ed.comodos.map((c, idx) => renderComodoAccordion(c, idx)).join('')}</div>`;
-    }
-    html += renderSecaoAccordion(`ed-${i}`, tituloCompleto, comodosHTML, i === 0);
-  });
+    const areaTag   = areaConstr ? `<span class="ed-area-tag">🏗 ${areaConstr} m²</span>` : '';
+    const comodosHTML = (ed.comodos && ed.comodos.length > 0)
+      ? `<div class="ed-comodos-lista">${ed.comodos.map((c, idx) => renderComodoAccordion(c, idx)).join('')}</div>`
+      : '';
+    return `
+      <div class="ed-container">
+        <div class="ed-container-header" onclick="toggleEdContainer(${i})">
+          <span class="ed-container-nome">🏚 ${escaparHTML(titulo)}</span>
+          ${areaTag}
+          <span class="ed-container-arrow aberto" id="arrow-ed-${i}">▾</span>
+        </div>
+        <div class="ed-container-body" id="corpo-ed-${i}">
+          ${comodosHTML}
+        </div>
+      </div>`;
+  }).join('');
+
   return `
     <section class="ficha-secao">
       <h2 class="ficha-secao-titulo">🏗 Edificações</h2>
-      ${html}
+      ${containers}
     </section>`;
 }
 
@@ -242,8 +250,10 @@ function renderGruposImovel(imovel) {
       .normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '-');
 
     html += renderSecaoAccordion(idSec, `${icone} ${grupo}`,
-      `<div class="ficha-grid-atributos">
-        ${entradas.map(([k, v]) => renderAtributo(k, v)).join('')}
+      `<div class="ficha-tabela-grupo">
+        <table class="ficha-tabela">
+          ${entradas.map(([k, v]) => renderAtributoTabela(k, v)).join('')}
+        </table>
       </div>`, true);
   }
   return html;
@@ -263,6 +273,15 @@ function renderSecaoAccordion(id, titulo, conteudoHTML, aberta) {
         ${conteudoHTML}
       </div>
     </section>`;
+}
+
+function toggleEdContainer(i) {
+  const corpo = document.getElementById('corpo-ed-' + i);
+  const arrow = document.getElementById('arrow-ed-' + i);
+  if (!corpo) return;
+  const aberto = corpo.style.display !== 'none';
+  corpo.style.display = aberto ? 'none' : 'block';
+  arrow?.classList.toggle('aberto', !aberto);
 }
 
 function toggleSecaoFicha(id) {
@@ -317,6 +336,21 @@ function toggleComodoFicha(idComodo) {
 /* ================================================================
    HELPERS
    ================================================================ */
+function renderAtributoTabela(chave, valor) {
+  let valorFormatado = valor;
+  if (valor === 'Sim') valorFormatado = '<span style="color:var(--verde);font-weight:700;">✓ Sim</span>';
+  else if (valor === 'Não' || valor === 'Nao') valorFormatado = '<span style="color:var(--texto-fraco);">✗ Não</span>';
+  else if (chave.includes('(R$') && valor && !isNaN(parseFloat(valor)))
+    valorFormatado = parseFloat(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  const def = typeof getDefPorLabel === 'function' ? getDefPorLabel(chave) : null;
+  const chaveHTML = def
+    ? `<span class="campo-tip" tabindex="0">${escaparHTML(chave)}<span class="tooltip-pop">${escaparHTML(def.texto)}</span></span>`
+    : escaparHTML(chave);
+
+  return `<tr><td>${chaveHTML}</td><td>${valorFormatado}</td></tr>`;
+}
+
 function renderAtributo(chave, valor) {
   let valorFormatado = valor;
   if (valor === 'Sim') valorFormatado = '<span style="color:var(--verde);font-weight:700;">✓ Sim</span>';

@@ -5,8 +5,8 @@
    ============================================================ */
 
 /* ── VERSÕES ─────────────────────────────────────────────── */
-const VERSAO_PORTAL = '0.7.7';
-const VERSAO_ATUAL  = '0.7.7'; /* ficha */
+const VERSAO_PORTAL = '0.7.8';
+const VERSAO_ATUAL  = '0.7.8'; /* ficha */
 
 /* ── CHANGELOG UNIFICADO (≥ 0.7.1) ───────────────────────────
    A partir da unificação, cada versão tem UMA entrada aqui (sem
@@ -14,6 +14,32 @@ const VERSAO_ATUAL  = '0.7.7'; /* ficha */
    CHANGELOG (ficha) e CHANGELOG_PORTAL, exibidas divididas no
    g-changelog.html. */
 const CHANGELOG_GERAL = [
+  {
+    versao: '0.7.8',
+    data:   '18/Jun/2026',
+    titulo: 'Piscina, energia solar e melhorias visuais no portal',
+    grupos: [
+      {
+        categoria: 'Interface & Funcionalidades',
+        itens: [
+          'Ficha: novo campo Piscina (Sim/Não)',
+          'Ficha: novo campo Energia solar (Sim/Não) com campo condicional de potência (kWp)',
+          'Portal: Localização, Informações Técnicas e Custos agora exibidos em tabela (chave/valor)',
+          'Portal: hierarquia visual de Edificações corrigida — cada edificação é um container colapsável com borda verde; cômodos ficam dentro do container',
+        ]
+      },
+      {
+        categoria: 'Sistema & Código',
+        itens: [
+          'f-ficha.html: exporta Piscina, Energia solar e Energia solar — potência (kWp) para Informações Técnicas no Excel',
+          'p-render.js: renderAtributoTabela() para grupos do imóvel; renderEdificacoes() reescrito com ed-container + toggleEdContainer()',
+          'p-style.css: estilos .ficha-tabela, .ed-container, .ed-container-header/nome/arrow/body, .ed-comodos-lista adicionados; .atributo mantido para cômodos',
+          'censor-subagent.md: Skill adicionado ao frontmatter para permitir invocação de /code-review',
+          'dados/imoveis-teste.json: campos de piscina e energia solar adicionados nos dois imóveis de teste',
+        ]
+      }
+    ]
+  },
   {
     versao: '0.7.7',
     data:   '18/Jun/2026',
@@ -594,3 +620,24 @@ function abrirChangelog() {
 function abrirChangelogPortal() {
   window.location.href = 'g-changelog.html';
 }
+
+/* ================================================================
+   RASCUNHO — staging area da sessão atual
+   Preenchido pelo executor (Claude) e pelo censor-subagent.
+   Lido pelo terminus-subagent ao fechar a versão.
+
+   terminus sempre pode fazer commit + push (independente do recheio).
+   Com recheio + bump: escreve entrada no CHANGELOG_GERAL, bumpa versões, apaga recheio, commita, push.
+   Sem recheio (ou sem bump): pula a parte do changelog e vai direto para commit + push.
+   Nova entrada do CHANGELOG_GERAL é inserida ACIMA desta seção.
+   ================================================================ */
+
+/* >> RASCUNHO_INICIO
+
+const RASCUNHO = {
+  titulo: '',
+  interface: [],
+  sistema: [],
+};
+
+RASCUNHO_FIM << */

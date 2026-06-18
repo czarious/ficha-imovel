@@ -1,5 +1,5 @@
 <!-- DESTINO: f-ficha.html -->
-<!-- arquivo: f-ficha.html | versao: 0.7.7 -->
+<!-- arquivo: f-ficha.html | versao: 0.7.8 -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -110,6 +110,8 @@
   /* ── BANHEIRO SUÍTE ── */
   .banheiro-grupo { margin-top: 20px; border: 1px solid #D4B8F0; border-radius: 8px; overflow: hidden; display: none; }
   .banheiro-grupo.visivel { display: block; }
+  .campo-cond { display: none; }
+  .campo-cond.visivel { display: block; }
   .banheiro-header { background: #F7F0FD; padding: 10px 16px; border-bottom: 1px solid #D4B8F0; font-size: 12px; font-weight: 500; color: #6B3FA0; text-transform: uppercase; letter-spacing: 0.07em; }
   .banheiro-body { padding: 16px; }
 
@@ -416,6 +418,38 @@ function renderLocalizacao() {
             </div>
           </div>
 
+          <!-- ── BLOCO DE CARACTERÍSTICAS ── -->
+          <div class="grupo-label" style="margin-top:8px">Características</div>
+
+          <div class="grid-2">
+            <div class="campo">
+              <label>Piscina</label>
+              <div class="select-wrap">
+                <select onchange="salvarLoc('piscina',this.value); atualizarCaracteristicas()">
+                  <option value="" ${!dadosLocalizacao.piscina?'selected':''}>—</option>
+                  <option value="Sim" ${dadosLocalizacao.piscina==='Sim'?'selected':''}>Sim</option>
+                  <option value="Não" ${dadosLocalizacao.piscina==='Não'?'selected':''}>Não</option>
+                </select>
+              </div>
+            </div>
+            <div class="campo">
+              <label>Energia solar</label>
+              <div class="select-wrap">
+                <select onchange="salvarLoc('energia_solar',this.value); atualizarCaracteristicas()">
+                  <option value="" ${!dadosLocalizacao.energia_solar?'selected':''}>—</option>
+                  <option value="Sim" ${dadosLocalizacao.energia_solar==='Sim'?'selected':''}>Sim</option>
+                  <option value="Não" ${dadosLocalizacao.energia_solar==='Não'?'selected':''}>Não</option>
+                </select>
+              </div>
+              <div id="row-solar-potencia" class="campo-cond ${dadosLocalizacao.energia_solar==='Sim'?'visivel':''}">
+                <label style="margin-top:8px">Potência instalada prevista (kWp)</label>
+                <input type="number" id="campo-solar-potencia" min="0" step="0.01" placeholder="Ex: 5.50"
+                  value="${dadosLocalizacao.energia_solar_potencia||''}"
+                  oninput="salvarLoc('energia_solar_potencia',this.value)">
+              </div>
+            </div>
+          </div>
+
           <!-- ── BLOCO DE CUSTOS ── -->
           <div id="bloco-custos" style="display:none">
             <div class="grupo-label" style="margin-top:8px">Custos</div>
@@ -647,6 +681,16 @@ async function buscarCEP(cep) {
 }
 
 function salvarLoc(campo, valor) { dadosLocalizacao[campo] = valor; }
+
+function atualizarCaracteristicas() {
+  const solarSim = dadosLocalizacao.energia_solar === 'Sim';
+  document.getElementById('row-solar-potencia')?.classList.toggle('visivel', solarSim);
+  if (!solarSim) {
+    dadosLocalizacao.energia_solar_potencia = '';
+    const el = document.getElementById('campo-solar-potencia');
+    if (el) el.value = '';
+  }
+}
 
 /* ════════════════════════════════════════════════════════
    ÁREAS DO IMÓVEL
@@ -1509,7 +1553,10 @@ function exportarExcel() {
     ['area_util','Área útil (m²)'],
     ['area_comum','Área comum — fração ideal (m²)'],
     ['fracao_ideal','Fração ideal (%)'],
-    ['area_total','Área total (m²)']
+    ['area_total','Área total (m²)'],
+    ['piscina','Piscina'],
+    ['energia_solar','Energia solar'],
+    ['energia_solar_potencia','Energia solar — potência (kWp)'],
   ];
   camposTecnicos.forEach(([id, label]) => {
     const v = dadosLocalizacao[id];

@@ -5,7 +5,7 @@
 > Contexto do projeto, decisões de arquitetura e regras de trabalho ficam em **CLAUDE.md** — não duplicar aqui.
 
 > Atualizar sempre que adicionar, remover ou renomear arquivo, link ou dependência.  
-> Auditado em: 18/Jun/2026 · versão portal 0.7.7 / ficha 0.7.7
+> Auditado em: 18/Jun/2026 · versão portal 0.7.8 / ficha 0.7.8
 
 ---
 
@@ -17,13 +17,13 @@
 
 | Arquivo | Versão atual | Última mudança relevante |
 |---------|-------------|--------------------------|
-| `f-ficha.html` | 0.7.7 | Seção Edificações (Chácara/Sítio/Fazenda/Galpão/Prédio Comercial) + tooltips em 13 campos |
-| `js/g-versao.js` | 0.7.7 | `VERSAO_PORTAL=0.7.7` / `VERSAO_ATUAL=0.7.7`; changelog v0.7.7 (Edificações + tooltips) |
+| `f-ficha.html` | 0.7.8 | Campos Piscina e Energia solar |
+| `js/g-versao.js` | 0.7.8 | `VERSAO_PORTAL=0.7.8` / `VERSAO_ATUAL=0.7.8`; changelog v0.7.8 (Piscina, energia solar e melhorias visuais) |
 | `js/g-definicoes.js` | 0.7.7 | Fonte única de 13 definições de termos imobiliários; expõe `DEFINICOES` e `getDefPorLabel()` |
 | `js/g-menu.js` | 0.7.2 | Badge de versão detecta ficha vs portal pelo pathname |
 | `js/g-config.js` | 0.7.1 | Constantes globais do app (APP_NOME, TOAST_KEY, Drive IDs) |
 | `js/g-geo.js` | 0.7.1 | Geocodificação via Nominatim |
-| `js/p-render.js` | 0.7.7 | renderEdificacoes() + tooltips via getDefPorLabel() + renderAtributo() formata R$ |
+| `js/p-render.js` | 0.7.8 | renderAtributoTabela() para tabela chave/valor + renderEdificacoes() reescrito com ed-container |
 | `js/p-mapa.js` | 0.7.2 | invalidateSize() — mapa renderiza completo ao abrir |
 | `js/p-storage.js` | 0.7.1 | CRUD no Google Drive (list, upload, download, delete) |
 | `js/p-parser.js` | 0.7.7 | Suporte a marcador `[Edificação]`; popula `imovel.edificacoes[]`; fallback para `imovel.comodos` |
@@ -33,7 +33,7 @@
 | `js/p-import.js` | 0.7.1 | Pipeline completo de importação (parse→valida→duplicata→salva) |
 | `js/p-acoes.js` | 0.7.1 | Copiar link, WhatsApp, excluir imóvel |
 | `css/g-global.css` | 0.7.1 | Sidebar CSS + tokens globais |
-| `css/p-style.css` | 0.7.7 | Estilos edificações no portal + `.campo-tip` tooltips |
+| `css/p-style.css` | 0.7.8 | Estilos `.ficha-tabela`, `.ed-container*` para exibição de grupos em tabela e edificações |
 | `index.html` | 0.7.7 | Select filtro-modalidade (Venda / Locação) |
 | `p-imovel.html` | 0.7.7 | Carrega `js/g-definicoes.js`; flag DADOS_TESTE (modo de teste local) |
 | `cadastro.html` | 0.7.1 | Tutorial + importação |
